@@ -1,19 +1,17 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
+
+defined('SYSPATH') or die('No direct script access.');
 
 // -- Environment setup --------------------------------------------------------
-
 // Load the core Kohana class
-require SYSPATH.'classes/kohana/core'.EXT;
+require SYSPATH . 'classes/kohana/core' . EXT;
 
-if (is_file(APPPATH.'classes/kohana'.EXT))
-{
-	// Application extends the core
-	require APPPATH.'classes/kohana'.EXT;
-}
-else
-{
-	// Load empty core extension
-	require SYSPATH.'classes/kohana'.EXT;
+if (is_file(APPPATH . 'classes/kohana' . EXT)) {
+    // Application extends the core
+    require APPPATH . 'classes/kohana' . EXT;
+} else {
+    // Load empty core extension
+    require SYSPATH . 'classes/kohana' . EXT;
 }
 
 /**
@@ -61,9 +59,8 @@ I18n::lang('en-us');
  * Note: If you supply an invalid environment name, a PHP warning will be thrown
  * saying "Couldn't find constant Kohana::<INVALID_ENV_NAME>"
  */
-if (isset($_SERVER['KOHANA_ENV']))
-{
-	Kohana::$environment = constant('Kohana::'.strtoupper($_SERVER['KOHANA_ENV']));
+if (isset($_SERVER['KOHANA_ENV'])) {
+    Kohana::$environment = constant('Kohana::' . strtoupper($_SERVER['KOHANA_ENV']));
 }
 
 /**
@@ -80,14 +77,14 @@ if (isset($_SERVER['KOHANA_ENV']))
  * - boolean  caching     enable or disable internal caching                 FALSE
  */
 Kohana::init(array(
-	'base_url'   => '/',
-	'index_file' => '',
+    'base_url' => '/',
+    'index_file' => '',
 ));
 
 /**
  * Attach the file write to logging. Multiple writers are supported.
  */
-Kohana::$log->attach(new Log_File(APPPATH.'logs'));
+Kohana::$log->attach(new Log_File(APPPATH . 'logs'));
 
 /**
  * Attach a file reader to config. Multiple readers are supported.
@@ -98,17 +95,17 @@ Kohana::$config->attach(new Config_File);
  * Enable modules. Modules are referenced by a relative or absolute path.
  */
 Kohana::modules(array(
-	//'auth'       => MODPATH.'auth',       // Basic authentication
-	'cache'      => MODPATH.'cache',      // Custom caching
-	//'codebench'  => MODPATH.'codebench',  // Benchmarking tool
-	//'database'   => MODPATH.'database',   // Database access
-	//'image'      => MODPATH.'image',      // Image manipulation
-	//'oauth'      => MODPATH.'oauth',      // OAuth authentication
-	//'orm'        => MODPATH.'orm',        // Object Relationship Mapping
-	//'pagination' => MODPATH.'pagination', // Paging of results
-	//'userguide'  => MODPATH.'userguide',  // User guide and API documentation
-	'kostache'   => MODPATH.'kostache',  // Kostache templating
-	));
+    //'auth'       => MODPATH.'auth',       // Basic authentication
+    'cache' => MODPATH . 'cache', // Custom caching
+    //'codebench'  => MODPATH.'codebench',  // Benchmarking tool
+    //'database'   => MODPATH.'database',   // Database access
+    //'image'      => MODPATH.'image',      // Image manipulation
+    //'oauth'      => MODPATH.'oauth',      // OAuth authentication
+    //'orm'        => MODPATH.'orm',        // Object Relationship Mapping
+    //'pagination' => MODPATH.'pagination', // Paging of results
+    //'userguide'  => MODPATH.'userguide',  // User guide and API documentation
+    'kostache' => MODPATH . 'kostache', // Kostache templating
+));
 
 /*
  * We want to show the world we're running on... Kohana of course!
@@ -120,52 +117,52 @@ Kohana::$expose = TRUE;
  * defaults for the URI.
  */
 Route::set('error', 'error')
-	->defaults(array(
-		'controller' => 'home',
-		'action'     => 'error'
-	));
+    ->defaults(array(
+        'controller' => 'home',
+        'action' => 'error'
+    ));
 
 Route::set('download', 'download')
-	->defaults(array(
-		'controller' => 'download',
-		'action'     => 'index'
-	));
+    ->defaults(array(
+        'controller' => 'download',
+        'action' => 'index'
+    ));
 
 Route::set('documentation', 'documentation')
-	->defaults(array(
-		'controller' => 'documentation',
-		'action'     => 'index'
-	));
+    ->defaults(array(
+        'controller' => 'documentation',
+        'action' => 'index'
+    ));
 
 Route::set('development', 'development')
-	->defaults(array(
-		'controller' => 'development',
-		'action'     => 'index'
-	));
+    ->defaults(array(
+        'controller' => 'development',
+        'action' => 'index'
+    ));
 
 Route::set('team', 'team')
-	->defaults(array(
-		'controller' => 'team',
-		'action'     => 'index'
-	));
+    ->defaults(array(
+        'controller' => 'team',
+        'action' => 'index'
+    ));
 
 Route::set('license', 'license')
-	->defaults(array(
-		'controller' => 'license',
-		'action'     => 'index'
-	));
+    ->defaults(array(
+        'controller' => 'license',
+        'action' => 'index'
+    ));
 
-	Route::set('donate', 'donate')
-		->defaults(array(
-			'controller' => 'donate',
-			'action'     => 'index'
-		));
+Route::set('donate', 'donate')
+    ->defaults(array(
+        'controller' => 'donate',
+        'action' => 'index'
+    ));
 
 Route::set('home', '(index)')
-	->defaults(array(
-		'controller' => 'home',
-		'action'     => 'index'
-	));
+    ->defaults(array(
+        'controller' => 'home',
+        'action' => 'index'
+    ));
 
 // // Handles: feed/$type.rss and feed/$type.atom
 // Route::set('feed', 'feed/<name>', array('name' => '.+'))

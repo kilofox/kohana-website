@@ -3,18 +3,18 @@
 $(document).ready(function() {
 
 	$("#galleryContainer").mouseenter(function(event) {
-	
+
 		var text = $(event.target).parent().closest();
 
 		$(text).animate({
 			top: "180px"
-		}, 300);;
-	
+		}, 300);
+
 		$("#gallery div.information").animate({
 			top: "180px"
 		}, 300);
 	});
-	
+
 	$("#galleryContainer").mouseleave(function() {
 		$("#gallery div.information").animate({
 			top: "255px"
@@ -23,11 +23,11 @@ $(document).ready(function() {
 
 	$("#galleryContainer").slides({
 		playInterval: 10000,
-		effect: 'slide', 
+		effect: 'slide',
 		navigation: false,
 		pagination: false,
 		slide: {
-			browserWindow: false, 
+			browserWindow: false,
 			interval: 600
 		},
 		container: "sliderContent"
@@ -35,11 +35,11 @@ $(document).ready(function() {
 
 	$("#whoGallery").slides({
 		playInterval: 10000,
-		effect: 'slide', 
+		effect: 'slide',
 		navigation: false,
 		pagination: false,
 		slide: {
-			browserWindow: false, 
+			browserWindow: false,
 			interval: 600
 		}
 	});

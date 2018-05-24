@@ -1,17 +1,19 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
-class View_License_Index extends Kostache_Layout {
+defined('SYSPATH') or die('No direct script access.');
+class View_License_Index extends Kostache_Layout
+{
+    /**
+     * @var     array    partials for the page
+     */
+    protected $_partials = array(
+        'header' => 'partials/header',
+        'footer' => 'partials/footer',
+    );
 
-	/**
-	 * @var     array    partials for the page
-	 */
-	protected $_partials = array(
-		'header'   => 'partials/header',
-		'footer'   => 'partials/footer',
-	);
+    /**
+     * @var     boolean   show the banner space on template
+     */
+    public $banner_exists = FALSE;
 
-	/**
-	 * @var     boolean   show the banner space on template
-	 */
-	public $banner_exists = FALSE;
 }

@@ -50,7 +50,7 @@ Normalize monospace sizing:
 en.wikipedia.org/wiki/MediaWiki_talk:Common.css/Archive_11#Teletype_style_fix_for_Chrome
 */
 pre, code, kbd, samp { font-family: monospace, sans-serif; }
- 
+
 /* 
 Minimal base styles 
 */
@@ -65,7 +65,7 @@ td, td img { vertical-align: top; }
 sub { vertical-align: sub; font-size: smaller; }
 sup { vertical-align: super; font-size: smaller; }
 pre { /* www.pathf.com/blogs/2008/05/formatting-quoted-code-in-blog-posts-css21-white-space-pre-wrap/ */
-white-space: pre; /* CSS2 */ white-space: pre-wrap; /* CSS 2.1 */ white-space: pre-line; /* CSS 3 (and 2.1 as well, actually) */ word-wrap: break-word; /* IE */ }
+	white-space: pre; /* CSS2 */ white-space: pre-wrap; /* CSS 2.1 */ white-space: pre-line; /* CSS 3 (and 2.1 as well, actually) */ word-wrap: break-word; /* IE */ }
 textarea { overflow:auto; } /* thnx ivannikolic! www.sitepoint.com/blogs/2010/08/20/ie-remove-textarea-scrollbars/ */
 .ie6 legend, .ie7 legend { margin-left:-7px; } /* thnx ivannikolic! */
 
@@ -92,7 +92,7 @@ a:link { -webkit-tap-highlight-color:#8aaa1a; } /* j.mp/webkit-tap-highlight-col
 www.viget.com/inspire/styling-the-button-element-in-internet-explorer/
 */
 button {  width:auto; overflow:visible; padding:0 .25em; }
- 
+
 /*
 Bicubic resizing for non-native sized IMG: 
 code.flickr.com/blog/2008/11/12/on-ui-quality-the-little-things-client-side-image-resizing/
@@ -117,12 +117,12 @@ body { background-color:#cdda9e; background-image:url(../img/headerBkg-2.png); b
 
 /* .wrapper hold all of the content of the site, including header, nav, banner, etc. */
 .wrapper { width:980px; margin:auto; }
-	
+
 /* .container holds the content are, excluding header, main nav, logo, banner */ 
 .container { background:#fcf6ea url(../img/contentMainBkg.gif); -moz-border-radius:5px; -webkit-border-radius:5px; border-radius:5px; margin-top:20px; }
-	
+
 footer { background:#81a20d url(../img/logoFooter.png) no-repeat 20px center; -moz-border-radius:0 0 5px 5px; -webkit-border-bottom-left-radius:5px; -webkit-border-bottom-right-radius:5px; border-radius:0 0 5px 5px; }
-		
+
 #banner,
 .container>section,
 .container>div,
@@ -426,24 +426,24 @@ Grade-A Mobile Browsers (Opera Mobile, iPhone Safari, Android Chrome)
 Consider this: www.cloudfour.com/css-media-query-for-mobile-is-fools-gold/
 */
 @media screen and (max-device-width: 480px) {
-html { -webkit-text-size-adjust:none; -ms-text-size-adjust:none; }
+	html { -webkit-text-size-adjust:none; -ms-text-size-adjust:none; }
 }
 
 /*
 Print styles (inlined to avoid required HTTP connection) www.phpied.com/delay-loading-your-print-css/
 */
 @media print {
-* { background: transparent !important; color: #444 !important; text-shadow: none !important; }
-a, a:visited { color: #444 !important; text-decoration: underline; }
-a:after { content: " (" attr(href) ")"; } 
-abbr:after { content: " (" attr(title) ")"; }
-.ir a:after { content: ""; }  /* Don't show links for images */
-pre, blockquote { border: 1px solid #999; page-break-inside: avoid; }
-thead { display: table-header-group; } /* css-discuss.incutio.com/wiki/Printing_Tables */ 
-tr, img { page-break-inside: avoid; }
-@page { margin: 0.5cm; }
-p, h2, h3 { orphans: 3; widows: 3; }
-h2, h3{ page-break-after: avoid; }
+	* { background: transparent !important; color: #444 !important; text-shadow: none !important; }
+	a, a:visited { color: #444 !important; text-decoration: underline; }
+	a:after { content: " (" attr(href) ")"; } 
+	abbr:after { content: " (" attr(title) ")"; }
+	.ir a:after { content: ""; }  /* Don't show links for images */
+	pre, blockquote { border: 1px solid #999; page-break-inside: avoid; }
+	thead { display: table-header-group; } /* css-discuss.incutio.com/wiki/Printing_Tables */ 
+	tr, img { page-break-inside: avoid; }
+	@page { margin: 0.5cm; }
+	p, h2, h3 { orphans: 3; widows: 3; }
+	h2, h3{ page-break-after: avoid; }
 }
 
 div#error { padding-left: 5em; }
@@ -458,12 +458,12 @@ div.notice {
 	padding: 5px 5px;
 	padding-left: 25px;
 	margin: 5px 0px;
-	
+
 	/* Rounded Corners and Shadow */
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
-	
+
 	/* Shadow */
 	-moz-box-shadow: 0 1px 2px rgba(0,0,0,.2);
 	-webkit-box-shadow: 0 1px 2px rgba(0,0,0,.2);
