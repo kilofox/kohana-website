@@ -1,6 +1,6 @@
 Icon?
 .DS_Store
 .svn
-/nbproject/private
+nbproject
 *~
 *.bak
