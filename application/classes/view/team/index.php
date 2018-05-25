@@ -17,13 +17,13 @@ class View_Team_Index extends Kostache_Layout
     public $banner_exists = FALSE;
 
     /**
-     * Email link for team@kohanaframework.org
+     * Email link for team@kohana.top
      *
      * @return  string
      */
     public function team_at_kohanaframework()
     {
-        return HTML::mailto('team@kohanaframework.org');
+        return HTML::mailto('team@kohana.top');
     }
 
 }

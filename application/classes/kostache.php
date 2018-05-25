@@ -149,7 +149,7 @@ class Kostache extends Kohana_Kostache
 
     public function github_releases_url()
     {
-        return 'https://github.com/kohana/kohana/releases';
+        return 'https://github.com/kilofox/kohana/releases';
     }
 
     /**

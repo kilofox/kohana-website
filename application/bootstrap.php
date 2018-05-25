@@ -17,7 +17,7 @@ if (is_file(APPPATH . 'classes/kohana' . EXT)) {
 /**
  * Set the default time zone.
  *
- * @see  http://kohanaframework.org/guide/using.configuration
+ * @see  http://kohana.top/guide/using.configuration
  * @see  http://php.net/timezones
  */
 date_default_timezone_set('America/Chicago');
@@ -25,7 +25,7 @@ date_default_timezone_set('America/Chicago');
 /**
  * Set the default locale.
  *
- * @see  http://kohanaframework.org/guide/using.configuration
+ * @see  http://kohana.top/guide/using.configuration
  * @see  http://php.net/setlocale
  */
 setlocale(LC_ALL, 'en_US.utf-8');
@@ -33,7 +33,7 @@ setlocale(LC_ALL, 'en_US.utf-8');
 /**
  * Enable the Kohana auto-loader.
  *
- * @see  http://kohanaframework.org/guide/using.autoloading
+ * @see  http://kohana.top/guide/using.autoloading
  * @see  http://php.net/spl_autoload_register
  */
 spl_autoload_register(array('Kohana', 'auto_load'));
