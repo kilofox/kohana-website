@@ -488,25 +488,3 @@ div.notice-success {
 /*
  * END Notices
  */
-
-/*
- * Pagodabox
- */
-div#pagodabox {
-	height: 100px;
-}
-
-div#pagodabox a {
-	display: block;
-	overflow: hidden;
-	background: url(../img/pagodaFloat.png) no-repeat;
-	width: 104px;
-	height: 0px;
-	padding-top: 54px;
-	margin-top: 25px;
-	float: right;
-}
-
-/*
- * END Pagodabox
- */
