@@ -12,6 +12,16 @@
 <link rel="stylesheet" href="{{base_url}}assets/css/responsive.css?v=1.0">
 <!-- All JavaScript at the bottom, except for Modernizr which enables HTML5 elements & feature detects -->
 <script src="{{base_url}}assets/js/lib/modernizr-2.0.6.js"></script>
+{{#stats}}
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-120526781-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-120526781-1');
+</script>
+{{/stats}}
 </head>
 
 <body>
@@ -51,20 +61,5 @@
 <script src="{{base_url}}assets/js/lib/slides.js"></script>
 <script src="{{base_url}}assets/js/global.js"></script>
 <script src="{{base_url}}assets/js/gallery.js"></script>
-
-{{#stats}}
-<!-- Google Analytics -->
-<script type="text/javascript">
-var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-</script>
-<script type="text/javascript">
-try {
-	var pageTracker = _gat._getTracker("UA-16034102-1");
-	pageTracker._setDomainName(".kohana.top");
-	pageTracker._trackPageview();
-} catch(err) {}
-</script>
-{{/stats}}
 </body>
 </html>
