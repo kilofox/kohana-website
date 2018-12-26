@@ -1,3 +1,6 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
-class Request_Client_Internal extends Kohana_Request_Client_Internal {}
+class Request_Client_Internal extends Kohana_Request_Client_Internal
+{
+    
+}

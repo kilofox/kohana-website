@@ -1,3 +1,6 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
-abstract class Session extends Kohana_Session {}
+abstract class Session extends Kohana_Session
+{
+    
+}

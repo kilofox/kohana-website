@@ -1,4 +1,5 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
+
 /**
  * Routes are used to determine the controller and action for a requested URI.
  * Every route generates a regular expression which is used to match a URI
@@ -10,10 +11,10 @@
  * a pattern for the key:
  *
  *     // This route will only match when <id> is a digit
- *     Route::set('user', 'user/<action>/<id>', array('id' => '\d+'));
+ *     Route::set('user', 'user/<action>/<id>', ['id' => '\d+']);
  *
  *     // This route will match when <path> is anything
- *     Route::set('file', '<path>', array('path' => '.*'));
+ *     Route::set('file', '<path>', ['path' => '.*']);
  *
  * It is also possible to create optional segments by using parentheses in
  * the URI definition:
@@ -22,7 +23,7 @@
  *     Route::set('default', '(<controller>(/<action>(/<id>)))');
  *
  *     // This route only requires the <file> key
- *     Route::set('file', '(<path>/)<file>(.<format>)', array('path' => '.*', 'format' => '\w+'));
+ *     Route::set('file', '(<path>/)<file>(.<format>)', ['path' => '.*', 'format' => '\w+']);
  *
  * Routes also provide a way to generate URIs (called "reverse routing"), which
  * makes them an extremely powerful and flexible way to generate internal links.
@@ -30,519 +31,526 @@
  * @package    Kohana
  * @category   Base
  * @author     Kohana Team
- * @copyright  (c) 2008-2011 Kohana Team
- * @license    http://kohanaframework.org/license
+ * @copyright  (c) 2008-2012 Kohana Team
+ * @license    https://kohana.top/license
  */
-class Kohana_Route {
+class Kohana_Route
+{
+    // Matches a URI group and captures the contents
+    const REGEX_GROUP = '\(((?:(?>[^()]+)|(?R))*)\)';
+    // Defines the pattern of a <segment>
+    const REGEX_KEY = '<([a-zA-Z0-9_]++)>';
+    // What can be part of a <segment> value
+    const REGEX_SEGMENT = '[^/.,;?\n]++';
+    // What must be escaped in the route regex
+    const REGEX_ESCAPE = '[.\\+*?[^\\]${}=!|]';
 
-	// Defines the pattern of a <segment>
-	const REGEX_KEY     = '<([a-zA-Z0-9_]++)>';
+    /**
+     * @var  string  default protocol for all routes
+     *
+     * @example  'http://'
+     */
+    public static $default_protocol = 'http://';
 
-	// What can be part of a <segment> value
-	const REGEX_SEGMENT = '[^/.,;?\n]++';
+    /**
+     * @var  array   list of valid localhost entries
+     */
+    public static $localhosts = [false, '', 'local', 'localhost'];
 
-	// What must be escaped in the route regex
-	const REGEX_ESCAPE  = '[.\\+*?[^\\]${}=!|]';
+    /**
+     * @var  string  default action for all routes
+     */
+    public static $default_action = 'index';
 
-	/**
-	 * @var  string  default protocol for all routes
-	 *
-	 * @example  'http://'
-	 */
-	public static $default_protocol = 'http://';
+    /**
+     * @var  bool Indicates whether routes are cached
+     */
+    public static $cache = false;
 
-	/**
-	 * @var  array   list of valid localhost entries
-	 */
-	public static $localhosts = array(FALSE, '', 'local', 'localhost');
+    /**
+     * @var  array
+     */
+    protected static $_routes = [];
 
-	/**
-	 * @var  string  default action for all routes
-	 */
-	public static $default_action = 'index';
+    /**
+     * Stores a named route and returns it. The "action" will always be set to
+     * "index" if it is not defined.
+     *
+     *     Route::set('default', '(<controller>(/<action>(/<id>)))')
+     *         ->defaults([
+     *             'controller' => 'welcome',
+     *         ]);
+     *
+     * @param   string  $name           route name
+     * @param   string  $uri            URI pattern
+     * @param   array   $regex          regex patterns for route keys
+     * @return  Route
+     */
+    public static function set($name, $uri = null, $regex = null)
+    {
+        return Route::$_routes[$name] = new Route($uri, $regex);
+    }
 
-	/**
-	 * @var  bool Indicates whether routes are cached
-	 */
-	public static $cache = FALSE;
+    /**
+     * Retrieves a named route.
+     *
+     *     $route = Route::get('default');
+     *
+     * @param   string  $name   route name
+     * @return  Route
+     * @throws  Kohana_Exception
+     */
+    public static function get($name)
+    {
+        if (!isset(Route::$_routes[$name])) {
+            throw new Kohana_Exception('The requested route does not exist: :route', [':route' => $name]);
+        }
 
-	/**
-	 * @var  array 
-	 */
-	protected static $_routes = array();
+        return Route::$_routes[$name];
+    }
 
-	/**
-	 * Stores a named route and returns it. The "action" will always be set to
-	 * "index" if it is not defined.
-	 *
-	 *     Route::set('default', '(<controller>(/<action>(/<id>)))')
-	 *         ->defaults(array(
-	 *             'controller' => 'welcome',
-	 *         ));
-	 *
-	 * @param   string   route name
-	 * @param   string   URI pattern
-	 * @param   array    regex patterns for route keys
-	 * @return  Route
-	 */
-	public static function set($name, $uri_callback = NULL, $regex = NULL)
-	{
-		return Route::$_routes[$name] = new Route($uri_callback, $regex);
-	}
+    /**
+     * Retrieves all named routes.
+     *
+     *     $routes = Route::all();
+     *
+     * @return  array  routes by name
+     */
+    public static function all()
+    {
+        return Route::$_routes;
+    }
 
-	/**
-	 * Retrieves a named route.
-	 *
-	 *     $route = Route::get('default');
-	 *
-	 * @param   string  route name
-	 * @return  Route
-	 * @throws  Kohana_Exception
-	 */
-	public static function get($name)
-	{
-		if ( ! isset(Route::$_routes[$name]))
-		{
-			throw new Kohana_Exception('The requested route does not exist: :route',
-				array(':route' => $name));
-		}
+    /**
+     * Get the name of a route.
+     *
+     *     $name = Route::name($route)
+     *
+     * @param   Route   $route  instance
+     * @return  string
+     */
+    public static function name(Route $route)
+    {
+        return array_search($route, Route::$_routes);
+    }
 
-		return Route::$_routes[$name];
-	}
+    /**
+     * Saves or loads the route cache. If your routes will remain the same for
+     * a long period of time, use this to reload the routes from the cache
+     * rather than redefining them on every page load.
+     *
+     *     if (! Route::cache()) {
+     *         // Set routes here
+     *         Route::cache(true);
+     *     }
+     *
+     * @param   boolean $save   cache the current routes
+     * @param   boolean $append append, rather than replace, cached routes when loading
+     * @return  void    when saving routes
+     * @return  boolean when loading routes
+     * @uses    Kohana::cache
+     */
+    public static function cache($save = false, $append = false)
+    {
+        if ($save === true) {
+            try {
+                // Cache all defined routes
+                Kohana::cache('Route::cache()', Route::$_routes);
+            } catch (Exception $e) {
+                // We most likely have a lambda in a route, which cannot be cached
+                throw new Kohana_Exception('One or more routes could not be cached (:message)', [
+                ':message' => $e->getMessage(),
+                ], 0, $e);
+            }
+        } else {
+            if ($routes = Kohana::cache('Route::cache()')) {
+                if ($append) {
+                    // Append cached routes
+                    Route::$_routes += $routes;
+                } else {
+                    // Replace existing routes
+                    Route::$_routes = $routes;
+                }
 
-	/**
-	 * Retrieves all named routes.
-	 *
-	 *     $routes = Route::all();
-	 *
-	 * @return  array  routes by name
-	 */
-	public static function all()
-	{
-		return Route::$_routes;
-	}
+                // Routes were cached
+                return Route::$cache = true;
+            } else {
+                // Routes were not cached
+                return Route::$cache = false;
+            }
+        }
+    }
 
-	/**
-	 * Get the name of a route.
-	 *
-	 *     $name = Route::name($route)
-	 *
-	 * @param   object  Route instance
-	 * @return  string
-	 */
-	public static function name(Route $route)
-	{
-		return array_search($route, Route::$_routes);
-	}
+    /**
+     * Create a URL from a route name. This is a shortcut for:
+     *
+     *     echo URL::site(Route::get($name)->uri($params), $protocol);
+     *
+     * @param   string  $name       route name
+     * @param   array   $params     URI parameters
+     * @param   mixed   $protocol   protocol string or boolean, adds protocol and domain
+     * @return  string
+     * @since   3.0.7
+     * @uses    URL::site
+     */
+    public static function url($name, array $params = null, $protocol = null)
+    {
+        $route = Route::get($name);
 
-	/**
-	 * Saves or loads the route cache. If your routes will remain the same for
-	 * a long period of time, use this to reload the routes from the cache
-	 * rather than redefining them on every page load.
-	 *
-	 *     if ( ! Route::cache())
-	 *     {
-	 *         // Set routes here
-	 *         Route::cache(TRUE);
-	 *     }
-	 *
-	 * @param   boolean   cache the current routes
-	 * @return  void      when saving routes
-	 * @return  boolean   when loading routes
-	 * @uses    Kohana::cache
-	 */
-	public static function cache($save = FALSE)
-	{
-		if ($save === TRUE)
-		{
-			// Cache all defined routes
-			Kohana::cache('Route::cache()', Route::$_routes);
-		}
-		else
-		{
-			if ($routes = Kohana::cache('Route::cache()'))
-			{
-				Route::$_routes = $routes;
+        // Create a URI with the route and convert it to a URL
+        if ($route->is_external())
+            return $route->uri($params);
+        else
+            return URL::site($route->uri($params), $protocol);
+    }
 
-				// Routes were cached
-				return Route::$cache = TRUE;
-			}
-			else
-			{
-				// Routes were not cached
-				return Route::$cache = FALSE;
-			}
-		}
-	}
+    /**
+     * Returns the compiled regular expression for the route. This translates
+     * keys and optional groups to a proper PCRE regular expression.
+     *
+     *     $compiled = Route::compile('<controller>(/<action>(/<id>))', [
+     *           'controller' => '[a-z]+',
+     *           'id' => '\d+',
+     *         ]
+     *     );
+     *
+     * @return  string
+     * @uses    Route::REGEX_ESCAPE
+     * @uses    Route::REGEX_SEGMENT
+     */
+    public static function compile($uri, array $regex = null)
+    {
+        // The URI should be considered literal except for keys and optional parts
+        // Escape everything preg_quote would escape except for : ( ) < >
+        $expression = preg_replace('#' . Route::REGEX_ESCAPE . '#', '\\\\$0', $uri);
 
-	/**
-	 * Create a URL from a route name. This is a shortcut for:
-	 *
-	 *     echo URL::site(Route::get($name)->uri($params), $protocol);
-	 *
-	 * @param   string   route name
-	 * @param   array    URI parameters
-	 * @param   mixed   protocol string or boolean, adds protocol and domain
-	 * @return  string
-	 * @since   3.0.7
-	 * @uses    URL::site
-	 */
-	public static function url($name, array $params = NULL, $protocol = NULL)
-	{
-		$route = Route::get($name);
+        if (strpos($expression, '(') !== false) {
+            // Make optional parts of the URI non-capturing and optional
+            $expression = str_replace(['(', ')'], ['(?:', ')?'], $expression);
+        }
 
-		// Create a URI with the route and convert it to a URL
-		if ($route->is_external())
-			return Route::get($name)->uri($params);
-		else
-			return URL::site(Route::get($name)->uri($params), $protocol);
-	}
+        // Insert default regex for keys
+        $expression = str_replace(['<', '>'], ['(?P<', '>' . Route::REGEX_SEGMENT . ')'], $expression);
 
-	/**
-	 * Returns the compiled regular expression for the route. This translates
-	 * keys and optional groups to a proper PCRE regular expression.
-	 *
-	 *     $compiled = Route::compile(
-	 *        '<controller>(/<action>(/<id>))',
-	 *         array(
-	 *           'controller' => '[a-z]+',
-	 *           'id' => '\d+',
-	 *         )
-	 *     );
-	 *
-	 * @return  string
-	 * @uses    Route::REGEX_ESCAPE
-	 * @uses    Route::REGEX_SEGMENT
-	 */
-	public static function compile($uri, array $regex = NULL)
-	{
-		if ( ! is_string($uri))
-			return;
+        if ($regex) {
+            $search = $replace = [];
+            foreach ($regex as $key => $value) {
+                $search[] = "<$key>" . Route::REGEX_SEGMENT;
+                $replace[] = "<$key>$value";
+            }
 
-		// The URI should be considered literal except for keys and optional parts
-		// Escape everything preg_quote would escape except for : ( ) < >
-		$expression = preg_replace('#'.Route::REGEX_ESCAPE.'#', '\\\\$0', $uri);
+            // Replace the default regex with the user-specified regex
+            $expression = str_replace($search, $replace, $expression);
+        }
 
-		if (strpos($expression, '(') !== FALSE)
-		{
-			// Make optional parts of the URI non-capturing and optional
-			$expression = str_replace(array('(', ')'), array('(?:', ')?'), $expression);
-		}
+        return '#^' . $expression . '$#uD';
+    }
 
-		// Insert default regex for keys
-		$expression = str_replace(array('<', '>'), array('(?P<', '>'.Route::REGEX_SEGMENT.')'), $expression);
+    /**
+     * @var  array  route filters
+     */
+    protected $_filters = [];
 
-		if ($regex)
-		{
-			$search = $replace = array();
-			foreach ($regex as $key => $value)
-			{
-				$search[]  = "<$key>".Route::REGEX_SEGMENT;
-				$replace[] = "<$key>$value";
-			}
+    /**
+     * @var  string  route URI
+     */
+    protected $_uri = '';
 
-			// Replace the default regex with the user-specified regex
-			$expression = str_replace($search, $replace, $expression);
-		}
+    /**
+     * @var  array
+     */
+    protected $_regex = [];
 
-		return '#^'.$expression.'$#uD';
-	}
+    /**
+     * @var  array
+     */
+    protected $_defaults = ['action' => 'index', 'host' => false];
 
-	/**
-	 * @var  callback     The callback method for routes
-	 */
-	protected $_callback;
+    /**
+     * @var  string
+     */
+    protected $_route_regex;
 
-	/**
-	 * @var  string  route URI
-	 */
-	protected $_uri = '';
+    /**
+     * Creates a new route. Sets the URI and regular expressions for keys.
+     * Routes should always be created with [Route::set] or they will not
+     * be properly stored.
+     *
+     *     $route = new Route($uri, $regex);
+     *
+     * The $uri parameter should be a string for basic regex matching.
+     *
+     *
+     * @param   string  $uri    route URI pattern
+     * @param   array   $regex  key patterns
+     * @return  void
+     * @uses    Route::_compile
+     */
+    public function __construct($uri = null, $regex = null)
+    {
+        if ($uri === null) {
+            // Assume the route is from cache
+            return;
+        }
 
-	/**
-	 * @var  array
-	 */
-	protected $_regex = array();
+        if (!empty($uri)) {
+            $this->_uri = $uri;
+        }
 
-	/**
-	 * @var  array
-	 */
-	protected $_defaults = array('action' => 'index', 'host' => FALSE);
+        if (!empty($regex)) {
+            $this->_regex = $regex;
+        }
 
-	/**
-	 * @var  string
-	 */
-	protected $_route_regex;
+        // Store the compiled regex locally
+        $this->_route_regex = Route::compile($uri, $regex);
+    }
 
-	/**
-	 * Creates a new route. Sets the URI and regular expressions for keys.
-	 * Routes should always be created with [Route::set] or they will not
-	 * be properly stored.
-	 *
-	 *     $route = new Route($uri, $regex);
-	 *
-	 * The $uri parameter can either be a string for basic regex matching or it
-	 * can be a valid callback or anonymous function (php 5.3+). If you use a
-	 * callback or anonymous function, your method should return an array
-	 * containing the proper keys for the route. If you want the route to be
-	 * "reversable", you need pass the route string as the third parameter.
-	 *
-	 *     $route = new Route(function($uri)
-	 *     {
-	 *     	if (list($controller, $action, $param) = explode('/', $uri) AND $controller == 'foo' AND $action == 'bar')
-	 *     	{
-	 *     		return array(
-	 *     			'controller' => 'foobar',
-	 *     			'action' => $action,
-	 *     			'id' => $param,
-	 *     		);
-	 *     	},
-	 *     	'foo/bar/<id>'
-	 *     });
-	 *
-	 * @param   mixed    route URI pattern or lambda/callback function
-	 * @param   array    key patterns
-	 * @return  void
-	 * @uses    Route::_compile
-	 */
-	public function __construct($uri = NULL, $regex = NULL)
-	{
-		if ($uri === NULL)
-		{
-			// Assume the route is from cache
-			return;
-		}
+    /**
+     * Provides default values for keys when they are not present. The default
+     * action will always be "index" unless it is overloaded here.
+     *
+     *     $route->defaults([
+     *         'controller' => 'welcome',
+     *         'action' => 'index'
+     *     ]);
+     *
+     * If no parameter is passed, this method will act as a getter.
+     *
+     * @param   array   $defaults   key values
+     * @return  $this or array
+     */
+    public function defaults(array $defaults = null)
+    {
+        if ($defaults === null) {
+            return $this->_defaults;
+        }
 
-		if ( ! is_string($uri) AND is_callable($uri))
-		{
-			$this->_callback = $uri;
-			$this->_uri = $regex;
-			$regex = NULL;
-		}
-		elseif ( ! empty($uri))
-		{
-			$this->_uri = $uri;
-		}
+        $this->_defaults = $defaults;
 
-		if ( ! empty($regex))
-		{
-			$this->_regex = $regex;
-		}
+        return $this;
+    }
 
-		// Store the compiled regex locally
-		$this->_route_regex = Route::compile($uri, $regex);
-	}
+    /**
+     * Filters to be run before route parameters are returned:
+     *
+     *     $route->filter(function(Route $route, $params, Request $request) {
+     *         // This route only matches POST requests
+     *         if ($request->method() !== HTTP_Request::POST) {
+     *             return false;
+     *         }
+     *         if ($params AND $params['controller'] === 'welcome') {
+     *             $params['controller'] = 'home';
+     *         }
+     *
+     *         return $params;
+     *     });
+     *
+     * To prevent a route from matching, return `false`. To replace the route
+     * parameters, return an array.
+     *
+     * [!!] Default parameters are added before filters are called!
+     *
+     * @throws  Kohana_Exception
+     * @param   array   $callback   callback string, array, or closure
+     * @return  $this
+     */
+    public function filter($callback)
+    {
+        if (!is_callable($callback)) {
+            throw new Kohana_Exception('Invalid Route::callback specified');
+        }
 
-	/**
-	 * Provides default values for keys when they are not present. The default
-	 * action will always be "index" unless it is overloaded here.
-	 *
-	 *     $route->defaults(array(
-	 *         'controller' => 'welcome',
-	 *         'action'     => 'index'
-	 *     ));
-	 * 
-	 * If no parameter is passed, this method will act as a getter.
-	 *
-	 * @param   array  key values
-	 * @return  $this or array
-	 */
-	public function defaults(array $defaults = NULL)
-	{
-		if ($defaults === NULL)
-		{
-			return $this->_defaults;
-		}
+        $this->_filters[] = $callback;
 
-		$this->_defaults = $defaults;
+        return $this;
+    }
 
-		return $this;
-	}
+    /**
+     * Tests if the route matches a given Request. A successful match will return
+     * all of the routed parameters as an array. A failed match will return
+     * boolean false.
+     *
+     *     // Params: controller = users, action = edit, id = 10
+     *     $params = $route->matches(Request::factory('users/edit/10'));
+     *
+     * This method should almost always be used within an if/else block:
+     *
+     *     if ($params = $route->matches($request)) {
+     *         // Parse the parameters
+     *     }
+     *
+     * @param   Request $request  Request object to match
+     * @return  array             on success
+     * @return  false             on failure
+     */
+    public function matches(Request $request)
+    {
+        // Get the URI from the Request
+        $uri = trim($request->uri(), '/');
 
-	/**
-	 * Tests if the route matches a given URI. A successful match will return
-	 * all of the routed parameters as an array. A failed match will return
-	 * boolean FALSE.
-	 *
-	 *     // Params: controller = users, action = edit, id = 10
-	 *     $params = $route->matches('users/edit/10');
-	 *
-	 * This method should almost always be used within an if/else block:
-	 *
-	 *     if ($params = $route->matches($uri))
-	 *     {
-	 *         // Parse the parameters
-	 *     }
-	 *
-	 * @param   string  URI to match
-	 * @return  array   on success
-	 * @return  FALSE   on failure
-	 */
-	public function matches($uri)
-	{
-		if ($this->_callback)
-		{
-			$closure = $this->_callback;
-			$params = call_user_func($closure, $uri);
+        if (!preg_match($this->_route_regex, $uri, $matches))
+            return false;
 
-			if ( ! is_array($params))
-				return FALSE;
-		}
-		else
-		{
-			if ( ! preg_match($this->_route_regex, $uri, $matches))
-				return FALSE;
+        $params = [];
+        foreach ($matches as $key => $value) {
+            if (is_int($key)) {
+                // Skip all unnamed keys
+                continue;
+            }
 
-			$params = array();
-			foreach ($matches as $key => $value)
-			{
-				if (is_int($key))
-				{
-					// Skip all unnamed keys
-					continue;
-				}
+            // Set the value for all matched keys
+            $params[$key] = $value;
+        }
 
-				// Set the value for all matched keys
-				$params[$key] = $value;
-			}
-		}
+        foreach ($this->_defaults as $key => $value) {
+            if (!isset($params[$key]) OR $params[$key] === '') {
+                // Set default values for any key that was not matched
+                $params[$key] = $value;
+            }
+        }
 
-		foreach ($this->_defaults as $key => $value)
-		{
-			if ( ! isset($params[$key]) OR $params[$key] === '')
-			{
-				// Set default values for any key that was not matched
-				$params[$key] = $value;
-			}
-		}
+        if (!empty($params['controller'])) {
+            // PSR-0: Replace underscores with spaces, run ucwords, then replace underscore
+            $params['controller'] = str_replace(' ', '_', ucwords(str_replace('_', ' ', $params['controller'])));
+        }
 
-		return $params;
-	}
+        if (!empty($params['directory'])) {
+            // PSR-0: Replace underscores with spaces, run ucwords, then replace underscore
+            $params['directory'] = str_replace(' ', '_', ucwords(str_replace('_', ' ', $params['directory'])));
+        }
 
-	/**
-	 * Returns whether this route is an external route
-	 * to a remote controller.
-	 *
-	 * @return  boolean
-	 */
-	public function is_external()
-	{
-		return ! in_array(Arr::get($this->_defaults, 'host', FALSE), Route::$localhosts);
-	}
+        if ($this->_filters) {
+            foreach ($this->_filters as $callback) {
+                // Execute the filter giving it the route, params, and request
+                $return = call_user_func($callback, $this, $params, $request);
 
-	/**
-	 * Generates a URI for the current route based on the parameters given.
-	 *
-	 *     // Using the "default" route: "users/profile/10"
-	 *     $route->uri(array(
-	 *         'controller' => 'users',
-	 *         'action'     => 'profile',
-	 *         'id'         => '10'
-	 *     ));
-	 *
-	 * @param   array   URI parameters
-	 * @return  string
-	 * @throws  Kohana_Exception
-	 * @uses    Route::REGEX_Key
-	 */
-	public function uri(array $params = NULL)
-	{
-		// Start with the routed URI
-		$uri = $this->_uri;
+                if ($return === false) {
+                    // Filter has aborted the match
+                    return false;
+                } elseif (is_array($return)) {
+                    // Filter has modified the parameters
+                    $params = $return;
+                }
+            }
+        }
 
-		if (strpos($uri, '<') === FALSE AND strpos($uri, '(') === FALSE)
-		{
-			// This is a static route, no need to replace anything
+        return $params;
+    }
 
-			if ( ! $this->is_external())
-				return $uri;
+    /**
+     * Returns whether this route is an external route
+     * to a remote controller.
+     *
+     * @return  boolean
+     */
+    public function is_external()
+    {
+        return !in_array(Arr::get($this->_defaults, 'host', false), Route::$localhosts);
+    }
 
-			// If the localhost setting does not have a protocol
-			if (strpos($this->_defaults['host'], '://') === FALSE)
-			{
-				// Use the default defined protocol
-				$params['host'] = Route::$default_protocol.$this->_defaults['host'];
-			}
-			else
-			{
-				// Use the supplied host with protocol
-				$params['host'] = $this->_defaults['host'];
-			}
+    /**
+     * Generates a URI for the current route based on the parameters given.
+     *
+     *     // Using the "default" route: "users/profile/10"
+     *     $route->uri([
+     *         'controller' => 'users',
+     *         'action' => 'profile',
+     *         'id' => '10'
+     *     ]);
+     *
+     * @param   array   $params URI parameters
+     * @return  string
+     * @throws  Kohana_Exception
+     * @uses    Route::REGEX_GROUP
+     * @uses    Route::REGEX_KEY
+     */
+    public function uri(array $params = null)
+    {
+        if ($params) {
+            // @issue #4079 rawurlencode parameters
+            $params = array_map('rawurlencode', $params);
+            // decode slashes back, see Apache docs about AllowEncodedSlashes and AcceptPathInfo
+            $params = str_replace(['%2F', '%5C'], ['/', '\\'], $params);
+        }
 
-			// Compile the final uri and return it
-			return rtrim($params['host'], '/').'/'.$uri;
-		}
+        $defaults = $this->_defaults;
 
-		while (preg_match('#\([^()]++\)#', $uri, $match))
-		{
-			// Search for the matched value
-			$search = $match[0];
+        /**
+         * Recursively compiles a portion of a URI specification by replacing
+         * the specified parameters and any optional parameters that are needed.
+         *
+         * @param   string  $portion    Part of the URI specification
+         * @param   boolean $required   Whether or not parameters are required (initially)
+         * @return  array   Tuple of the compiled portion and whether or not it contained specified parameters
+         */
+        $compile = function ($portion, $required) use (&$compile, $defaults, $params) {
+            $missing = [];
 
-			// Remove the parenthesis from the match as the replace
-			$replace = substr($match[0], 1, -1);
+            $pattern = '#(?:' . Route::REGEX_KEY . '|' . Route::REGEX_GROUP . ')#';
+            $result = preg_replace_callback($pattern, function ($matches) use (&$compile, $defaults, &$missing, $params, &$required) {
+                if ($matches[0][0] === '<') {
+                    // Parameter, unwrapped
+                    $param = $matches[1];
 
-			while (preg_match('#'.Route::REGEX_KEY.'#', $replace, $match))
-			{
-				list($key, $param) = $match;
+                    if (isset($params[$param])) {
+                        // This portion is required when a specified
+                        // parameter does not match the default
+                        $required = ($required OR ! isset($defaults[$param]) OR $params[$param] !== $defaults[$param]);
 
-				if (isset($params[$param]))
-				{
-					// Replace the key with the parameter value
-					$replace = str_replace($key, $params[$param], $replace);
-				}
-				else
-				{
-					// This group has missing parameters
-					$replace = '';
-					break;
-				}
-			}
+                        // Add specified parameter to this result
+                        return $params[$param];
+                    }
 
-			// Replace the group in the URI
-			$uri = str_replace($search, $replace, $uri);
-		}
+                    // Add default parameter to this result
+                    if (isset($defaults[$param]))
+                        return $defaults[$param];
 
-		while (preg_match('#'.Route::REGEX_KEY.'#', $uri, $match))
-		{
-			list($key, $param) = $match;
+                    // This portion is missing a parameter
+                    $missing[] = $param;
+                }
+                else {
+                    // Group, unwrapped
+                    $result = $compile($matches[2], false);
 
-			if ( ! isset($params[$param]))
-			{
-				// Look for a default
-				if (isset($this->_defaults[$param]))
-				{
-					$params[$param] = $this->_defaults[$param];
-				}
-				else
-				{
-					// Ungrouped parameters are required
-					throw new Kohana_Exception('Required route parameter not passed: :param', array(
-						':param' => $param,
-					));
-			}
-			}
+                    if ($result[1]) {
+                        // This portion is required when it contains a group
+                        // that is required
+                        $required = true;
 
-			$uri = str_replace($key, $params[$param], $uri);
-		}
+                        // Add required groups to this result
+                        return $result[0];
+                    }
 
-		// Trim all extra slashes from the URI
-		$uri = preg_replace('#//+#', '/', rtrim($uri, '/'));
+                    // Do not add optional groups to this result
+                }
+            }, $portion);
 
-		if ($this->is_external())
-		{
-			// Need to add the host to the URI
-			$host = $this->_defaults['host'];
+            if ($required AND $missing) {
+                throw new Kohana_Exception('Required route parameter not passed: :param', [':param' => reset($missing)]);
+            }
 
-			if (strpos($host, '://') === FALSE)
-			{
-				// Use the default defined protocol
-				$host = Route::$default_protocol.$host;
-			}
+            return [$result, $required];
+        };
 
-			// Clean up the host and prepend it to the URI
-			$uri = rtrim($host, '/').'/'.$uri;
-		}
+        list($uri) = $compile($this->_uri, true);
 
-		return $uri;
-	}
+        // Trim all extra slashes from the URI
+        $uri = preg_replace('#//+#', '/', rtrim($uri, '/'));
 
-} // End Route
+        if ($this->is_external()) {
+            // Need to add the host to the URI
+            $host = $this->_defaults['host'];
+
+            if (strpos($host, '://') === false) {
+                // Use the default defined protocol
+                $host = Route::$default_protocol . $host;
+            }
+
+            // Clean up the host and prepend it to the URI
+            $uri = rtrim($host, '/') . '/' . $uri;
+        }
+
+        return $uri;
+    }
+
+}

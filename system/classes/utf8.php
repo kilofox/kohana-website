@@ -1,3 +1,6 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
-class UTF8 extends Kohana_UTF8 {}
+class UTF8 extends Kohana_UTF8
+{
+    
+}

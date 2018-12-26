@@ -1,3 +1,6 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
-class Encrypt extends Kohana_Encrypt {}
+abstract class Encrypt extends Kohana_Encrypt
+{
+    
+}

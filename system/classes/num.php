@@ -1,3 +1,6 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
-class Num extends Kohana_Num {}
+class Num extends Kohana_Num
+{
+    
+}

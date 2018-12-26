@@ -1,3 +1,6 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
-class HTTP_Exception_408 extends Kohana_HTTP_Exception_408 {}
+class HTTP_Exception_408 extends Kohana_HTTP_Exception_408
+{
+    
+}

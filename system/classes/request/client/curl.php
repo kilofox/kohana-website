@@ -1,3 +1,6 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
-class Request_Client_Curl extends Kohana_Request_Client_Curl {}
+class Request_Client_Curl extends Kohana_Request_Client_Curl
+{
+    
+}

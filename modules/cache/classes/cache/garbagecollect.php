@@ -1,3 +1,6 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
-interface Cache_GarbageCollect extends Kohana_Cache_GarbageCollect {}
+interface Cache_GarbageCollect extends Kohana_Cache_GarbageCollect
+{
+    
+}

@@ -1,10 +1,10 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
-class Kohana_HTTP_Exception_505 extends HTTP_Exception {
-
-	/**
-	 * @var   integer    HTTP 505 HTTP Version Not Supported
-	 */
-	protected $_code = 505;
+class Kohana_HTTP_Exception_505 extends HTTP_Exception
+{
+    /**
+     * @var   integer    HTTP 505 HTTP Version Not Supported
+     */
+    protected $_code = 505;
 
 }

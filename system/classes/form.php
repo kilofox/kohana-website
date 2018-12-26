@@ -1,3 +1,6 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
-class Form extends Kohana_Form {}
+class Form extends Kohana_Form
+{
+    
+}

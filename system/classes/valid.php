@@ -1,3 +1,6 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
-class Valid extends Kohana_Valid {}
+class Valid extends Kohana_Valid
+{
+    
+}

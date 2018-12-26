@@ -1,7 +1,6 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
-return array
-(
-	'Spanish' => 'Español',
-	'Hello, world!' => '¡Hola, mundo!',
-);
+return [
+    'Spanish' => 'Español',
+    'Hello, world!' => '¡Hola, mundo!',
+];

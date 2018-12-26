@@ -1,211 +1,185 @@
-<?php defined('SYSPATH') OR die('Kohana bootstrap needs to be included before tests run');
+<?php
 
 /**
  * Unit tests for response class
  *
  * @group kohana
- * @group kohana.response
+ * @group kohana.core
+ * @group kohana.core.response
  *
  * @package    Kohana
  * @category   Tests
  * @author     Kohana Team
- * @copyright  (c) 2008-2011 Kohana Team
- * @license    http://kohanaframework.org/license
+ * @copyright  (c) 2008-2012 Kohana Team
+ * @license    https://kohana.top/license
  */
 class Kohana_ResponseTest extends Unittest_TestCase
 {
-	/**
-	 * Provider for test_body
-	 *
-	 * @return array
-	 */
-	public function provider_body()
-	{
-		$view = $this->getMock('View');
-		$view->expects($this->any())
-			->method('__toString')
-			->will($this->returnValue('foo'));
+    /**
+     * Provider for test_body
+     *
+     * @return array
+     */
+    public function provider_body()
+    {
+        $view = $this->createMock('View');
 
-		return array(
-			array('unit test', 'unit test'),
-			array($view, 'foo'),
-		);
-	}
+        $view->expects($this->any())
+            ->method('__toString')
+            ->will($this->returnValue('foo'));
 
-	/**
-	 * Tests that we can set and read a body of a response
-	 * 
-	 * @test
-	 * @dataProvider provider_body
-	 *
-	 * @return null
-	 */
-	public function test_body($source, $expected)
-	{
-		$response = new Response;
-		$response->body($source);
-		$this->assertSame($response->body(), $expected);
+        return [
+            ['unit test', 'unit test'],
+            [$view, 'foo'],
+        ];
+    }
 
-		$response = (string) $response;
-		$this->assertSame($response, $expected);
-	}
+    /**
+     * Tests that we can set and read a body of a response
+     *
+     * @test
+     * @dataProvider provider_body
+     *
+     * @return null
+     */
+    public function test_body($source, $expected)
+    {
+        $response = new Response;
+        $response->body($source);
+        $this->assertSame($response->body(), $expected);
 
-	/**
-	 * Provides data for test_body_string_zero()
-	 *
-	 * @return array
-	 */
-	public function provider_body_string_zero()
-	{
-		return array(
-			array('0', '0'),
-			array("0", '0'),
-			array(0, '0')
-		);
-	}
+        $response = (string) $response;
+        $this->assertSame($response, $expected);
+    }
 
-	/**
-	 * Test that Response::body() handles numerics correctly
-	 *
-	 * @test
-	 * @dataProvider provider_body_string_zero
-	 * @param string $string 
-	 * @param string $expected 
-	 * @return void
-	 */
-	public function test_body_string_zero($string, $expected)
-	{
-		$response = new Response;
-		$response->body($string);
+    /**
+     * Provides data for test_body_string_zero()
+     *
+     * @return array
+     */
+    public function provider_body_string_zero()
+    {
+        return [
+            ['0', '0'],
+            ["0", '0'],
+            [0, '0'],
+        ];
+    }
 
-		$this->assertSame($expected, $response->body());
-	}
+    /**
+     * Test that Response::body() handles numerics correctly
+     *
+     * @test
+     * @dataProvider provider_body_string_zero
+     * @param string $string
+     * @param string $expected
+     * @return void
+     */
+    public function test_body_string_zero($string, $expected)
+    {
+        $response = new Response;
+        $response->body($string);
 
-	/**
-	 * provider for test_cookie_set()
-	 *
-	 * @return array
-	 */
-	public function provider_cookie_set()
-	{
-		return array(
-			array(
-				'test1',
-				'foo',
-				array(
-					'test1' => array(
-						'value' => 'foo',
-						'expiration' => Cookie::$expiration
-					),
-				)
-			),
-			array(
-				array(
-					'test2' => 'stfu',
-					'test3' => array(
-						'value' => 'snafu',
-						'expiration' => 123456789
-					)
-				),
-				NULL,
-				array(
-					'test2' => array(
-						'value' => 'stfu',
-						'expiration' => Cookie::$expiration
-					),
-					'test3' => array(
-						'value' => 'snafu',
-						'expiration' => 123456789
-					)
-				)
-			)
-		);
-	}
+        $this->assertSame($expected, $response->body());
+    }
 
-	/**
-	 * Tests the Response::cookie() method, ensures
-	 * correct values are set, including defaults
-	 *
-	 * @test
-	 * @dataProvider provider_cookie_set
-	 * @param string $key 
-	 * @param string $value 
-	 * @param string $expected 
-	 * @return void
-	 */
-	public function test_cookie_set($key, $value, $expected)
-	{
-		// Setup the Response and apply cookie
-		$response = new Response;
-		$response->cookie($key, $value);
+    /**
+     * provider for test_cookie_set()
+     *
+     * @return array
+     */
+    public function provider_cookie_set()
+    {
+        return [
+            [
+                'test1',
+                'foo',
+                [
+                    'test1' => [
+                        'value' => 'foo',
+                        'expiration' => Cookie::$expiration
+                    ],
+                ]
+            ],
+            [
+                [
+                    'test2' => 'stfu',
+                    'test3' => ['value' => 'snafu', 'expiration' => 123456789]
+                ],
+                null,
+                [
+                    'test2' => [
+                        'value' => 'stfu',
+                        'expiration' => Cookie::$expiration
+                    ],
+                    'test3' => [
+                        'value' => 'snafu',
+                        'expiration' => 123456789
+                    ]
+                ]
+            ],
+        ];
+    }
 
-		foreach ($expected as $_key => $_value)
-		{
-			$cookie = $response->cookie($_key);
+    /**
+     * Tests the Response::cookie() method, ensures
+     * correct values are set, including defaults
+     *
+     * @test
+     * @dataProvider provider_cookie_set
+     * @param string $key
+     * @param string $value
+     * @param string $expected
+     * @return void
+     */
+    public function test_cookie_set($key, $value, $expected)
+    {
+        // Setup the Response and apply cookie
+        $response = new Response;
+        $response->cookie($key, $value);
 
-			$this->assertSame($_value['value'], $cookie['value']);
-			$this->assertSame($_value['expiration'], $cookie['expiration']);
-		}
-	}
+        foreach ($expected as $_key => $_value) {
+            $cookie = $response->cookie($_key);
 
-	/**
-	 * Tests the Response::cookie() get functionality
-	 *
-	 * @return void
-	 */
-	public function test_cookie_get()
-	{
-		$response = new Response;
+            $this->assertSame($_value['value'], $cookie['value']);
+            $this->assertSame($_value['expiration'], $cookie['expiration']);
+        }
+    }
 
-		// Test for empty cookies
-		$this->assertSame(array(), $response->cookie());
+    /**
+     * Tests the Response::cookie() get functionality
+     *
+     * @return void
+     */
+    public function test_cookie_get()
+    {
+        $response = new Response;
 
-		// Test for no specific cookie
-		$this->assertNull($response->cookie('foobar'));
+        // Test for empty cookies
+        $this->assertSame([], $response->cookie());
 
-		$response->cookie('foo', 'bar');
-		$cookie = $response->cookie('foo');
+        // Test for no specific cookie
+        $this->assertNull($response->cookie('foobar'));
 
-		$this->assertSame('bar', $cookie['value']);
-		$this->assertSame(Cookie::$expiration, $cookie['expiration']);
-	}
+        $response->cookie('foo', 'bar');
+        $cookie = $response->cookie('foo');
 
-	/**
-	 * Tests that the headers are not sent by PHP in CLI mode
-	 *
-	 * @return void
-	 */
-	public function test_send_headers_cli()
-	{
-		if (headers_sent())
-			$this->markTestSkipped('Cannot test this feature as headers have already been sent!');
+        $this->assertSame('bar', $cookie['value']);
+        $this->assertSame(Cookie::$expiration, $cookie['expiration']);
+    }
 
-		if (Kohana::$is_cli)
-		{
-			$content_type = 'application/json';
-			$response = new Response;
-			$response->headers('content-type', $content_type)
-				->send_headers();
+    /**
+     * Test the content type is sent when set
+     *
+     * @test
+     */
+    public function test_content_type_when_set()
+    {
+        $content_type = 'application/json';
+        $response = new Response;
+        $response->headers('content-type', $content_type);
+        $headers = $response->send_headers()->headers();
+        $this->assertSame($content_type, (string) $headers['content-type']);
+    }
 
-			$this->assertFalse(headers_sent());
-		}
-		else
-		{
-			$this->markTestSkipped('Unable to perform test outside of CLI mode');
-		}
-	}
-
-	/**
-	 * Test the content type is sent when set
-	 * 
-	 * @test
-	 */
-	public function test_content_type_when_set()
-	{
-		$content_type = 'application/json';
-		$response = new Response;
-		$response->headers('content-type', $content_type);
-		$headers  = $response->send_headers()->headers();
-		$this->assertSame($content_type, (string) $headers['content-type']);
-	}
 }

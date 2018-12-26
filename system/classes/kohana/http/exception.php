@@ -1,34 +1,71 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
-class Kohana_HTTP_Exception extends Kohana_Exception {
+abstract class Kohana_HTTP_Exception extends Kohana_Exception
+{
+    /**
+     * Creates an HTTP_Exception of the specified type.
+     *
+     * @param   integer $code       the http status code
+     * @param   string  $message    status message, custom content to display with error
+     * @param   array   $variables  translation variables
+     * @return  HTTP_Exception
+     */
+    public static function factory($code, $message = null, array $variables = null, Exception $previous = null)
+    {
+        $class = 'HTTP_Exception_' . $code;
 
-	/**
-	 * @var     int      http status code
-	 */
-	protected $_code = 0;
+        return new $class($message, $variables, $previous);
+    }
 
-	/**
-	 * Creates a new translated exception.
-	 *
-	 *     throw new Kohana_Exception('Something went terrible wrong, :user',
-	 *         array(':user' => $user));
-	 *
-	 * @param   string   status message, custom content to display with error
-	 * @param   array    translation variables
-	 * @param   integer  the http status code
-	 * @return  void
-	 */
-	public function __construct($message = NULL, array $variables = NULL, $code = 0)
-	{
-		if ($code == 0)
-		{
-			$code = $this->_code;
-		}
+    /**
+     * @var  int        http status code
+     */
+    protected $_code = 0;
 
-		if ( ! isset(Response::$messages[$code]))
-			throw new Kohana_Exception('Unrecognized HTTP status code: :code . Only valid HTTP status codes are acceptable, see RFC 2616.', array(':code' => $code));
+    /**
+     * @var  Request    Request instance that triggered this exception.
+     */
+    protected $_request;
 
-		parent::__construct($message, $variables, $code);
-	}
+    /**
+     * Creates a new translated exception.
+     *
+     *     throw new Kohana_Exception('Something went terrible wrong, :user', [':user' => $user]);
+     *
+     * @param   string  $message    status message, custom content to display with error
+     * @param   array   $variables  translation variables
+     * @return  void
+     */
+    public function __construct($message = null, array $variables = null, Exception $previous = null)
+    {
+        parent::__construct($message, $variables, $this->_code, $previous);
+    }
 
-} // End Kohana_HTTP_Exception
+    /**
+     * Store the Request that triggered this exception.
+     *
+     * @param   Request   $request  Request object that triggered this exception.
+     * @return  HTTP_Exception
+     */
+    public function request(Request $request = null)
+    {
+        if ($request === null)
+            return $this->_request;
+
+        $this->_request = $request;
+
+        return $this;
+    }
+
+    /**
+     * Generate a Response for the current Exception
+     *
+     * @uses   Kohana_Exception::response()
+     * @return Response
+     */
+    public function get_response()
+    {
+        return Kohana_Exception::response($this);
+    }
+
+}

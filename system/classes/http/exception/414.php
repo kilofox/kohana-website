@@ -1,3 +1,6 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
-class HTTP_Exception_414 extends Kohana_HTTP_Exception_414 {}
+class HTTP_Exception_414 extends Kohana_HTTP_Exception_414
+{
+    
+}

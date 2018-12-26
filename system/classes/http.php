@@ -1,3 +1,6 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
-abstract class HTTP extends Kohana_HTTP {}
+abstract class HTTP extends Kohana_HTTP
+{
+    
+}

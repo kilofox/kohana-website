@@ -1,89 +1,118 @@
-<?php defined('SYSPATH') OR die('Kohana bootstrap needs to be included before tests run');
+<?php
 
 /**
  * Unit tests for internal request client
  *
  * @group kohana
- * @group kohana.request
- * @group kohana.request.client
- * @group kohana.request.client.internal
+ * @group kohana.core
+ * @group kohana.core.request
+ * @group kohana.core.request.client
+ * @group kohana.core.request.client.internal
  *
  * @package    Kohana
  * @category   Tests
  * @author     Kohana Team
- * @copyright  (c) 2008-2011 Kohana Team
- * @license    http://kohanaframework.org/license
+ * @copyright  (c) 2008-2012 Kohana Team
+ * @license    https://kohana.top/license
  */
 class Kohana_Request_Client_InternalTest extends Unittest_TestCase
 {
-	public function provider_exceptions()
-	{
-		return array(
-			array('', 'welcome', 'missing_action', 'welcome/missing_action',
-				  'The requested URL welcome/missing_action was not found on this server.'),
-			array('kohana3', 'missing_controller', 'index', 'kohana3/missing_controller/index',
-				  'The requested URL kohana3/missing_controller/index was not found on this server.'),
-			array('', 'template', 'missing_action', 'kohana3/template/missing_action',
-				  'Cannot create instances of abstract controller_template'),
-		);
-	}
+    protected $_log_object;
 
-	/**
-	 * Tests for correct exception messages
-	 *
-	 * @test
-	 * @dataProvider provider_exceptions
-	 *
-	 * @return null
-	 */
-	public function test_exceptions($directory, $controller, $action, $uri, $expected)
-	{
-		// Mock for request object
-		$request = $this->getMock('Request', array('directory', 'controller', 'action', 'uri', 'response'), array($uri));
+    // @codingStandardsIgnoreStart
+    public function setUp()
+    // @codingStandardsIgnoreEnd
+    {
+        parent::setUp();
 
-		$request->expects($this->any())
-			->method('directory')
-			->will($this->returnValue($directory));
+        // temporarily save $log object
+        $this->_log_object = Kohana::$log;
+        Kohana::$log = null;
+    }
 
-		$request->expects($this->any())
-			->method('controller')
-			->will($this->returnValue($controller));
+    // @codingStandardsIgnoreStart
+    public function tearDown()
+    // @codingStandardsIgnoreEnd
+    {
+        // re-assign log object
+        Kohana::$log = $this->_log_object;
 
-		$request->expects($this->any())
-			->method('action')
-			->will($this->returnValue($action));
+        parent::tearDown();
+    }
 
-		$request->expects($this->any())
-			->method('uri')
-			->will($this->returnValue($uri));
+    public function provider_response_failure_status()
+    {
+        return [
+            [
+                '',
+                'Welcome',
+                'missing_action',
+                'Welcome/missing_action',
+                404
+            ],
+            [
+                'kohana3',
+                'missing_controller',
+                'index',
+                'kohana3/missing_controller/index',
+                404
+            ],
+            [
+                '',
+                'Template',
+                'missing_action',
+                'kohana3/Template/missing_action',
+                500
+            ],
+        ];
+    }
 
-		$request->expects($this->any())
-			->method('response')
-			->will($this->returnValue($this->getMock('Response')));
+    /**
+     * Tests for correct exception messages
+     *
+     * @test
+     * @dataProvider provider_response_failure_status
+     *
+     * @return null
+     */
+    public function test_response_failure_status($directory, $controller, $action, $uri, $expected)
+    {
+        // Mock for request object
+        $request = $this->getMockBuilder('Request')
+            ->setMethods(['directory', 'controller', 'action', 'uri', 'execute', 'method'])
+            ->setConstructorArgs([$uri])
+            ->getMock();
 
-		$internal_client = new Request_Client_Internal;
+        $request->expects($this->any())
+            ->method('directory')
+            ->will($this->returnValue($directory));
 
-		try
-		{
-			$internal_client->execute($request);
-		}
-		catch(HTTP_Exception_404 $e)
-		{
-			if ($e->getMessage() !== $expected)
-			{
-				$this->fail('Was expecting "'.$expected.'" but got "'.$e->getMessage().'" instead.');
-			}
-			return;
-		}
-		catch(Kohana_Exception $e)
-		{
-			if ($e->getMessage() !== $expected)
-			{
-				$this->fail('Was expecting "'.$expected.'" but got "'.$e->getMessage().'" instead.');
-			}
-			return;
-		}
+        $request->expects($this->any())
+            ->method('controller')
+            ->will($this->returnValue($controller));
 
-		$this->fail('A HTTP_Exception_404 or Kohana_Exception exception was expected.');
-	}
+        $request->expects($this->any())
+            ->method('action')
+            ->will($this->returnValue($action));
+
+        $request->expects($this->any())
+            ->method('uri')
+            ->will($this->returnValue($uri));
+
+        $request->expects($this->any())
+            ->method('execute')
+            ->will($this->returnValue($this->createMock('Response')));
+
+        // mock `method` method to avoid fatals in newer versions of PHPUnit
+        $request->expects($this->any())
+            ->method('method')
+            ->withAnyParameters();
+
+        $internal_client = new Request_Client_Internal;
+
+        $response = $internal_client->execute($request);
+
+        $this->assertSame($expected, $response->status());
+    }
+
 }

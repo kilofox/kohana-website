@@ -1,3 +1,6 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
-class Config extends Kohana_Config {}
+class Config extends Kohana_Config
+{
+    
+}

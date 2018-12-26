@@ -1,3 +1,6 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
-class Security extends Kohana_Security {}
+class Security extends Kohana_Security
+{
+    
+}

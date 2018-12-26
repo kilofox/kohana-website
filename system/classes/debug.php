@@ -1,3 +1,6 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
-class Debug extends Kohana_Debug {}
+class Debug extends Kohana_Debug
+{
+    
+}

@@ -1,4 +1,5 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
+
 /**
  * Base Config source Interface
  *
@@ -7,8 +8,10 @@
  * @package    Kohana
  * @category   Configuration
  * @author     Kohana Team
- * @copyright  (c) 2010 Kohana Team
- * @license    http://kohanaphp.com/license
+ * @copyright  (c) 2012-2014 Kohana Team
+ * @license    https://kohana.top/license
  */
-
-interface Kohana_Config_Source {}
+interface Kohana_Config_Source
+{
+    
+}

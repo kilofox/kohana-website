@@ -1,3 +1,6 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
-class Fragment extends Kohana_Fragment {}
+class Fragment extends Kohana_Fragment
+{
+    
+}

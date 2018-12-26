@@ -1,3 +1,6 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
-interface Cache_Arithmetic extends Kohana_Cache_Arithmetic {}
+interface Cache_Arithmetic extends Kohana_Cache_Arithmetic
+{
+    
+}

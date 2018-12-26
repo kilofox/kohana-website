@@ -1,3 +1,6 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
-class Response extends Kohana_Response {}
+class Response extends Kohana_Response
+{
+    
+}

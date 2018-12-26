@@ -1,3 +1,6 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
-class Profiler extends Kohana_Profiler {}
+class Profiler extends Kohana_Profiler
+{
+    
+}

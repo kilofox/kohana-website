@@ -1,3 +1,6 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
-class Inflector extends Kohana_Inflector {}
+class Inflector extends Kohana_Inflector
+{
+    
+}
