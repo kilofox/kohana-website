@@ -10,7 +10,7 @@ class Kohana_Exception extends Kohana_Kohana_Exception
      * @param   object   exception object
      * @return  boolean
      */
-    public static function handler(Exception $e)
+    public static function handler($e)
     {
         $response = new Response;
 
