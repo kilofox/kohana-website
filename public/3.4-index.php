@@ -6,14 +6,14 @@
  *
  * @link https://kohana.top/guide/about.install#application
  */
-$application = 'application';
+$application = '../guides/3.4/application';
 
 /**
  * The directory in which your modules are located.
  *
  * @link https://kohana.top/guide/about.install#modules
  */
-$modules = 'modules';
+$modules = '../guides/3.4/modules';
 
 /**
  * The directory in which the Kohana resources are located. The system
@@ -21,7 +21,7 @@ $modules = 'modules';
  *
  * @link https://kohana.top/guide/about.install#system
  */
-$system = 'system';
+$system = '../guides/3.4/system';
 
 /**
  * The default extension of resource files. If you change this, all resources
@@ -53,7 +53,7 @@ error_reporting(E_ALL | E_STRICT);
  * @link https://kohana.top/guide/using.configuration
  */
 // Set the full path to the docroot
-define('DOCROOT', realpath(__DIR__ . '/..') . DIRECTORY_SEPARATOR);
+define('DOCROOT', __DIR__ . DIRECTORY_SEPARATOR);
 
 // Make the application relative to the docroot, for symlink'd index.php
 if (!is_dir($application) AND is_dir(DOCROOT . $application))
