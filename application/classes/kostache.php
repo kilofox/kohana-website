@@ -137,16 +137,6 @@ class Kostache extends Kohana_Kostache
         return Route::url('team');
     }
 
-    /**
-     * Returns license page url
-     *
-     * @return  string
-     */
-    public function license_url()
-    {
-        return Route::url('license');
-    }
-
     public function github_releases_url()
     {
         return 'https://github.com/kilofox/kohana/releases';
