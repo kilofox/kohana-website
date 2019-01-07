@@ -1,29 +1,6 @@
 <?php
 
 /**
- * The directory in which your application specific resources are located.
- * The application directory must contain the bootstrap.php file.
- *
- * @link https://kohana.top/guide/about.install#application
- */
-$application = '../guides/3.4/application';
-
-/**
- * The directory in which your modules are located.
- *
- * @link https://kohana.top/guide/about.install#modules
- */
-$modules = '../guides/3.4/modules';
-
-/**
- * The directory in which the Kohana resources are located. The system
- * directory must contain the classes/kohana.php file.
- *
- * @link https://kohana.top/guide/about.install#system
- */
-$system = '../guides/3.4/system';
-
-/**
  * The default extension of resource files. If you change this, all resources
  * must be renamed to use the new extension.
  *
@@ -36,15 +13,12 @@ define('EXT', '.php');
  * @link http://www.php.net/manual/errorfunc.configuration#ini.error-reporting
  *
  * When developing your application, it is highly recommended to enable notices
- * and strict warnings. Enable them by using: E_ALL | E_STRICT
+ * and warnings. Enable them by using: E_ALL
  *
- * In a production environment, it is safe to ignore notices and strict warnings.
- * Disable them by using: E_ALL ^ E_NOTICE
- *
- * When using a legacy application with PHP >= 5.3, it is recommended to disable
- * deprecated notices. Disable with: E_ALL & ~E_DEPRECATED
+ * In a production environment, it is safe to ignore notices and warnings.
+ * Disable them by using: E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED
  */
-error_reporting(E_ALL | E_STRICT);
+error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED);
 
 /**
  * End of standard configuration! Changing any of the code below should only be
@@ -55,25 +29,10 @@ error_reporting(E_ALL | E_STRICT);
 // Set the full path to the docroot
 define('DOCROOT', __DIR__ . DIRECTORY_SEPARATOR);
 
-// Make the application relative to the docroot, for symlink'd index.php
-if (!is_dir($application) AND is_dir(DOCROOT . $application))
-    $application = DOCROOT . $application;
-
-// Make the modules relative to the docroot, for symlink'd index.php
-if (!is_dir($modules) AND is_dir(DOCROOT . $modules))
-    $modules = DOCROOT . $modules;
-
-// Make the system relative to the docroot, for symlink'd index.php
-if (!is_dir($system) AND is_dir(DOCROOT . $system))
-    $system = DOCROOT . $system;
-
-// Define the absolute paths for configured directories
-define('APPPATH', realpath($application) . DIRECTORY_SEPARATOR);
-define('MODPATH', realpath($modules) . DIRECTORY_SEPARATOR);
-define('SYSPATH', realpath($system) . DIRECTORY_SEPARATOR);
-
-// Clean up the configuration vars
-unset($application, $modules, $system);
+// Define the absolute paths for required directories
+define('APPPATH', realpath(DOCROOT . '../guides/3.4/application') . DIRECTORY_SEPARATOR);
+define('MODPATH', realpath(DOCROOT . '../guides/3.4/modules') . DIRECTORY_SEPARATOR);
+define('SYSPATH', realpath(DOCROOT . '../guides/3.4/system') . DIRECTORY_SEPARATOR);
 
 /**
  * Define the start time of the application, used for profiling.
@@ -92,7 +51,7 @@ if (!defined('KOHANA_START_MEMORY')) {
 // Bootstrap the application
 require '../guides/3.4-bootstrap' . EXT;
 
-if (PHP_SAPI == 'cli') {
+if (PHP_SAPI === 'cli') {
     // Try and load minion
     class_exists('Minion_Task') OR die('Please enable the Minion module for CLI support.');
     set_exception_handler(['Minion_Exception', 'handler']);
