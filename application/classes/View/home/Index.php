@@ -5,7 +5,7 @@ class View_Home_Index extends Kostache_Layout
     /**
      * @var     array    partials for the page
      */
-    protected $_partials = array(
+    protected $_partials = [
         'header' => 'partials/header',
         'footer' => 'partials/footer',
         'banner' => 'partials/home/banner',
@@ -13,7 +13,7 @@ class View_Home_Index extends Kostache_Layout
         'gallery' => 'home/gallery',
         'social' => 'home/social',
         'whouses' => 'home/whouses',
-    );
+    ];
 
     /**
      * @var     boolean   show the banner space on template

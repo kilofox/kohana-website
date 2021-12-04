@@ -20,12 +20,12 @@ class Notice
     {
         $session = Session::instance();
 
-        $notices = $session->get('notices', array());
+        $notices = $session->get('notices', []);
 
-        $notices[] = array(
+        $notices[] = [
             'type' => $type,
             'message' => __($message, $values),
-        );
+        ];
 
         $session->set('notices', $notices);
     }
@@ -39,7 +39,7 @@ class Notice
     {
         $session = Session::instance();
 
-        return $session->get_once('notices', array());
+        return $session->get_once('notices', []);
     }
 
 }

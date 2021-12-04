@@ -5,10 +5,10 @@ class Kostache extends Kohana_Kostache
     /**
      * @var     array    partials for the page
      */
-    protected $_partials = array(
+    protected $_partials = [
         'header' => 'partials/header',
         'footer' => 'partials/footer',
-    );
+    ];
 
     /**
      * @var     string    title of the site

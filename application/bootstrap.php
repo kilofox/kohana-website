@@ -34,7 +34,7 @@ setlocale(LC_ALL, 'en_US.utf-8');
  * @see  http://kohana.top/guide/using.autoloading
  * @see  http://php.net/spl_autoload_register
  */
-spl_autoload_register(array('Kohana', 'auto_load'));
+spl_autoload_register(['Kohana', 'auto_load']);
 
 /**
  * Enable the Kohana auto-loader for unserialization.
@@ -74,10 +74,10 @@ if (isset($_SERVER['KOHANA_ENV'])) {
  * - boolean  profile     enable or disable internal profiling               TRUE
  * - boolean  caching     enable or disable internal caching                 FALSE
  */
-Kohana::init(array(
+Kohana::init([
     'base_url' => '/',
     'index_file' => '',
-));
+]);
 
 /**
  * Attach the file write to logging. Multiple writers are supported.
@@ -92,7 +92,7 @@ Kohana::$config->attach(new Config_File);
 /**
  * Enable modules. Modules are referenced by a relative or absolute path.
  */
-Kohana::modules(array(
+Kohana::modules([
     //'auth'       => MODPATH.'auth',       // Basic authentication
     'cache' => MODPATH . 'cache', // Custom caching
     //'codebench'  => MODPATH.'codebench',  // Benchmarking tool
@@ -103,7 +103,7 @@ Kohana::modules(array(
     //'pagination' => MODPATH.'pagination', // Paging of results
     //'userguide'  => MODPATH.'userguide',  // User guide and API documentation
     'kostache' => MODPATH . 'kostache', // Kostache templating
-));
+]);
 
 /*
  * We want to show the world we're running on... Kohana of course!
@@ -111,81 +111,90 @@ Kohana::modules(array(
 Kohana::$expose = TRUE;
 
 /**
+ * Cookie Salt
+ * @see https://kohana.top/3.4/guide/kohana/cookies
+ *
+ * If you have not defined a cookie salt in your Cookie class then
+ * uncomment the line below and define a preferrably long salt.
+ */
+ Cookie::$salt = 'null';
+
+/**
  * Set the routes. Each route must have a minimum of a name, a URI and a set of
  * defaults for the URI.
  */
 Route::set('error', 'error')
-    ->defaults(array(
+    ->defaults([
         'controller' => 'home',
         'action' => 'error'
-    ));
+    ]);
 
 Route::set('download', 'download')
-    ->defaults(array(
+    ->defaults([
         'controller' => 'download',
         'action' => 'index'
-    ));
+    ]);
 
 Route::set('documentation', 'documentation')
-    ->defaults(array(
+    ->defaults([
         'controller' => 'documentation',
         'action' => 'index'
-    ));
+    ]);
 
 Route::set('development', 'development')
-    ->defaults(array(
+    ->defaults([
         'controller' => 'development',
         'action' => 'index'
-    ));
+    ]);
 
 Route::set('team', 'team')
-    ->defaults(array(
+    ->defaults([
         'controller' => 'team',
         'action' => 'index'
-    ));
+    ]);
 
 Route::set('license', 'license')
-    ->defaults(array(
+    ->defaults([
         'controller' => 'license',
         'action' => 'index'
-    ));
+    ]);
 
 Route::set('donate', 'donate')
-    ->defaults(array(
+    ->defaults([
         'controller' => 'donate',
         'action' => 'index'
-    ));
+    ]);
 
 Route::set('home', '(index)')
-    ->defaults(array(
+    ->defaults([
         'controller' => 'home',
         'action' => 'index'
-    ));
+    ]);
 
-// // Handles: feed/$type.rss and feed/$type.atom
-// Route::set('feed', 'feed/<name>', array('name' => '.+'))
-// 	->defaults(array(
-// 		'controller' => 'feed',
-// 		'action'     => 'load',
-// 	));
+//// Handles: feed/$type.rss and feed/$type.atom
+//Route::set('feed', 'feed/<name>', ['name' => '.+'])
+//    ->defaults([
+//        'controller' => 'feed',
+//        'action' => 'load',
+//    ]);
 //
-// // Handles: download/$file
-// Route::set('file', 'download/<file>', array('file' => '.+'))
-// 	->defaults(array(
-// 		'controller' => 'file',
-// 		'action'     => 'get',
-// 	));
+//// Handles: download/$file
+//Route::set('file', 'download/<file>', ['file' => '.+'])
+//    ->defaults([
+//        'controller' => 'file',
+//        'action' => 'get',
+//    ]);
 //
-// // Handles: donate
-// Route::set('donate', 'donate(/<action>)')
-// 	->defaults(array(
-// 		'controller' => 'donate',
-// 		'action'     => 'index',
-// 	));
+//// Handles: donate
+//Route::set('donate', 'donate(/<action>)')
+//    ->defaults([
+//        'controller' => 'donate',
+//        'action' => 'index',
+//    ]);
 //
-// // Handles: $lang/$page and $page
-// Route::set('page', '((<lang>/)<page>)', array('lang' => '[a-z]{2}', 'page' => '.+'))
-// 	->defaults(array(
-// 		'controller' => 'page',
-// 		'action'     => 'load',
-// 	));
+//// Handles: $lang/$page and $page
+//Route::set('page', '((<lang>/)<page>)', ['lang' => '[a-z]{2}', 'page' => '.+'])
+//    ->defaults([
+//        'controller' => 'page',
+//        'action' => 'load',
+//    ]);

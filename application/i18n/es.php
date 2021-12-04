@@ -3,7 +3,7 @@
 /**
  * Spanish Lang File
  */
-return array(
+return [
     'Basic Usage' => 'Uso Básico',
     'Getting Started' => 'Para empezar',
-);
+];
