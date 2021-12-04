@@ -18,7 +18,7 @@ class Kostache extends Kohana_Kostache
     /**
      * @var     boolean   show the banner space on template
      */
-    public $banner_exists = FALSE;
+    public $banner_exists = false;
 
     /**
      * @var     string    description of the page

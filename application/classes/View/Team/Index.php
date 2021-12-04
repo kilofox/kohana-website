@@ -13,7 +13,7 @@ class View_Team_Index extends Kostache_Layout
     /**
      * @var     boolean   show the banner space on template
      */
-    public $banner_exists = FALSE;
+    public $banner_exists = false;
 
     /**
      * Email link for team@kohana.top

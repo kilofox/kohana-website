@@ -16,7 +16,7 @@ class Notice
      * @param   array   Translation values
      * @return	void
      */
-    public static function add($type, $message = NULL, array $values = NULL)
+    public static function add($type, $message = null, array $values = null)
     {
         $session = Session::instance();
 

@@ -18,11 +18,11 @@ class View_Home_Index extends Kostache_Layout
     /**
      * @var     boolean   show the banner space on template
      */
-    public $banner_exists = TRUE;
+    public $banner_exists = true;
 
     /**
      * @var     boolean   triggers the menu bar highlight
      */
-    public $menu_home = TRUE;
+    public $menu_home = true;
 
 }

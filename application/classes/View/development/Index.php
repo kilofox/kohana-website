@@ -13,12 +13,12 @@ class View_Development_Index extends Kostache_Layout
     /**
      * @var     boolean   show the banner space on template
      */
-    public $banner_exists = FALSE;
+    public $banner_exists = false;
 
     /**
      * @var     boolean   triggers the menu bar highlight
      */
-    public $menu_development = TRUE;
+    public $menu_development = true;
 
     /**
      * Returns team page url

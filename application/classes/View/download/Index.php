@@ -13,11 +13,11 @@ class View_Download_Index extends Kostache_Layout
     /**
      * @var     boolean   show the banner space on template
      */
-    public $banner_exists = FALSE;
+    public $banner_exists = false;
 
     /**
      * @var     boolean   triggers the menu bar highlight
      */
-    public $menu_download = TRUE;
+    public $menu_download = true;
 
 }

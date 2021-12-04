@@ -13,6 +13,6 @@ class View_License_Index extends Kostache_Layout
     /**
      * @var     boolean   show the banner space on template
      */
-    public $banner_exists = FALSE;
+    public $banner_exists = false;
 
 }

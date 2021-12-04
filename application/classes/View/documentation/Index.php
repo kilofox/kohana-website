@@ -13,12 +13,12 @@ class View_Documentation_Index extends Kostache_Layout
     /**
      * @var     boolean   show the banner space on template
      */
-    public $banner_exists = FALSE;
+    public $banner_exists = false;
 
     /**
      * @var     boolean   triggers the menu bar highlight
      */
-    public $menu_documentation = TRUE;
+    public $menu_documentation = true;
 
     /**
      * Returns home page url
