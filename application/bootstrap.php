@@ -115,15 +115,16 @@ Kohana::$config->attach(new Config_File);
  * Enable modules. Modules are referenced by a relative or absolute path.
  */
 Kohana::modules([
-    //'auth'       => MODPATH.'auth',       // Basic authentication
-    'cache' => MODPATH . 'cache', // Custom caching
-    //'codebench'  => MODPATH.'codebench',  // Benchmarking tool
-    //'database'   => MODPATH.'database',   // Database access
-    //'image'      => MODPATH.'image',      // Image manipulation
-    //'oauth'      => MODPATH.'oauth',      // OAuth authentication
-    //'orm'        => MODPATH.'orm',        // Object Relationship Mapping
-    //'pagination' => MODPATH.'pagination', // Paging of results
-    //'userguide'  => MODPATH.'userguide',  // User guide and API documentation
+//    'auth' => MODPATH . 'auth', // Basic authentication
+    'cache' => MODPATH . 'cache', // Caching with multiple backends
+//    'codebench' => MODPATH . 'codebench', // Benchmarking tool
+//    'database' => MODPATH . 'database', // Database access
+//    'image' => MODPATH . 'image', // Image manipulation
+//    'minion' => MODPATH . 'minion', // CLI Tasks
+//    'oauth' => MODPATH . 'oauth', // OAuth authentication
+//    'orm' => MODPATH . 'orm', // Object Relationship Mapping
+//    'unittest' => MODPATH . 'unittest', // Unit testing
+//    'userguide' => MODPATH . 'userguide', // User guide and API documentation
     'kostache' => MODPATH . 'kostache', // Kostache templating
 ]);
 
