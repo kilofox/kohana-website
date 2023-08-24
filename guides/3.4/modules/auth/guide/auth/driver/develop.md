@@ -2,7 +2,7 @@
 
 ## Real World Example
 
-Sometimes the best way to learn is to jump right in and read the code from another module. The [ORM](https://github.com/kohana/orm/blob/3.2/develop/classes/kohana/auth/orm.php) module comes with an auth driver you can learn from.
+Sometimes the best way to learn is to jump right in and read the code from another module. The [ORM](../orm) module comes with an [auth driver](../../guide-api/Auth_ORM) you can learn from.
 
 [!!] We will be developing an `example` driver. In your own driver you will substitute `example` with your driver name.
 
@@ -17,30 +17,30 @@ First we will show you a quick example and then break down what is going on.
 ~~~
 class Auth_Example extends Auth
 {
-	protected function _login($username, $password, $remember)
-	{
-		// Do username/password check here
-	}
+    protected function _login($username, $password, $remember)
+    {
+        // Do username/password check here
+    }
 
-	public function password($username)
-	{
-		// Return the password for the username
-	}
+    public function password($username)
+    {
+        // Return the password for the username
+    }
 
-	public function check_password($password)
-	{
-		// Check to see if the logged in user has the given password
-	}
+    public function check_password($password)
+    {
+        // Check to see if the logged in user has the given password
+    }
 
-	public function logged_in($role = NULL)
-	{
-		// Check to see if the user is logged in, and if $role is set, has all roles
-	}
+    public function logged_in($role = null)
+    {
+        // Check to see if the user is logged in, and if $role is set, has all roles
+    }
 
-	public function get_user($default = NULL)
-	{
-		// Get the logged in user, or return the $default if a user is not found
-	}
+    public function get_user($default = null)
+    {
+        // Get the logged in user, or return the $default if a user is not found
+    }
 }
 ~~~
 
@@ -48,7 +48,7 @@ class Auth_Example extends Auth
 
 All drivers must extend the [Auth] class.
 
-	class Auth_Example extends Auth
+    class Auth_Example extends Auth
 
 ## Abstract Methods
 
@@ -69,9 +69,9 @@ Given that every auth system is going to check if users exist and if they have r
 Here are a few functions that you should pay attention to.
 
 ~~~
-public function logged_in($role = NULL)
+public function logged_in($role = null)
 
-public function get_user($default = NULL)
+public function get_user($default = null)
 ~~~
 
 ## Activating the Driver

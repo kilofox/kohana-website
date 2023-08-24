@@ -10,7 +10,7 @@ The `createMock()` and `getMockBuilder()` methods provided by PHPUnit can be use
 
 Most of the time you'll only need to use the createMock() method, i.e.:
 
-	$mock = $this->createMock('ORM');
+    $mock = $this->createMock('ORM');
 
 The creation of this mock is performed using best practice defaults. The `__construct` and `__clone` methods of the original class are not executed and the arguments passed to a method of the test double will not be cloned. If these defaults don't match your needs then you can use the `getMockBuilder() ` method to customize the test double generation. Here is a list of methods provided by the Mock Builder:
 
@@ -26,7 +26,7 @@ The creation of this mock is performed using best practice defaults. The `__cons
 
 You start off by telling PHPUnit how many times the method should be called by calling expects() on the mock object:
 
-	$mock->expects($matcher);
+    $mock->expects($matcher);
 
 `expects()` takes one argument, an invoker matcher which you can create using factory methods defined in `PHPUnit_Framework_TestCase`:
 
@@ -52,29 +52,29 @@ You start off by telling PHPUnit how many times the method should be called by c
 
 In our example we want `check()` to be called once on our mock object, so if we update it accordingly:
 
-	$mock = $this->getMockBuilder('ORM')
-		->setMethods(['check'])
-		->getMock();
-	
-	$mock->expects($this->once());
+    $mock = $this->getMockBuilder('ORM')
+        ->setMethods(['check'])
+        ->getMock();
+
+    $mock->expects($this->once());
 
 ### What is the method we're mocking?
 
 Although we told PHPUnit what methods we want to mock, we haven't actually told it what method these rules we're specifiying apply to.
 You do this by calling `method()` on the returned from `expects()`:
 
-	$mock->expects($matcher)
-		->method($methodName);
+    $mock->expects($matcher)
+        ->method($methodName);
 
 As you can probably guess, `method()` takes one parameter, the name of the method you're mocking.
 There's nothing very fancy about this function.
 
-	$mock = $this->getMockBuilder('ORM')
-		->setMethods(['check'])
-		->getMock();
-	
-	$mock->expects($this->once())
-		->method('check');
+    $mock = $this->getMockBuilder('ORM')
+        ->setMethods(['check'])
+        ->getMock();
+
+    $mock->expects($this->once())
+        ->method('check');
 
 
 ### What parameters should our mock method expect?
@@ -86,20 +86,20 @@ There are two ways to do this, either
 
 The former can be achieved by calling `withAnyParameters()` on the object returned from `method()`.
 
-	$mock->expects($matcher)
-		->method($methodName)
-		->withAnyParameters();
+    $mock->expects($matcher)
+        ->method($methodName)
+        ->withAnyParameters();
 
 To only allow specific parameters you can use the `with()` method which accepts any number of parameters.
 The order in which you define the parameters is the order that it expects them to be in when called.
 
-	$mock->expects($matcher)
-		->method($methodName)
-		->with($param1, $param2);
+    $mock->expects($matcher)
+        ->method($methodName)
+        ->with($param1, $param2);
 
 Calling `with()` without any parameters will force the mock method to accept no parameters.
 
-PHPUnit has a fairly complex way of comparing parameters passed to the mock method with the expected values, which can be summarised like so - 
+PHPUnit has a fairly complex way of comparing parameters passed to the mock method with the expected values, which can be summarised like so -
 
 * If the values are identical, they are equal.
 * If the values are of different types they are not equal.
@@ -118,9 +118,9 @@ If a parameter passed to `with()` is not an instance of a constraint object (one
 
 i.e., the following methods produce the same result:
 
-	->with('foo', 1);
-	
-	->with($this->equalTo('foo'), $this->equalTo(1));
+    ->with('foo', 1);
+
+    ->with($this->equalTo('foo'), $this->equalTo(1));
 
 Here are some of the wrappers PHPUnit provides for creating constraint objects:
 
@@ -137,13 +137,13 @@ Here are some of the wrappers PHPUnit provides for creating constraint objects:
 : Asserts that the parameter is greater than `$value`.
 
 `$this->anything()`
-: Returns TRUE regardless of what the parameter is.
+: Returns true regardless of what the parameter is.
 
 `$this->equalTo($value, $delta = 0, $canonicalizeEOL = false, $ignoreCase = false)`
 : Asserts that the parameter is equal to `$value` (same as not passing a constraint object to `with()`).
 : `$delta` is the degree of accuracy to use when comparing numbers. i.e. 0 means numbers need to be identical, 1 means numbers can be within a distance of one from each other.
-: If `$canonicalizeEOL` is TRUE then all newlines in string values will be converted to `\n` before comparision.
-: If `$ignoreCase` is TRUE then both strings will be converted to lowercase before comparision.
+: If `$canonicalizeEOL` is true then all newlines in string values will be converted to `\n` before comparision.
+: If `$ignoreCase` is true then both strings will be converted to lowercase before comparision.
 
 `$this->identicalTo($value)`
 : Asserts that the parameter is identical to `$value`.
@@ -164,7 +164,7 @@ Here are some of the wrappers PHPUnit provides for creating constraint objects:
 : Asserts that the parameter matches the PCRE pattern `$pattern` (using `preg_match()`).
 
 `$this->stringContains($string, $ignoreCase = false)`
-: Asserts that the parameter contains the string `$string`. If `$ignoreCase` is TRUE then a case insensitive comparision is done.
+: Asserts that the parameter contains the string `$string`. If `$ignoreCase` is true then a case insensitive comparision is done.
 
 `$this->stringEndsWith($suffix)`
 : Asserts that the parameter ends with `$suffix` (assumes parameter is a string).
@@ -176,16 +176,16 @@ Here are some of the wrappers PHPUnit provides for creating constraint objects:
 : Asserts that the parameter contains at least one value that is identical to `$value` (assumes parameter is array or `SplObjectStorage`).
 
 `$this->containsOnly($type, $isNativeType = true)`
-: Asserts that the parameter only contains items of type `$type`. `$isNativeType` should be set to TRUE when `$type` refers to a built in PHP data type (i.e. int, string etc.) (assumes parameter is array).
+: Asserts that the parameter only contains items of type `$type`. `$isNativeType` should be set to true when `$type` refers to a built in PHP data type (i.e. int, string etc.) (assumes parameter is array).
 
 
 There are more constraint objects than listed here, look in `PHPUnit_Framework_Assert` and `PHPUnit/Framework/Constraint` if you need more constraints.
 
 If we continue our example, we have the following:
 
-	$mock->expects($this->once())
-		->method('check')
-		->with();
+    $mock->expects($this->once())
+        ->method('check')
+        ->with();
 
 So far PHPUnit knows that we want the `check()` method to be called once, with no parameters. Now we just need to get it to return something.
 
@@ -203,7 +203,7 @@ Specifying a return value is easy, just call `will()` on the object returned by 
 
 The function is defined like so:
 
-	public function will(PHPUnit_Framework_MockObject_Stub $stub)
+    public function will(PHPUnit_Framework_MockObject_Stub $stub)
 
 PHPUnit provides some MockObject stubs out of the box, you can access them via (when called from a testcase):
 
@@ -222,13 +222,13 @@ Obviously if you really want to you can create your own MockObject stub, but the
 
 Updating our example gives:
 
-	$mock->expects($this->once())
-		->method('check')
-		->with()
-		->will($this->returnValue(true));
+    $mock->expects($this->once())
+        ->method('check')
+        ->with()
+        ->will($this->returnValue(true));
 
 And we're done!
 
-If you now call `$mock->check()` the value TRUE should be returned.
+If you now call `$mock->check()` the value true should be returned.
 
 If you don't call a mocked method and PHPUnit expects it to be called then the test the mock was generated for will fail.

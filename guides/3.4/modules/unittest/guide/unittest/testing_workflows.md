@@ -1,6 +1,6 @@
 # Testing workflows
 
-Having unittests for your application is a nice idea, but unless you actually use them they're about as useful as a chocolate firegaurd.  There are quite a few ways of getting tests "into" your development process and this guide aims to cover a few of them.
+Having unittests for your application is a nice idea, but unless you actually use them they're about as useful as a chocolate firegaurd. There are quite a few ways of getting tests "into" your development process and this guide aims to cover a few of them.
 
 ## Integrating with IDEs
 
@@ -22,7 +22,7 @@ If you're developing in a text editor such as textmate, vim, gedit etc. chances 
 
 In such situations you can run a simple bash script to loop over the tests every X seconds, here's an example script:
 
-	while(true) do clear; phpunit; sleep 8; done;
+    while(true) do clear; phpunit; sleep 8; done;
 
 You will probably need to adjust the timeout (`sleep 8`) to suit your own workflow, but 8 seconds seems to be about enough time to see what's erroring before the tests are re-run.
 
