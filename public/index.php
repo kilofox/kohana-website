@@ -1,19 +1,6 @@
 <?php
 
 /**
- * Detect and "route" to guide applications...
- */
-if (preg_match('/^\/([\d\.]+)\/guide/', $_SERVER['REQUEST_URI'], $matches)) {
-    $version = $matches[1];
-
-    if (is_file('../guides/' . $version . '-index.php')) {
-        return include '../guides/' . $version . '-index.php';
-    }
-}
-
-unset($matches);
-
-/**
  * The default extension of resource files. If you change this, all resources
  * must be renamed to use the new extension.
  *

@@ -1,3 +1,7 @@
+<FilesMatch 3\.[123]{1}\-index\.php$>
+    FcgidWrapper "${PHP56Wrapper}" .php
+</FilesMatch>
+
 # Turn on URL rewriting
 RewriteEngine On
 
