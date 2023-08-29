@@ -2,7 +2,7 @@
 
 Kohana provides classes that make it easy to work with both cookies and sessions. At a high level both sessions and cookies provide the same functionality. They allow the developer to store temporary or persistent information about a specific client for later retrieval, usually to make something persistent between requests.
 
-Sessions should be used for storing temporary or private data.  Very sensitive data should be stored using the [Session] class with the "database" or "native" adapters. When using the "cookie" adapter, the session should always be encrypted.
+Sessions should be used for storing temporary or private data. Very sensitive data should be stored using the [Session] class with the "database" or "native" adapters. When using the "cookie" adapter, the session should always be encrypted.
 
 [!!] For more information on best practices with session variables see [the seven deadly sins of sessions](http://lists.nyphp.org/pipermail/talk/2006-December/020358.html).
 
@@ -24,7 +24,7 @@ You can also use this to overload the `$_SESSION` global to get and set data in 
 
     // Overload $_SESSION with the session data
     $_SESSION =& $session->as_array();
-    
+
     // Set session data
     $_SESSION[$key] = $value;
 
@@ -34,8 +34,8 @@ Storing session or cookie data is done using the `set` method:
 
     // Set session data
     $session->set($key, $value);
-	// Or
-	Session::instance()->set($key, $value);
+    // Or
+    Session::instance()->set($key, $value);
 
     // Store a user id
     $session->set('user_id', 10);
@@ -80,7 +80,7 @@ Cookie
 
 The default adapter can be set by changing the value of [Session::$default]. The default adapter is "native".
 
-To access a Session using the default adapter, simply call [Session::instance()].  To access a Session using something other than the default, pass the adapter name to `instance()`, for example: `Session::instance('cookie')`
+To access a Session using the default adapter, simply call [Session::instance()]. To access a Session using something other than the default, pass the adapter name to `instance()`, for example: `Session::instance('cookie')`
 
 
 ### Session Adapter Settings
@@ -89,30 +89,30 @@ You can apply configuration settings to each of the session adapters by creating
 
 [!!] As with cookies, a "lifetime" setting of "0" means that the session will expire when the browser is closed.
 
-    return array(
-        'native' => array(
+    return [
+        'native' => [
             'name' => 'session_name',
             'lifetime' => 43200,
-        ),
-        'cookie' => array(
+        ],
+        'cookie' => [
             'name' => 'cookie_name',
-            'encrypted' => TRUE,
+            'encrypted' => true,
             'lifetime' => 43200,
-        ),
-        'database' => array(
+        ],
+        'database' => [
             'name' => 'cookie_name',
-            'encrypted' => TRUE,
+            'encrypted' => true,
             'lifetime' => 43200,
             'group' => 'default',
             'table' => 'table_name',
-            'columns' => array(
-                'session_id'  => 'session_id',
-        		'last_active' => 'last_active',
-        		'contents'    => 'contents'
-            ),
+            'columns' => [
+                'session_id' => 'session_id',
+                'last_active' => 'last_active',
+                'contents' => 'contents'
+            ],
             'gc' => 500,
-        ),
-    );
+        ],
+    ];
 
 #### Native Adapter
 
@@ -126,7 +126,7 @@ Type      | Setting   | Description                                       | Defa
 Type      | Setting   | Description                                       | Default
 ----------|-----------|---------------------------------------------------|-----------
 `string`  | name      | name of the cookie used to store the session data | `"session"`
-`boolean` | encrypted | encrypt the session data using [Encrypt]?         | `FALSE`
+`boolean` | encrypted | encrypt the session data using [Encrypt]?         | `false`
 `integer` | lifetime  | number of seconds the session should live for     | `0`
 
 #### Database Adapter
@@ -138,7 +138,7 @@ Type      | Setting   | Description                                       | Defa
 `array`   | columns   | associative array of column aliases               | `array`
 `integer` | gc        | 1:x chance that garbage collection will be run    | `500`
 `string`  | name      | name of the cookie used to store the session data | `"session"`
-`boolean` | encrypted | encrypt the session data using [Encrypt]?         | `FALSE`
+`boolean` | encrypted | encrypt the session data using [Encrypt]?         | `false`
 `integer` | lifetime  | number of seconds the session should live for     | `0`
 
 ##### Table Schema

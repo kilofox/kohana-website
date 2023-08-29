@@ -11,10 +11,10 @@ To keep your URLs clean, you will probably want to be able to access your app wi
 
 The first thing you will need to change is the `index_file` setting of [Kohana::init] to false:
 
-    Kohana::init(array(
-        'base_url'   => '/myapp/',
-        'index_file' => FALSE,
-    ));
+    Kohana::init([
+        'base_url' => '/myapp/',
+        'index_file' => false,
+    ]);
 
 This change will make it so all of the links generated using [URL::site], [URL::base], and [HTML::anchor] will no longer include "index.php" in the URL. All generated links will start with `/myapp/` instead of `/myapp/index.php/`.
 
@@ -30,7 +30,7 @@ Rename `example.htaccess` to only `.htaccess` and alter the `RewriteBase` line t
 
     RewriteBase /myapp/
 
-The rest of the `.htaccess file` rewrites all requests through index.php, unless the file exists on the server (so your css, images, favicon, etc. are still loaded like normal).  In most cases, you are done!
+The rest of the `.htaccess file` rewrites all requests through index.php, unless the file exists on the server (so your css, images, favicon, etc. are still loaded like normal). In most cases, you are done!
 
 ### 404 errors
 
@@ -38,11 +38,11 @@ If you get a "404 Not Found" error when trying to view a page then it's likely A
 
 In the main apache configuration file (usually `httpd.conf`), or in the virtual server configuration file, check that the `AccessFileName` directive is set to `.htaccess` and the `AllowOverride` directive is set to `All`.
 
-		AccessFileName .htaccess
+        AccessFileName .htaccess
 
-		<Directory "/var/www/html/myapp">
-				AllowOverride All
-		</Directory>
+        <Directory "/var/www/html/myapp">
+                AllowOverride All
+        </Directory>
 
 
 ### Failed!
@@ -65,7 +65,7 @@ To something more simple:
 
 ### Still Failed!
 
-If you are still getting errors, check to make sure that your host supports URL `mod_rewrite`. If you can change the Apache configuration, add these lines to the	 configuration, usually `httpd.conf`:
+If you are still getting errors, check to make sure that your host supports URL `mod_rewrite`. If you can change the Apache configuration, add these lines to the     configuration, usually `httpd.conf`:
 
     <Directory "/var/www/html/myapp">
         Order allow,deny

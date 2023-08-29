@@ -8,7 +8,7 @@ Shown here are the basic usage of this module. For full documentation about the 
 
 ~~~
 // Uses the image from upload directory
-$img = Image::factory(DOCROOT.'uploads/sample-image.jpg');
+$img = Image::factory(DOCROOT . 'uploads/sample-image.jpg');
 ~~~
 
 Once an instance is created, you can now manipulate the image by using the following instance methods.
@@ -30,16 +30,16 @@ Other examples:
 ~~~
 // Resize to 200 pixels on the shortest side
 $img->resize(200, 200);
- 
+
 // Resize to 200x200 pixels, keeping aspect ratio
 $img->resize(200, 200, Image::INVERSE);
- 
+
 // Resize to 500 pixel width, keeping aspect ratio
-$img->resize(500, NULL);
- 
+$img->resize(500, null);
+
 // Resize to 500 pixel height, keeping aspect ratio
-$img->resize(NULL, 500);
- 
+$img->resize(null, 500);
+
 // Resize to 200x500 pixels, ignoring aspect ratio
 $img->resize(200, 500, Image::NONE);
 ~~~
@@ -49,24 +49,24 @@ $img->resize(200, 500, Image::NONE);
 You can render the image object directly to the browser using the [Image::render()] method.
 
 ~~~
-$img = Image::factory(DOCROOT.'uploads/colorado-farm-1920x1200.jpg');
+$img = Image::factory(DOCROOT . 'uploads/colorado-farm-1920x1200.jpg');
 
 header('Content-Type: image/jpeg');
 
 echo $img->resize(300, 300)
-	->render();
+    ->render();
 ~~~
 
 What it did is resize a 1920x1200 wallpaper image into 300x300 proportionally and render it to the browser. If you are trying to render the image in a controller action, you can do instead:
 
 ~~~
-$img = Image::factory(DOCROOT.'uploads/colorado-farm-1920x1200.jpg');
+$img = Image::factory(DOCROOT . 'uploads/colorado-farm-1920x1200.jpg');
 
 $this->response->headers('Content-Type', 'image/jpg');
 
 $this->response->body(
-	$img->resize(300, 300)
-		->render()
+    $img->resize(300, 300)
+        ->render()
 );
 ~~~
 
@@ -74,8 +74,8 @@ $this->response->body(
 
 ~~~
 // Render the image at 50% quality
-$img->render(NULL, 50);
- 
+$img->render(null, 50);
+
 // Render the image as a PNG
 $img->render('png');
 ~~~
@@ -87,12 +87,12 @@ $img->render('png');
 On our example above, instead of rendering the file to the browser, you may want to save it somewhere instead. To do so, you may:
 
 ~~~
-$img = Image::factory(DOCROOT.'uploads/colorado-farm-1920x1200.jpg');
+$img = Image::factory(DOCROOT . 'uploads/colorado-farm-1920x1200.jpg');
 
-$filename = DOCROOT.'uploads/img-'.uniqid().'.jpg';
+$filename = DOCROOT . 'uploads/img-' . uniqid() . '.jpg';
 
 $img->resize(300, 300)
-	->save($filename, 80);
+    ->save($filename, 80);
 ~~~
 
 What we do is resize the image and save it to file reducing quality to 80% and save it to the upload directory using a unique filename.
@@ -101,7 +101,7 @@ What we do is resize the image and save it to file reducing quality to 80% and s
 
 There are more methods available for the [Image] module which provides powerfull features that are best describe in the API documentation. Here are some of them:
 
-* [Image::background()] - Set the background color of an image. 
+* [Image::background()] - Set the background color of an image.
 * [Image::crop()] - Crop an image to the given size.
 * [Image::flip()] - Flip the image along the horizontal or vertical axis.
 * [Image::reflection()] - Add a reflection to an image.

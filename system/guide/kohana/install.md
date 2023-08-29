@@ -2,13 +2,13 @@
 
 [!!] Before continuing, make sure you have a web server (like Apache) configured with the following requirements.
 
- - PHP 5.3.3 or newer.
+ - PHP 5.6 or newer.
  - [Iconv Extension](http://php.net/iconv)
  - [Character Type (CTYPE) Extension](http://php.net/ctype)
 
 # Download
 
-You can get the latest **stable** release on the [Kohana website](http://kohanaframework.org/). This will give you a fully functional application with an `application`, `modules`, and `system` directory.
+You can get the latest **stable** release on the [Kohana website](https://kohana.top/). This will give you a fully functional application with an `application`, `modules`, and `system` directory.
 
 [!!] You can find information about the file structure on the [Cascading Filesystem](files) page.
 
@@ -29,21 +29,21 @@ date_default_timezone_set('America/Sao_Paulo');
  * Example of kohana's installation at /var/www/kohana and
  * Apache's DocumentRoot configured to /var/www
  */
-Kohana::init(array(
-	'base_url' => '/kohana/',
-));
+Kohana::init([
+    'base_url' => '/kohana/',
+]);
 ~~~
 
  - List your trusted hosts. Open `application/config/url.php` and add regex patterns of the hosts you expect your application to be accessible from.
 
    [!!] Do not forget to escape your dots (.) as these are regex patterns. These patterns should always fully match, as they are prepended with `^` and appended with `$`.
 ~~~
-return array(
-	'trusted_hosts' => array(
-		'example\.org',
-		'.*\.example\.org',
-	),
-);
+return [
+    'trusted_hosts' => [
+        'example\.org',
+        '.*\.example\.org',
+    ],
+];
 ~~~
 
  - Define a salt for the `Cookie` class.
