@@ -23,8 +23,8 @@ class Kohana_Encrypt_McryptTest extends Unittest_TestCase
      * Provider for test_encode.
      *
      * AES Multiblock Message Test (MMT) Sample Vectors - Known Answer Test (KAT).
-     * @link http://csrc.nist.gov/groups/STM/cavp/index.html NIST - Cryptographic Algorithm Validation Program
-     * @link http://csrc.nist.gov/groups/STM/cavp/documents/aes/aesmmt.zip file used CBCMMT128.rsp
+     * @link https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program NIST - Cryptographic Algorithm Validation Program
+     * @link https://csrc.nist.gov/csrc/media/projects/cryptographic-algorithm-validation-program/documents/aes/aesmmt.zip file used CBCMMT128.rsp
      *
      * @return  array   Array of $mode, $cipher, $key, $iv, $txtPlain, $txtEncoded.
      */
@@ -182,7 +182,7 @@ class Kohana_Encrypt_McryptTest extends Unittest_TestCase
      * @param   string  $key        Encryption key.
      * @param   string  $iv         Initialization vector.
      * @param   string  $txtPlain   Plain text to be encrypted.
-     * @param   string  $txtEncoded Known ecrypted text.
+     * @param   string  $txtEncoded Known encrypted text.
      *
      * @dataProvider providerEncode
      * @covers Encrypt_Mcrypt::encode
@@ -197,7 +197,7 @@ class Kohana_Encrypt_McryptTest extends Unittest_TestCase
         $e = $this->getMockBuilder('Encrypt_Mcrypt')
             ->enableOriginalConstructor()
             ->setConstructorArgs(['name' => 'mcrypt', 'config' => ['driver' => 'mcrypt', 'cipher' => $cipher, 'key' => $key, 'mode' => $mode, 'iv' => $iv]])
-            ->setMethods(null)
+            ->setMethods()
             ->getMock();
 
         // Prepare data.
@@ -212,8 +212,8 @@ class Kohana_Encrypt_McryptTest extends Unittest_TestCase
      * Provider for test_decode.
      *
      * AES Multiblock Message Test (MMT) Sample Vectors - Known Answer Test (KAT).
-     * @link http://csrc.nist.gov/groups/STM/cavp/index.html NIST - Cryptographic Algorithm Validation Program
-     * @link http://csrc.nist.gov/groups/STM/cavp/documents/aes/aesmmt.zip file used CBCMMT128.rsp
+     * @link https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program NIST - Cryptographic Algorithm Validation Program
+     * @link https://csrc.nist.gov/csrc/media/projects/cryptographic-algorithm-validation-program/documents/aes/aesmmt.zip file used CBCMMT128.rsp
      *
      * @return  array   Array of $mode, $cipher, $key, $iv, $txtEncoded, $txtPlain.
      */
@@ -370,7 +370,7 @@ class Kohana_Encrypt_McryptTest extends Unittest_TestCase
      * @param   string  $cipher     Encryption cipher.
      * @param   string  $key        Encryption key.
      * @param   string  $iv         Initialization vector.
-     * @param   string  $txtEncoded Ecrypted text.
+     * @param   string  $txtEncoded Encrypted text.
      * @param   string  $txtPlain   Known plain text that is decrypted.
      *
      * @dataProvider providerDecode
@@ -386,7 +386,7 @@ class Kohana_Encrypt_McryptTest extends Unittest_TestCase
         $e = $this->getMockBuilder('Encrypt_Mcrypt')
             ->enableOriginalConstructor()
             ->setConstructorArgs(['name' => 'mcrypt', 'config' => ['driver' => 'mcrypt', 'cipher' => $cipher, 'key' => $key, 'mode' => $mode]])
-            ->setMethods(null)
+            ->setMethods()
             ->getMock();
 
         // Prepare data.
@@ -450,7 +450,7 @@ class Kohana_Encrypt_McryptTest extends Unittest_TestCase
         $e = $this->getMockBuilder('Encrypt_Mcrypt')
             ->enableOriginalConstructor()
             ->setConstructorArgs(['name' => 'mcrypt', 'config' => ['driver' => 'mcrypt', 'cipher' => $cipher, 'key' => $key, 'mode' => $mode]])
-            ->setMethods(null)
+            ->setMethods()
             ->getMock();
 
         // Encode.
@@ -516,7 +516,7 @@ class Kohana_Encrypt_McryptTest extends Unittest_TestCase
         $e = $this->getMockBuilder('Encrypt_Mcrypt')
             ->enableOriginalConstructor()
             ->setConstructorArgs(['name' => 'mcrypt', 'config' => ['driver' => 'mcrypt', 'cipher' => $cipher, 'key' => $key, 'mode' => $mode]])
-            ->setMethods(null)
+            ->setMethods()
             ->getMock();
 
         // Assert.
@@ -544,7 +544,7 @@ class Kohana_Encrypt_McryptTest extends Unittest_TestCase
         $e = $this->getMockBuilder('Encrypt_Mcrypt')
             ->enableOriginalConstructor()
             ->setConstructorArgs(['name' => 'mcrypt', 'config' => ['driver' => 'mcrypt', 'cipher' => $cipher, 'key' => $key, 'mode' => $mode]])
-            ->setMethods(null)
+            ->setMethods()
             ->getMock();
 
         $txtEncodedFirst = $e->encode($txtPlain);
@@ -572,9 +572,10 @@ class Kohana_Encrypt_McryptTest extends Unittest_TestCase
     /**
      * Helper method to test for private/protected properties.
      *
-     * @param   mixed   $expect Expected value.
-     * @param   mixed   $object Object that holds the private/protected property.
-     * @param   string  $name   The name of the private/protected property.
+     * @param mixed $expect Expected value.
+     * @param mixed $object Object that holds the private/protected property.
+     * @param string $name The name of the private/protected property.
+     * @throws ReflectionException
      */
     protected function assertSameProtectedProperty($expect, $object, $name)
     {
