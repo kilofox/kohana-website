@@ -30,13 +30,13 @@ abstract class Kohana_Session
      *
      * [!!] [Session::write] will automatically be called when the request ends.
      *
-     * @param string $type type of session (native, cookie, etc.)
-     * @param string $id session identifier
+     * @param string|null $type Type of session (native, cookie, etc.)
+     * @param string|null $id Session identifier
      * @return  Session
      * @throws Kohana_Exception
      * @uses    Kohana::$config
      */
-    public static function instance($type = null, $id = null)
+    public static function instance(string $type = null, string $id = null): Session
     {
         if ($type === null) {
             // Use the default type
@@ -90,13 +90,12 @@ abstract class Kohana_Session
      *
      * [!!] Sessions can only be created using the [Session::instance] method.
      *
-     * @param array $config configuration
-     * @param string $id session id
-     * @return  void
+     * @param array|null $config configuration
+     * @param string|null $id session id
      * @throws Session_Exception
      * @uses    Session::read
      */
-    public function __construct(array $config = null, $id = null)
+    public function __construct(array $config = null, string $id = null)
     {
         if (isset($config['name'])) {
             // Cookie name to store the session id in
@@ -161,7 +160,7 @@ abstract class Kohana_Session
      *
      * @return  array
      */
-    public function & as_array()
+    public function & as_array(): array
     {
         return $this->_data;
     }
@@ -176,7 +175,7 @@ abstract class Kohana_Session
      * @return  string
      * @since   3.0.8
      */
-    public function id()
+    public function id(): ?string
     {
         return null;
     }
@@ -189,7 +188,7 @@ abstract class Kohana_Session
      * @return  string
      * @since   3.0.8
      */
-    public function name()
+    public function name(): string
     {
         return $this->_name;
     }
@@ -199,11 +198,11 @@ abstract class Kohana_Session
      *
      *     $foo = $session->get('foo');
      *
-     * @param   string  $key        variable name
+     * @param string $key Variable name
      * @param   mixed   $default    default value to return
      * @return  mixed
      */
-    public function get($key, $default = null)
+    public function get(string $key, $default = null)
     {
         return array_key_exists($key, $this->_data) ? $this->_data[$key] : $default;
     }
@@ -213,11 +212,11 @@ abstract class Kohana_Session
      *
      *     $bar = $session->get_once('bar');
      *
-     * @param   string  $key        variable name
+     * @param string $key Variable name
      * @param   mixed   $default    default value to return
      * @return  mixed
      */
-    public function get_once($key, $default = null)
+    public function get_once(string $key, $default = null)
     {
         $value = $this->get($key, $default);
 
@@ -231,11 +230,11 @@ abstract class Kohana_Session
      *
      *     $session->set('foo', 'bar');
      *
-     * @param   string  $key    variable name
+     * @param string $key Variable name
      * @param   mixed   $value  value
      * @return  $this
      */
-    public function set($key, $value)
+    public function set(string $key, $value): Kohana_Session
     {
         $this->_data[$key] = $value;
 
@@ -247,13 +246,13 @@ abstract class Kohana_Session
      *
      *     $session->bind('foo', $foo);
      *
-     * @param   string  $key    variable name
+     * @param string $key Variable name
      * @param   mixed   $value  referenced value
      * @return  $this
      */
-    public function bind($key, & $value)
+    public function bind(string $key, &$value): Kohana_Session
     {
-        $this->_data[$key] = & $value;
+        $this->_data[$key] = &$value;
 
         return $this;
     }
@@ -263,14 +262,12 @@ abstract class Kohana_Session
      *
      *     $session->delete('foo');
      *
-     * @param   string  $key,...    variable name
+     * @param string ...$keys variable name
      * @return  $this
      */
-    public function delete($key)
+    public function delete(...$keys): Kohana_Session
     {
-        $args = func_get_args();
-
-        foreach ($args as $key) {
+        foreach ($keys as $key) {
             unset($this->_data[$key]);
         }
 
@@ -282,11 +279,11 @@ abstract class Kohana_Session
      *
      *     $session->read();
      *
-     * @param string $id session id
+     * @param string|null $id Session ID
      * @return  void
      * @throws Session_Exception
      */
-    public function read($id = null)
+    public function read(string $id = null)
     {
         try {
             if (is_string($data = $this->_read($id))) {
@@ -300,8 +297,6 @@ abstract class Kohana_Session
 
                 // Unserialize the data
                 $data = $this->_unserialize($data);
-            } else {
-                // Ignore these, session is valid, likely no data though.
             }
         } catch (Exception $e) {
             // Error reading the session, usually a corrupt session.
@@ -321,7 +316,7 @@ abstract class Kohana_Session
      *
      * @return  string
      */
-    public function regenerate()
+    public function regenerate(): string
     {
         return $this->_regenerate();
     }
@@ -335,12 +330,12 @@ abstract class Kohana_Session
      * but not displayed, because sessions are written after output has
      * been sent.
      *
-     * @return  boolean
+     * @return  bool
      * @uses    Kohana::$log
      */
-    public function write()
+    public function write(): bool
     {
-        if (headers_sent() OR $this->_destroyed) {
+        if (headers_sent() || $this->_destroyed) {
             // Session cannot be written when the headers are sent or when
             // the session has been destroyed
             return false;
@@ -364,9 +359,9 @@ abstract class Kohana_Session
      *
      *     $success = $session->destroy();
      *
-     * @return  boolean
+     * @return bool
      */
-    public function destroy()
+    public function destroy(): bool
     {
         if ($this->_destroyed === false) {
             if ($this->_destroyed = $this->_destroy()) {
@@ -383,9 +378,9 @@ abstract class Kohana_Session
      *
      *     $success = $session->restart();
      *
-     * @return  boolean
+     * @return bool
      */
-    public function restart()
+    public function restart(): bool
     {
         if ($this->_destroyed === false) {
             // Wipe out the current session.
@@ -401,10 +396,10 @@ abstract class Kohana_Session
     /**
      * Serializes the session data.
      *
-     * @param   array  $data  data
+     * @param array $data Data
      * @return  string
      */
-    protected function _serialize($data)
+    protected function _serialize(array $data): string
     {
         return serialize($data);
     }
@@ -412,10 +407,10 @@ abstract class Kohana_Session
     /**
      * Unserializes the session data.
      *
-     * @param   string  $data  data
+     * @param string $data Data
      * @return  array
      */
-    protected function _unserialize($data)
+    protected function _unserialize(string $data): array
     {
         return unserialize($data);
     }
@@ -423,10 +418,10 @@ abstract class Kohana_Session
     /**
      * Encodes the session data using [base64_encode].
      *
-     * @param   string  $data  data
+     * @param string $data Data
      * @return  string
      */
-    protected function _encode($data)
+    protected function _encode(string $data): string
     {
         return base64_encode($data);
     }
@@ -434,10 +429,10 @@ abstract class Kohana_Session
     /**
      * Decodes the session data using [base64_decode].
      *
-     * @param   string  $data  data
+     * @param string $data Data
      * @return  string
      */
-    protected function _decode($data)
+    protected function _decode(string $data): string
     {
         return base64_decode($data);
     }
@@ -445,32 +440,32 @@ abstract class Kohana_Session
     /**
      * Loads the raw session data string and returns it.
      *
-     * @param   string  $id session id
-     * @return  string
+     * @param string|null $id Session ID
+     * @return string|array
      */
-    abstract protected function _read($id = null);
+    abstract protected function _read(string $id = null);
     /**
      * Generate a new session id and return it.
      *
-     * @return  string
+     * @return string|null
      */
-    abstract protected function _regenerate();
+    abstract protected function _regenerate(): ?string;
     /**
      * Writes the current session.
      *
-     * @return  boolean
+     * @return bool
      */
-    abstract protected function _write();
+    abstract protected function _write(): bool;
     /**
      * Destroys the current session.
      *
-     * @return  boolean
+     * @return bool
      */
-    abstract protected function _destroy();
+    abstract protected function _destroy(): bool;
     /**
      * Restarts the current session.
      *
-     * @return  boolean
+     * @return bool
      */
-    abstract protected function _restart();
+    abstract protected function _restart(): bool;
 }

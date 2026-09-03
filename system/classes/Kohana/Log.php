@@ -24,7 +24,7 @@ class Kohana_Log
     const DEBUG = LOG_DEBUG;    // 7
 
     /**
-     * @var  boolean  immediately write when logs are added
+     * @var bool immediately write when logs are added
      */
     public static $write_on_add = false;
 
@@ -40,7 +40,7 @@ class Kohana_Log
      *
      * @return  Log
      */
-    public static function instance()
+    public static function instance(): Log
     {
         if (Log::$_instance === null) {
             // Create a new instance
@@ -71,10 +71,10 @@ class Kohana_Log
      *
      * @param   Log_Writer  $writer     instance
      * @param   mixed       $levels     array of messages levels to write OR max level to write
-     * @param   integer     $min_level  min level to write IF $levels is not an array
-     * @return  Log
+     * @param int $min_level Min level to write IF $levels is not an array
+     * @return  Kohana_Log
      */
-    public function attach(Log_Writer $writer, $levels = [], $min_level = 0)
+    public function attach(Log_Writer $writer, $levels = [], int $min_level = 0): Kohana_Log
     {
         if (!is_array($levels)) {
             $levels = range($min_level, $levels);
@@ -94,9 +94,9 @@ class Kohana_Log
      *     $log->detach($writer);
      *
      * @param   Log_Writer  $writer instance
-     * @return  Log
+     * @return  Kohana_Log
      */
-    public function detach(Log_Writer $writer)
+    public function detach(Log_Writer $writer): Kohana_Log
     {
         // Remove the writer
         unset($this->_writers["$writer"]);
@@ -112,13 +112,13 @@ class Kohana_Log
      *         ':user' => $username,
      *     ]);
      *
-     * @param   string  $level       level of message
-     * @param   string  $message     message body
-     * @param   array   $values      values to replace in the message
-     * @param   array   $additional  additional custom parameters to supply to the log writer
-     * @return  Log
+     * @param string $level level of message
+     * @param string $message message body
+     * @param array|null $values values to replace in the message
+     * @param array|null $additional additional custom parameters to supply to the log writer
+     * @return  Kohana_Log
      */
-    public function add($level, $message, array $values = null, array $additional = null)
+    public function add(string $level, string $message, array $values = null, array $additional = null): Kohana_Log
     {
         if ($values) {
             // Insert the values into the message
@@ -140,7 +140,7 @@ class Kohana_Log
             }
         }
 
-        if ($additional == null) {
+        if ($additional === null) {
             $additional = [];
         }
 
@@ -150,10 +150,10 @@ class Kohana_Log
             'level' => $level,
             'body' => $message,
             'trace' => $trace,
-            'file' => isset($trace[0]['file']) ? $trace[0]['file'] : null,
-            'line' => isset($trace[0]['line']) ? $trace[0]['line'] : null,
-            'class' => isset($trace[0]['class']) ? $trace[0]['class'] : null,
-            'function' => isset($trace[0]['function']) ? $trace[0]['function'] : null,
+            'file' => $trace[0]['file'] ?? null,
+            'line' => $trace[0]['line'] ?? null,
+            'class' => $trace[0]['class'] ?? null,
+            'function' => $trace[0]['function'] ?? null,
             'additional' => $additional,
         ];
 

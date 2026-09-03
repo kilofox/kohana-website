@@ -36,7 +36,7 @@ class Bench_AutoLinkEmails extends Codebench
         );
     }
 
-    protected function _callback_external($matches)
+    protected function _callback_external($matches): string
     {
         return HTML::mailto($matches[0]);
     }
@@ -45,7 +45,10 @@ class Bench_AutoLinkEmails extends Codebench
     public function bench_replace_callback_internal($subject)
     {
         return preg_replace_callback(
-            '~\b(?<!href="mailto:|">|58;)(?!\.)[-+_a-z0-9.]++(?<!\.)@(?![-.])[-a-z0-9.]+(?<!\.)\.[a-z]{2,6}\b~i', create_function('$matches', 'return HTML::mailto($matches[0]);'), // Yuck!
+            '~\b(?<!href="mailto:|">|58;)(?!\.)[-+_a-z0-9.]++(?<!\.)@(?![-.])[-a-z0-9.]+(?<!\.)\.[a-z]{2,6}\b~i',
+            function ($matches) {
+                return HTML::mailto($matches[0]);
+            }, // Yuck!
             $subject
         );
     }

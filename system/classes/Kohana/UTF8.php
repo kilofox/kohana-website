@@ -25,11 +25,6 @@
 class Kohana_UTF8
 {
     /**
-     * @var  boolean  Does the server support UTF-8 natively?
-     */
-    public static $server_utf8 = null;
-
-    /**
      * @var  array  List of called methods that have had their required file included.
      */
     public static $called = [];
@@ -42,25 +37,25 @@ class Kohana_UTF8
      *     UTF8::clean($_GET); // Clean GET data
      *
      * @param   mixed   $var        variable to clean
-     * @param   string  $charset    character set, defaults to Kohana::$charset
+     * @param string|null $charset Character set, defaults to Kohana::$charset
      * @return  mixed
      * @uses    UTF8::clean
      * @uses    UTF8::strip_ascii_ctrl
      * @uses    UTF8::is_ascii
      */
-    public static function clean($var, $charset = null)
+    public static function clean($var, string $charset = null)
     {
         if (!$charset) {
             // Use the application character set
             $charset = Kohana::$charset;
         }
 
-        if (is_array($var) OR is_object($var)) {
+        if (is_array($var) || is_object($var)) {
             foreach ($var as $key => $val) {
                 // Recursion!
                 $var[UTF8::clean($key)] = UTF8::clean($val);
             }
-        } elseif (is_string($var) AND $var !== '') {
+        } elseif (is_string($var) && $var !== '') {
             // Remove control characters
             $var = UTF8::strip_ascii_ctrl($var);
 
@@ -89,9 +84,9 @@ class Kohana_UTF8
      *     $ascii = UTF8::is_ascii($str);
      *
      * @param   mixed   $str    string or array of strings to check
-     * @return  boolean
+     * @return  bool
      */
-    public static function is_ascii($str)
+    public static function is_ascii($str): bool
     {
         if (is_array($str)) {
             $str = implode($str);
@@ -105,10 +100,10 @@ class Kohana_UTF8
      *
      *     $str = UTF8::strip_ascii_ctrl($str);
      *
-     * @param   string  $str    string to clean
+     * @param string $str String to clean
      * @return  string
      */
-    public static function strip_ascii_ctrl($str)
+    public static function strip_ascii_ctrl(string $str): string
     {
         return preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]+/S', '', $str);
     }
@@ -118,10 +113,10 @@ class Kohana_UTF8
      *
      *     $str = UTF8::strip_non_ascii($str);
      *
-     * @param   string  $str    string to clean
+     * @param string $str String to clean
      * @return  string
      */
-    public static function strip_non_ascii($str)
+    public static function strip_non_ascii(string $str): string
     {
         return preg_replace('/[^\x00-\x7F]+/S', '', $str);
     }
@@ -131,12 +126,12 @@ class Kohana_UTF8
      *
      *     $ascii = UTF8::transliterate_to_ascii($utf8);
      *
-     * @author  Andreas Gohr <andi@splitbrain.org>
      * @param   string  $str    string to transliterate
-     * @param   integer $case   -1 lowercase only, +1 uppercase only, 0 both cases
+     * @param int $case -1 lowercase only, +1 uppercase only, 0 both cases
      * @return  string
+     * @author  Andreas Gohr <andi@splitbrain.org>
      */
-    public static function transliterate_to_ascii($str, $case = 0)
+    public static function transliterate_to_ascii(string $str, int $case = 0): string
     {
         if (!isset(UTF8::$called[__FUNCTION__])) {
             require Kohana::find_file('utf8', __FUNCTION__);
@@ -154,24 +149,13 @@ class Kohana_UTF8
      *
      *     $length = UTF8::strlen($str);
      *
-     * @param   string  $str    string being measured for length
-     * @return  integer
-     * @uses    UTF8::$server_utf8
+     * @param string $str String being measured for length
+     * @return  int
      * @uses    Kohana::$charset
      */
-    public static function strlen($str)
+    public static function strlen(string $str): int
     {
-        if (UTF8::$server_utf8)
-            return mb_strlen($str, Kohana::$charset);
-
-        if (!isset(UTF8::$called[__FUNCTION__])) {
-            require Kohana::find_file('utf8', __FUNCTION__);
-
-            // Function has been called
-            UTF8::$called[__FUNCTION__] = true;
-        }
-
-        return _strlen($str);
+        return mb_strlen($str, Kohana::$charset);
     }
 
     /**
@@ -180,28 +164,16 @@ class Kohana_UTF8
      *
      *     $position = UTF8::strpos($str, $search);
      *
-     * @author  Harry Fuecks <hfuecks@gmail.com>
      * @param   string  $str    haystack
-     * @param   string  $search needle
-     * @param   integer $offset offset from which character in haystack to start searching
-     * @return  integer position of needle
-     * @return  boolean false if the needle is not found
-     * @uses    UTF8::$server_utf8
+     * @param string $search Needle
+     * @param int $offset Offset from which character in haystack to start searching
+     * @return  int|false Position of needle if found, false otherwise.
+     * @author  Harry Fuecks <hfuecks@gmail.com>
      * @uses    Kohana::$charset
      */
-    public static function strpos($str, $search, $offset = 0)
+    public static function strpos(string $str, string $search, int $offset = 0)
     {
-        if (UTF8::$server_utf8)
-            return mb_strpos($str, $search, $offset, Kohana::$charset);
-
-        if (!isset(UTF8::$called[__FUNCTION__])) {
-            require Kohana::find_file('utf8', __FUNCTION__);
-
-            // Function has been called
-            UTF8::$called[__FUNCTION__] = true;
-        }
-
-        return _strpos($str, $search, $offset);
+        return mb_strpos($str, $search, $offset, Kohana::$charset);
     }
 
     /**
@@ -210,27 +182,15 @@ class Kohana_UTF8
      *
      *     $position = UTF8::strrpos($str, $search);
      *
-     * @author  Harry Fuecks <hfuecks@gmail.com>
      * @param   string  $str    haystack
-     * @param   string  $search needle
-     * @param   integer $offset offset from which character in haystack to start searching
-     * @return  integer position of needle
-     * @return  boolean false if the needle is not found
-     * @uses    UTF8::$server_utf8
+     * @param string $search Needle
+     * @param int $offset Offset from which character in haystack to start searching
+     * @return  int|false Position of needle if found, false otherwise.
+     * @author  Harry Fuecks <hfuecks@gmail.com>
      */
-    public static function strrpos($str, $search, $offset = 0)
+    public static function strrpos(string $str, string $search, int $offset = 0)
     {
-        if (UTF8::$server_utf8)
-            return mb_strrpos($str, $search, $offset, Kohana::$charset);
-
-        if (!isset(UTF8::$called[__FUNCTION__])) {
-            require Kohana::find_file('utf8', __FUNCTION__);
-
-            // Function has been called
-            UTF8::$called[__FUNCTION__] = true;
-        }
-
-        return _strrpos($str, $search, $offset);
+        return mb_strrpos($str, $search, $offset, Kohana::$charset);
     }
 
     /**
@@ -239,27 +199,16 @@ class Kohana_UTF8
      *
      *     $sub = UTF8::substr($str, $offset);
      *
-     * @author  Chris Smith <chris@jalakai.co.uk>
      * @param   string  $str    input string
-     * @param   integer $offset offset
-     * @param   integer $length length limit
+     * @param int $offset Offset
+     * @param int|null $length Length limit
      * @return  string
-     * @uses    UTF8::$server_utf8
+     * @author  Chris Smith <chris@jalakai.co.uk>
      * @uses    Kohana::$charset
      */
-    public static function substr($str, $offset, $length = null)
+    public static function substr(string $str, int $offset, int $length = null): string
     {
-        if (UTF8::$server_utf8)
-            return ($length === null) ? mb_substr($str, $offset, mb_strlen($str), Kohana::$charset) : mb_substr($str, $offset, $length, Kohana::$charset);
-
-        if (!isset(UTF8::$called[__FUNCTION__])) {
-            require Kohana::find_file('utf8', __FUNCTION__);
-
-            // Function has been called
-            UTF8::$called[__FUNCTION__] = true;
-        }
-
-        return _substr($str, $offset, $length);
+        return $length === null ? mb_substr($str, $offset, mb_strlen($str), Kohana::$charset) : mb_substr($str, $offset, $length, Kohana::$charset);
     }
 
     /**
@@ -268,13 +217,14 @@ class Kohana_UTF8
      *
      *     $str = UTF8::substr_replace($str, $replacement, $offset);
      *
-     * @author  Harry Fuecks <hfuecks@gmail.com>
-     * @param   string  $str            input string
-     * @param   string  $replacement    replacement string
-     * @param   integer $offset         offset
+     * @param string $str Input string
+     * @param string $replacement Replacement string
+     * @param int $offset Offset
+     * @param int|null $length
      * @return  string
+     * @author  Harry Fuecks <hfuecks@gmail.com>
      */
-    public static function substr_replace($str, $replacement, $offset, $length = null)
+    public static function substr_replace(string $str, string $replacement, int $offset, int $length = null): string
     {
         if (!isset(UTF8::$called[__FUNCTION__])) {
             require Kohana::find_file('utf8', __FUNCTION__);
@@ -292,50 +242,28 @@ class Kohana_UTF8
      *
      *     $str = UTF8::strtolower($str);
      *
-     * @author  Andreas Gohr <andi@splitbrain.org>
      * @param   string  $str mixed case string
      * @return  string
-     * @uses    UTF8::$server_utf8
+     * @author  Andreas Gohr <andi@splitbrain.org>
      * @uses    Kohana::$charset
      */
-    public static function strtolower($str)
+    public static function strtolower(string $str): string
     {
-        if (UTF8::$server_utf8)
-            return mb_strtolower($str, Kohana::$charset);
-
-        if (!isset(UTF8::$called[__FUNCTION__])) {
-            require Kohana::find_file('utf8', __FUNCTION__);
-
-            // Function has been called
-            UTF8::$called[__FUNCTION__] = true;
-        }
-
-        return _strtolower($str);
+        return mb_strtolower($str, Kohana::$charset);
     }
 
     /**
      * Makes a UTF-8 string uppercase. This is a UTF8-aware version
      * of [strtoupper](https://www.php.net/strtoupper).
      *
-     * @author  Andreas Gohr <andi@splitbrain.org>
      * @param   string  $str mixed case string
      * @return  string
-     * @uses    UTF8::$server_utf8
+     * @author  Andreas Gohr <andi@splitbrain.org>
      * @uses    Kohana::$charset
      */
-    public static function strtoupper($str)
+    public static function strtoupper(string $str): string
     {
-        if (UTF8::$server_utf8)
-            return mb_strtoupper($str, Kohana::$charset);
-
-        if (!isset(UTF8::$called[__FUNCTION__])) {
-            require Kohana::find_file('utf8', __FUNCTION__);
-
-            // Function has been called
-            UTF8::$called[__FUNCTION__] = true;
-        }
-
-        return _strtoupper($str);
+        return mb_strtoupper($str, Kohana::$charset);
     }
 
     /**
@@ -344,11 +272,11 @@ class Kohana_UTF8
      *
      *     $str = UTF8::ucfirst($str);
      *
-     * @author  Harry Fuecks <hfuecks@gmail.com>
      * @param   string  $str mixed case string
      * @return  string
+     * @author  Harry Fuecks <hfuecks@gmail.com>
      */
-    public static function ucfirst($str)
+    public static function ucfirst(string $str): string
     {
         if (!isset(UTF8::$called[__FUNCTION__])) {
             require Kohana::find_file('utf8', __FUNCTION__);
@@ -366,11 +294,11 @@ class Kohana_UTF8
      *
      *     $str = UTF8::ucwords($str);
      *
-     * @author  Harry Fuecks <hfuecks@gmail.com>
      * @param   string  $str mixed case string
      * @return  string
+     * @author  Harry Fuecks <hfuecks@gmail.com>
      */
-    public static function ucwords($str)
+    public static function ucwords(string $str): string
     {
         if (!isset(UTF8::$called[__FUNCTION__])) {
             require Kohana::find_file('utf8', __FUNCTION__);
@@ -388,14 +316,12 @@ class Kohana_UTF8
      *
      *     $compare = UTF8::strcasecmp($str1, $str2);
      *
-     * @author  Harry Fuecks <hfuecks@gmail.com>
      * @param   string  $str1   string to compare
-     * @param   string  $str2   string to compare
-     * @return  integer less than 0 if str1 is less than str2
-     * @return  integer greater than 0 if str1 is greater than str2
-     * @return  integer 0 if they are equal
+     * @param string $str2 String to compare
+     * @return  int Less than 0 if str1 is less than str2, greater than 0 if str1 is greater than str2, or 0 if they are equal.
+     * @author  Harry Fuecks <hfuecks@gmail.com>
      */
-    public static function strcasecmp($str1, $str2)
+    public static function strcasecmp(string $str1, string $str2): int
     {
         if (!isset(UTF8::$called[__FUNCTION__])) {
             require Kohana::find_file('utf8', __FUNCTION__);
@@ -415,15 +341,14 @@ class Kohana_UTF8
      * [!!] This function is very slow compared to the native version. Avoid
      * using it when possible.
      *
-     * @author  Harry Fuecks <hfuecks@gmail.com
      * @param   string|array    $search     text to replace
      * @param   string|array    $replace    replacement text
      * @param   string|array    $str        subject text
-     * @param   integer         $count      number of matched and replaced needles will be returned via this parameter which is passed by reference
-     * @return  string  if the input was a string
-     * @return  array   if the input was an array
+     * @param   int|null $count Number of matched and replaced needles will be returned via this parameter which is passed by reference
+     * @return  string|array Replaced value, same type as input.
+     * @author  Harry Fuecks <hfuecks@gmail.com>
      */
-    public static function str_ireplace($search, $replace, $str, & $count = null)
+    public static function str_ireplace($search, $replace, $str, int &$count = null)
     {
         if (!isset(UTF8::$called[__FUNCTION__])) {
             require Kohana::find_file('utf8', __FUNCTION__);
@@ -442,22 +367,14 @@ class Kohana_UTF8
      *
      *     $found = UTF8::stristr($str, $search);
      *
-     * @author  Harry Fuecks <hfuecks@gmail.com>
      * @param   string  $str    input string
-     * @param   string  $search needle
-     * @return  string  matched substring if found
-     * @return  false   if the substring was not found
+     * @param string $search Needle
+     * @return  string|false Matched substring if found, false otherwise.
+     * @author  Harry Fuecks <hfuecks@gmail.com>
      */
-    public static function stristr($str, $search)
+    public static function stristr(string $str, string $search)
     {
-        if (!isset(UTF8::$called[__FUNCTION__])) {
-            require Kohana::find_file('utf8', __FUNCTION__);
-
-            // Function has been called
-            UTF8::$called[__FUNCTION__] = true;
-        }
-
-        return _stristr($str, $search);
+        return mb_stristr($str, $search, false, Kohana::$charset);
     }
 
     /**
@@ -466,14 +383,14 @@ class Kohana_UTF8
      *
      *     $found = UTF8::strspn($str, $mask);
      *
-     * @author  Harry Fuecks <hfuecks@gmail.com>
      * @param   string  $str    input string
-     * @param   string  $mask   mask for search
-     * @param   integer $offset start position of the string to examine
-     * @param   integer $length length of the string to examine
-     * @return  integer length of the initial segment that contains characters in the mask
+     * @param string $mask Mask for search
+     * @param int|null $offset Start position of the string to examine
+     * @param int|null $length Length of the string to examine
+     * @return  int length of the initial segment that contains characters in the mask
+     * @author  Harry Fuecks <hfuecks@gmail.com>
      */
-    public static function strspn($str, $mask, $offset = null, $length = null)
+    public static function strspn(string $str, string $mask, int $offset = null, int $length = null): int
     {
         if (!isset(UTF8::$called[__FUNCTION__])) {
             require Kohana::find_file('utf8', __FUNCTION__);
@@ -491,14 +408,14 @@ class Kohana_UTF8
      *
      *     $found = UTF8::strcspn($str, $mask);
      *
-     * @author  Harry Fuecks <hfuecks@gmail.com>
      * @param   string  $str    input string
-     * @param   string  $mask   mask for search
-     * @param   integer $offset start position of the string to examine
-     * @param   integer $length length of the string to examine
-     * @return  integer length of the initial segment that contains characters not in the mask
+     * @param string $mask Mask for search
+     * @param int|null $offset Start position of the string to examine
+     * @param int|null $length Length of the string to examine
+     * @return  int length of the initial segment that contains characters not in the mask
+     * @author  Harry Fuecks <hfuecks@gmail.com>
      */
-    public static function strcspn($str, $mask, $offset = null, $length = null)
+    public static function strcspn(string $str, string $mask, int $offset = null, int $length = null): int
     {
         if (!isset(UTF8::$called[__FUNCTION__])) {
             require Kohana::find_file('utf8', __FUNCTION__);
@@ -517,14 +434,14 @@ class Kohana_UTF8
      *     $str = UTF8::str_pad($str, $length);
      *
      * @param string $str input string
-     * @param integer $final_str_length desired string length after padding
+     * @param int $final_str_length desired string length after padding
      * @param string $pad_str string to use as padding
      * @param string $pad_type padding type: STR_PAD_RIGHT, STR_PAD_LEFT, or STR_PAD_BOTH
      * @return  string
      * @throws UTF8_Exception
      * @author  Harry Fuecks <hfuecks@gmail.com>
      */
-    public static function str_pad($str, $final_str_length, $pad_str = ' ', $pad_type = STR_PAD_RIGHT)
+    public static function str_pad(string $str, int $final_str_length, string $pad_str = ' ', $pad_type = STR_PAD_RIGHT): string
     {
         if (!isset(UTF8::$called[__FUNCTION__])) {
             require Kohana::find_file('utf8', __FUNCTION__);
@@ -542,12 +459,12 @@ class Kohana_UTF8
      *
      *     $array = UTF8::str_split($str);
      *
-     * @author  Harry Fuecks <hfuecks@gmail.com>
      * @param   string  $str            input string
-     * @param   integer $split_length   maximum length of each chunk
+     * @param int $split_length Maximum length of each chunk
      * @return  array
+     * @author  Harry Fuecks <hfuecks@gmail.com>
      */
-    public static function str_split($str, $split_length = 1)
+    public static function str_split(string $str, int $split_length = 1): array
     {
         if (!isset(UTF8::$called[__FUNCTION__])) {
             require Kohana::find_file('utf8', __FUNCTION__);
@@ -564,11 +481,11 @@ class Kohana_UTF8
      *
      *     $str = UTF8::strrev($str);
      *
-     * @author  Harry Fuecks <hfuecks@gmail.com>
      * @param   string  $str string to be reversed
      * @return  string
+     * @author  Harry Fuecks <hfuecks@gmail.com>
      */
-    public static function strrev($str)
+    public static function strrev(string $str): string
     {
         if (!isset(UTF8::$called[__FUNCTION__])) {
             require Kohana::find_file('utf8', __FUNCTION__);
@@ -586,12 +503,12 @@ class Kohana_UTF8
      *
      *     $str = UTF8::trim($str);
      *
-     * @author  Andreas Gohr <andi@splitbrain.org>
      * @param   string  $str        input string
-     * @param   string  $charlist   string of characters to remove
+     * @param string|null $charlist String of characters to remove
      * @return  string
+     * @author  Andreas Gohr <andi@splitbrain.org>
      */
-    public static function trim($str, $charlist = null)
+    public static function trim(string $str, string $charlist = null): string
     {
         if (!isset(UTF8::$called[__FUNCTION__])) {
             require Kohana::find_file('utf8', __FUNCTION__);
@@ -609,12 +526,12 @@ class Kohana_UTF8
      *
      *     $str = UTF8::ltrim($str);
      *
-     * @author  Andreas Gohr <andi@splitbrain.org>
      * @param   string  $str        input string
-     * @param   string  $charlist   string of characters to remove
+     * @param string|null $charlist String of characters to remove
      * @return  string
+     * @author  Andreas Gohr <andi@splitbrain.org>
      */
-    public static function ltrim($str, $charlist = null)
+    public static function ltrim(string $str, string $charlist = null): string
     {
         if (!isset(UTF8::$called[__FUNCTION__])) {
             require Kohana::find_file('utf8', __FUNCTION__);
@@ -632,12 +549,12 @@ class Kohana_UTF8
      *
      *     $str = UTF8::rtrim($str);
      *
-     * @author  Andreas Gohr <andi@splitbrain.org>
-     * @param   string  $str        input string
-     * @param   string  $charlist   string of characters to remove
+     * @param string $str Input string
+     * @param string|null $charlist String of characters to remove
      * @return  string
+     * @author  Andreas Gohr <andi@splitbrain.org>
      */
-    public static function rtrim($str, $charlist = null)
+    public static function rtrim(string $str, string $charlist = null): string
     {
         if (!isset(UTF8::$called[__FUNCTION__])) {
             require Kohana::find_file('utf8', __FUNCTION__);
@@ -656,11 +573,11 @@ class Kohana_UTF8
      *     $digit = UTF8::ord($character);
      *
      * @param string $chr UTF-8 encoded character
-     * @return  integer
+     * @return int
      * @throws UTF8_Exception
      * @author  Harry Fuecks <hfuecks@gmail.com>
      */
-    public static function ord($chr)
+    public static function ord(string $chr): int
     {
         if (!isset(UTF8::$called[__FUNCTION__])) {
             require Kohana::find_file('utf8', __FUNCTION__);
@@ -686,11 +603,10 @@ class Kohana_UTF8
      * Slight modifications to fit with phputf8 library by Harry Fuecks <hfuecks@gmail.com>
      *
      * @param string $str UTF-8 encoded string
-     * @return  array   Unicode code points
-     * @return  false   if the string is invalid
+     * @return array|false Unicode code points if succeeded, or false if the string is invalid.
      * @throws UTF8_Exception
      */
-    public static function to_unicode($str)
+    public static function to_unicode(string $str)
     {
         if (!isset(UTF8::$called[__FUNCTION__])) {
             require Kohana::find_file('utf8', __FUNCTION__);
@@ -715,12 +631,11 @@ class Kohana_UTF8
      * Ported to PHP by Henri Sivonen <hsivonen@iki.fi>, see http://hsivonen.iki.fi/php-utf8/
      * Slight modifications to fit with phputf8 library by Harry Fuecks <hfuecks@gmail.com>.
      *
-     * @param array $str Unicode code points representing a string
-     * @return  string  utf8 string of characters
-     * @return  boolean false if a code point cannot be found
+     * @param array $arr Unicode code points representing a string
+     * @return string|false UTF-8 encoded string on success, false if invalid code point encountered.
      * @throws UTF8_Exception
      */
-    public static function from_unicode($arr)
+    public static function from_unicode(array $arr)
     {
         if (!isset(UTF8::$called[__FUNCTION__])) {
             require Kohana::find_file('utf8', __FUNCTION__);
@@ -732,9 +647,4 @@ class Kohana_UTF8
         return _from_unicode($arr);
     }
 
-}
-
-if (Kohana_UTF8::$server_utf8 === null) {
-    // Determine if this server supports UTF-8 natively
-    Kohana_UTF8::$server_utf8 = extension_loaded('mbstring');
 }

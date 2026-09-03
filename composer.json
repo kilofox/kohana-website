@@ -1,0 +1,36 @@
+{
+    "name": "muffetlab/kohana-website",
+    "type": "project",
+    "description": "The Kohana framework main website",
+    "keywords": ["kohana"],
+    "homepage": "https://kohana.top",
+    "license": "MIT",
+    "require": {
+        "php": ">=7.1,<7.4",
+        "ext-ctype": "*",
+        "ext-curl": "*",
+        "ext-dom": "*",
+        "ext-fileinfo": "*",
+        "ext-gd": "*",
+        "ext-iconv": "*",
+        "ext-json": "*",
+        "ext-libxml": "*",
+        "ext-mbstring": "*",
+        "ext-openssl": "*",
+        "ext-simplexml": "*",
+        "michelf/php-markdown": "^1.9"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.5",
+        "phpunit/phpunit-dom-assertions": "^2.6.0"
+    },
+    "config": {
+        "policy": {
+            "advisories": {
+                "ignore-id": [
+                    "PKSA-z3gr-8qht-p93v"
+                ]
+            }
+        }
+    }
+}

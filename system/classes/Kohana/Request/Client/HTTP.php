@@ -53,7 +53,7 @@ class Kohana_Request_Client_HTTP extends Request_Client_External
      * @throws Kohana_Exception
      * @throws Request_Exception
      */
-    public function _send_message(Request $request, Response $response)
+    public function _send_message(Request $request, Response $response): Response
     {
         $http_method_mapping = [
             HTTP_Request::GET => HTTPRequest::METH_GET,
@@ -84,7 +84,7 @@ class Kohana_Request_Client_HTTP extends Request_Client_External
         $http_request->setQueryData($request->query());
 
         // Set the body
-        if ($request->method() == HTTP_Request::PUT) {
+        if ($request->method() === HTTP_Request::PUT) {
             $http_request->addPutData($request->body());
         } else {
             $http_request->setBody($request->body());

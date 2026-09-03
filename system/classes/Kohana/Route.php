@@ -81,12 +81,12 @@ class Kohana_Route
      *             'controller' => 'welcome',
      *         ]);
      *
-     * @param   string  $name           route name
-     * @param   string  $uri            URI pattern
-     * @param   array   $regex          regex patterns for route keys
+     * @param string $name Route name
+     * @param string|null $uri URI pattern
+     * @param array|null $regex Regex patterns for route keys
      * @return  Route
      */
-    public static function set($name, $uri = null, $regex = null)
+    public static function set(string $name, string $uri = null, array $regex = null): Route
     {
         return Route::$_routes[$name] = new Route($uri, $regex);
     }
@@ -96,11 +96,11 @@ class Kohana_Route
      *
      *     $route = Route::get('default');
      *
-     * @param   string  $name   route name
+     * @param string $name Route name
      * @return  Route
      * @throws  Kohana_Exception
      */
-    public static function get($name)
+    public static function get(string $name): Route
     {
         if (!isset(Route::$_routes[$name])) {
             throw new Kohana_Exception('The requested route does not exist: :route', [':route' => $name]);
@@ -116,7 +116,7 @@ class Kohana_Route
      *
      * @return  array  routes by name
      */
-    public static function all()
+    public static function all(): array
     {
         return Route::$_routes;
     }
@@ -127,7 +127,7 @@ class Kohana_Route
      *     $name = Route::name($route)
      *
      * @param   Route   $route  instance
-     * @return  string
+     * @return int|string|false
      */
     public static function name(Route $route)
     {
@@ -144,16 +144,15 @@ class Kohana_Route
      *         Route::cache(true);
      *     }
      *
-     * @param boolean $save cache the current routes
-     * @param boolean $append append, rather than replace, cached routes when loading
-     * @return  void    when saving routes
-     * @return  boolean when loading routes
+     * @param bool $save cache the current routes
+     * @param bool $append append, rather than replace, cached routes when loading
+     * @return void|bool Returns void when saving routes, or bool when loading routes.
      * @throws Kohana_Exception
      * @uses    Kohana::cache
      */
-    public static function cache($save = false, $append = false)
+    public static function cache(bool $save = false, bool $append = false)
     {
-        if ($save === true) {
+        if ($save) {
             try {
                 // Cache all defined routes
                 Kohana::cache('Route::cache()', Route::$_routes);
@@ -188,14 +187,14 @@ class Kohana_Route
      *     echo URL::site(Route::get($name)->uri($params), $protocol);
      *
      * @param string $name route name
-     * @param array $params URI parameters
+     * @param array|null $params URI parameters
      * @param mixed $protocol protocol string or boolean, adds protocol and domain
      * @return  string
      * @throws Kohana_Exception
      * @uses    URL::site
      * @since   3.0.7
      */
-    public static function url($name, array $params = null, $protocol = null)
+    public static function url(string $name, array $params = null, $protocol = null): string
     {
         $route = Route::get($name);
 
@@ -216,11 +215,13 @@ class Kohana_Route
      *         ]
      *     );
      *
+     * @param $uri
+     * @param array|null $regex
      * @return  string
      * @uses    Route::REGEX_ESCAPE
      * @uses    Route::REGEX_SEGMENT
      */
-    public static function compile($uri, array $regex = null)
+    public static function compile($uri, array $regex = null): string
     {
         // The URI should be considered literal except for keys and optional parts
         // Escape everything preg_quote would escape except for : ( ) < >
@@ -283,12 +284,12 @@ class Kohana_Route
      * The $uri parameter should be a string for basic regex matching.
      *
      *
-     * @param   string  $uri    route URI pattern
-     * @param   array   $regex  key patterns
+     * @param string|null $uri Route URI pattern
+     * @param array|null $regex Key patterns
      * @return  void
      * @uses    Route::_compile
      */
-    public function __construct($uri = null, $regex = null)
+    public function __construct(string $uri = null, array $regex = null)
     {
         if ($uri === null) {
             // Assume the route is from cache
@@ -318,8 +319,8 @@ class Kohana_Route
      *
      * If no parameter is passed, this method will act as a getter.
      *
-     * @param   array   $defaults   key values
-     * @return  $this or array
+     * @param array|null $defaults key values
+     * @return array|Kohana_Route
      */
     public function defaults(array $defaults = null)
     {
@@ -340,7 +341,7 @@ class Kohana_Route
      *         if ($request->method() !== HTTP_Request::POST) {
      *             return false;
      *         }
-     *         if ($params AND $params['controller'] === 'welcome') {
+     *         if ($params && $params['controller'] === 'welcome') {
      *             $params['controller'] = 'home';
      *         }
      *
@@ -352,11 +353,11 @@ class Kohana_Route
      *
      * [!!] Default parameters are added before filters are called!
      *
-     * @throws  Kohana_Exception
      * @param   array   $callback   callback string, array, or closure
      * @return  $this
+     * @throws  Kohana_Exception
      */
-    public function filter($callback)
+    public function filter(array $callback): Kohana_Route
     {
         if (!is_callable($callback)) {
             throw new Kohana_Exception('Invalid Route::callback specified');
@@ -382,8 +383,7 @@ class Kohana_Route
      *     }
      *
      * @param   Request $request  Request object to match
-     * @return  array             on success
-     * @return  false             on failure
+     * @return array|false Returns routed parameters as an array on success, or false on failure.
      */
     public function matches(Request $request)
     {
@@ -405,7 +405,7 @@ class Kohana_Route
         }
 
         foreach ($this->_defaults as $key => $value) {
-            if (!isset($params[$key]) OR $params[$key] === '') {
+            if (!isset($params[$key]) || $params[$key] === '') {
                 // Set default values for any key that was not matched
                 $params[$key] = $value;
             }
@@ -443,9 +443,9 @@ class Kohana_Route
      * Returns whether this route is an external route
      * to a remote controller.
      *
-     * @return  boolean
+     * @return bool
      */
-    public function is_external()
+    public function is_external(): bool
     {
         return !in_array(Arr::get($this->_defaults, 'host', false), Route::$localhosts);
     }
@@ -460,13 +460,13 @@ class Kohana_Route
      *         'id' => '10'
      *     ]);
      *
-     * @param   array   $params URI parameters
+     * @param array|null $params URI parameters
      * @return  string
-     * @throws  Kohana_Exception
+     * @throws Kohana_Exception
      * @uses    Route::REGEX_GROUP
      * @uses    Route::REGEX_KEY
      */
-    public function uri(array $params = null)
+    public function uri(array $params = null): string
     {
         if ($params) {
             // @issue #4079 rawurlencode parameters
@@ -482,11 +482,11 @@ class Kohana_Route
          * the specified parameters and any optional parameters that are needed.
          *
          * @param string $portion Part of the URI specification
-         * @param boolean $required Whether parameters are required (initially)
+         * @param bool $required Whether parameters are required (initially)
          * @return  array   Tuple of the compiled portion and whether it contained specified parameters
          * @throws Kohana_Exception
          */
-        $compile = function ($portion, $required) use (&$compile, $defaults, $params) {
+        $compile = function (string $portion, bool $required) use (&$compile, $defaults, $params) {
             $missing = [];
 
             $pattern = '#(?:' . Route::REGEX_KEY . '|' . Route::REGEX_GROUP . ')#';
@@ -498,7 +498,7 @@ class Kohana_Route
                     if (isset($params[$param])) {
                         // This portion is required when a specified
                         // parameter does not match the default
-                        $required = ($required OR ! isset($defaults[$param]) OR $params[$param] !== $defaults[$param]);
+                        $required = $required || !isset($defaults[$param]) || $params[$param] !== $defaults[$param];
 
                         // Add specified parameter to this result
                         return $params[$param];
@@ -526,9 +526,11 @@ class Kohana_Route
 
                     // Do not add optional groups to this result
                 }
+
+                return '';
             }, $portion);
 
-            if ($required AND $missing) {
+            if ($required && $missing) {
                 throw new Kohana_Exception('Required route parameter not passed: :param', [':param' => reset($missing)]);
             }
 

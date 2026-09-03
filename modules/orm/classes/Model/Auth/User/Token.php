@@ -16,7 +16,7 @@ class Model_Auth_User_Token extends ORM
     ];
     protected $_created_column = [
         'column' => 'created',
-        'format' => TRUE,
+        'format' => true,
     ];
 
     /**
@@ -25,7 +25,7 @@ class Model_Auth_User_Token extends ORM
      * @return  void
      * @throws Kohana_Exception
      */
-    public function __construct($id = NULL)
+    public function __construct($id = null)
     {
         parent::__construct($id);
 
@@ -34,7 +34,7 @@ class Model_Auth_User_Token extends ORM
             $this->delete_expired();
         }
 
-        if ($this->expires < time() AND $this->_loaded) {
+        if ($this->expires < time() && $this->_loaded) {
             // This object has expired
             $this->delete();
         }
@@ -46,7 +46,7 @@ class Model_Auth_User_Token extends ORM
      * @return  ORM
      * @throws Kohana_Exception
      */
-    public function delete_expired()
+    public function delete_expired(): ORM
     {
         // Delete all expired tokens
         DB::delete($this->_table_name)
@@ -56,17 +56,17 @@ class Model_Auth_User_Token extends ORM
         return $this;
     }
 
-    public function create(Validation $validation = NULL)
+    public function create(Validation $validation = null): Kohana_ORM
     {
         $this->token = $this->create_token();
 
         return parent::create($validation);
     }
 
-    protected function create_token()
+    protected function create_token(): string
     {
         do {
-            $token = sha1(uniqid(Text::random('alnum', 32), TRUE));
+            $token = sha1(uniqid(Text::random('alnum', 32), true));
         } while (ORM::factory('User_Token', ['token' => $token])->loaded());
 
         return $token;

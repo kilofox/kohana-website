@@ -11,7 +11,6 @@
  * *  File
  * *  [Memcached](https://www.php.net/manual/en/book.memcached.php)
  * *  [Memcache](https://www.php.net/manual/en/book.memcache.php)
- * *  [Memcached-tags](https://code.google.com/archive/p/memcached-tags/)
  * *  [SQLite](https://www.php.net/manual/en/ref.pdo-sqlite.php)
  *
  * ### Introduction to caching
@@ -108,12 +107,12 @@ abstract class Kohana_Cache
      *     // Access an instantiated group directly
      *     $foo_group = Cache::$instances['default'];
      *
-     * @param string $group the name of the cache group to use [Optional]
+     * @param string|null $group The name of the cache group to use
      * @return  Cache
      * @throws Cache_Exception
      * @throws Kohana_Exception
      */
-    public static function instance($group = null)
+    public static function instance(string $group = null): Cache
     {
         // If there is no group supplied
         if ($group === null) {
@@ -171,8 +170,8 @@ abstract class Kohana_Cache
      *     // Get a configuration setting
      *     $servers = $cache->config('servers');
      *
-     * @param   mixed    key to set to array, either array or config path
-     * @param   mixed    value to associate with key
+     * @param mixed $key key to set to array, either array or config path
+     * @param mixed $value value to associate with key
      * @return  mixed
      */
     public function config($key = null, $value = null)
@@ -215,12 +214,12 @@ abstract class Kohana_Cache
      *     // Retrieve cache entry from memcached group
      *     $data = Cache::instance('memcached')->get('foo');
      *
-     * @param   string  $id       id of cache to entry
-     * @param   string  $default  default value to return if cache miss
+     * @param string $id ID of cache entry
+     * @param mixed $default Default value to return if cache miss
      * @return  mixed
      * @throws  Cache_Exception
      */
-    abstract public function get($id, $default = null);
+    abstract public function get(string $id, $default = null);
     /**
      * Set a value to cache with id and lifetime
      *
@@ -238,12 +237,12 @@ abstract class Kohana_Cache
      *          return;
      *     }
      *
-     * @param   string   $id        id of cache entry
-     * @param   string   $data      data to set to cache
-     * @param   integer  $lifetime  lifetime in seconds
-     * @return  boolean
+     * @param string $id ID of cache entry
+     * @param mixed $data Data to set to cache
+     * @param int $lifetime Lifetime in seconds
+     * @return  bool
      */
-    abstract public function set($id, $data, $lifetime = 3600);
+    abstract public function set(string $id, $data, int $lifetime = 3600): bool;
     /**
      * Delete a cache entry based on id
      *
@@ -253,10 +252,10 @@ abstract class Kohana_Cache
      *     // Delete 'foo' entry from the memcached group
      *     Cache::instance('memcached')->delete('foo');
      *
-     * @param   string  $id  id to remove from cache
-     * @return  boolean
+     * @param string $id ID to remove from cache
+     * @return  bool
      */
-    abstract public function delete($id);
+    abstract public function delete(string $id): bool;
     /**
      * Delete all cache entries.
      *
@@ -270,19 +269,19 @@ abstract class Kohana_Cache
      *     // Delete all cache entries in the memcached group
      *     Cache::instance('memcached')->delete_all();
      *
-     * @return  boolean
+     * @return bool
      */
-    abstract public function delete_all();
+    abstract public function delete_all(): bool;
     /**
      * Replaces troublesome characters with underscores.
      *
      *     // Sanitize a cache id
      *     $id = $this->_sanitize_id($id);
      *
-     * @param   string  $id  id of cache to sanitize
+     * @param string $id ID of cache to sanitize
      * @return  string
      */
-    protected function _sanitize_id($id)
+    protected function _sanitize_id(string $id): string
     {
         // Change slashes and spaces to underscores
         return str_replace(['/', '\\', ' '], '_', $id);

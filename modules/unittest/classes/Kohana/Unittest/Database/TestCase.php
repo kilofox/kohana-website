@@ -9,11 +9,11 @@
  * @copyright  (c) 2008-2009 Kohana Team
  * @license    https://kohana.top/license
  */
-abstract class Kohana_Unittest_Database_TestCase extends PHPUnit_Extensions_Database_TestCase
+abstract class Kohana_Unittest_Database_TestCase extends PHPUnit\Framework\TestCase
 {
     /**
      * Make sure PHPUnit backs up globals
-     * @var boolean
+     * @var bool
      */
     protected $backupGlobals = false;
 
@@ -41,6 +41,10 @@ abstract class Kohana_Unittest_Database_TestCase extends PHPUnit_Extensions_Data
      *
      * Extending classes that have their own setUp() should call
      * parent::setUp()
+     *
+     * @return void
+     * @throws Kohana_Exception
+     * @throws ReflectionException
      */
     public function setUp()
     {
@@ -48,7 +52,7 @@ abstract class Kohana_Unittest_Database_TestCase extends PHPUnit_Extensions_Data
 
         $this->setEnvironment($this->environmentDefault);
 
-        return parent::setUp();
+        parent::setUp();
     }
 
     /**
@@ -56,12 +60,16 @@ abstract class Kohana_Unittest_Database_TestCase extends PHPUnit_Extensions_Data
      *
      * Extending classes that have their own tearDown()
      * should call parent::tearDown()
+     *
+     * @return void
+     * @throws Kohana_Exception
+     * @throws ReflectionException
      */
     public function tearDown()
     {
         $this->_helpers->restore_environment();
 
-        return parent::tearDown();
+        parent::tearDown();
     }
 
     /**
@@ -70,7 +78,7 @@ abstract class Kohana_Unittest_Database_TestCase extends PHPUnit_Extensions_Data
      * @return PDO
      * @throws Kohana_Exception
      */
-    public function getConnection()
+    public function getConnection(): PDO
     {
         // Get the unittesting db connection
         $config = Kohana::$config->load('database.' . $this->_database_connection);
@@ -82,10 +90,13 @@ abstract class Kohana_Unittest_Database_TestCase extends PHPUnit_Extensions_Data
         }
 
         $pdo = new PDO(
-            $config['connection']['dsn'], $config['connection']['username'], $config['connection']['password']
+            $config['connection']['dsn'],
+            $config['connection']['username'],
+            $config['connection']['password']
         );
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        return $this->createDefaultDBConnection($pdo, $config['connection']['database']);
+        return $pdo;
     }
 
     /**
@@ -94,17 +105,19 @@ abstract class Kohana_Unittest_Database_TestCase extends PHPUnit_Extensions_Data
      * @return Kohana_Database The database connection
      * @throws Kohana_Exception
      */
-    public function getKohanaConnection()
+    public function getKohanaConnection(): Kohana_Database
     {
         return Database::instance(Kohana::$config->load('unittest')->db_connection);
     }
 
     /**
      * Removes all kohana related cache files in the cache directory
+     *
+     * @return void
      */
     public function cleanCacheDir()
     {
-        return Kohana_Unittest_Helpers::clean_cache_dir();
+        Kohana_Unittest_Helpers::clean_cache_dir();
     }
 
     /**
@@ -114,7 +127,7 @@ abstract class Kohana_Unittest_Database_TestCase extends PHPUnit_Extensions_Data
      * @param string $path The path to act on
      * @return string
      */
-    public function dirSeparator($path)
+    public function dirSeparator(string $path): string
     {
         return Kohana_Unittest_Helpers::dir_separator($path);
     }
@@ -133,7 +146,7 @@ abstract class Kohana_Unittest_Database_TestCase extends PHPUnit_Extensions_Data
      * @throws Kohana_Exception
      * @throws ReflectionException
      */
-    public function setEnvironment(array $environment)
+    public function setEnvironment(array $environment): ?bool
     {
         return $this->_helpers->set_environment($environment);
     }
@@ -141,9 +154,9 @@ abstract class Kohana_Unittest_Database_TestCase extends PHPUnit_Extensions_Data
     /**
      * Check for internet connectivity
      *
-     * @return boolean Whether an internet connection is available
+     * @return bool Whether an internet connection is available
      */
-    public function hasInternet()
+    public function hasInternet(): bool
     {
         return Kohana_Unittest_Helpers::has_internet();
     }

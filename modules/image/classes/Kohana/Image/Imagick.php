@@ -20,9 +20,9 @@ class Kohana_Image_Imagick extends Image
      * Checks if ImageMagick is enabled.
      *
      * @throws  Kohana_Exception
-     * @return  boolean
+     * @return  bool
      */
-    public static function check()
+    public static function check(): bool
     {
         if (!extension_loaded('imagick')) {
             throw new Kohana_Exception('Imagick is not installed, or the extension is not loaded');
@@ -64,10 +64,9 @@ class Kohana_Image_Imagick extends Image
     public function __destruct()
     {
         $this->im->clear();
-        $this->im->destroy();
     }
 
-    protected function _do_resize($width, $height)
+    protected function _do_resize(int $width, int $height): bool
     {
         if ($this->im->scaleImage($width, $height)) {
             // Reset the width and height
@@ -80,7 +79,7 @@ class Kohana_Image_Imagick extends Image
         return false;
     }
 
-    protected function _do_crop($width, $height, $offset_x, $offset_y)
+    protected function _do_crop(int $width, int $height, int $offset_x, int $offset_y): bool
     {
         if ($this->im->cropImage($width, $height, $offset_x, $offset_y)) {
             // Reset the width and height
@@ -96,7 +95,7 @@ class Kohana_Image_Imagick extends Image
         return false;
     }
 
-    protected function _do_rotate($degrees)
+    protected function _do_rotate(int $degrees): bool
     {
         if ($this->im->rotateImage(new ImagickPixel('transparent'), $degrees)) {
             // Reset the width and height
@@ -112,7 +111,7 @@ class Kohana_Image_Imagick extends Image
         return false;
     }
 
-    protected function _do_flip($direction)
+    protected function _do_flip(int $direction)
     {
         if ($direction === Image::HORIZONTAL) {
             return $this->im->flopImage();
@@ -121,18 +120,18 @@ class Kohana_Image_Imagick extends Image
         }
     }
 
-    protected function _do_sharpen($amount)
+    protected function _do_sharpen(int $amount)
     {
         // ImageMagick does not support $amount under 5 (0.15)
-        $amount = ($amount < 5) ? 5 : $amount;
+        $amount = max($amount, 5);
 
         // Amount should be in the range of 0.0 to 3.0
-        $amount = ($amount * 3.0) / 100;
+        $amount = $amount * 3.0 / 100;
 
         return $this->im->sharpenImage(0, $amount);
     }
 
-    protected function _do_reflection($height, $opacity, $fade_in)
+    protected function _do_reflection(int $height, int $opacity, bool $fade_in): bool
     {
         // Clone the current image and flip it for reflection
         $reflection = $this->im->clone();
@@ -174,7 +173,7 @@ class Kohana_Image_Imagick extends Image
 
         // Place the image and reflection into the container
         if ($image->compositeImage($this->im, Imagick::COMPOSITE_SRC, 0, 0)
-            AND $image->compositeImage($reflection, Imagick::COMPOSITE_OVER, 0, $this->height)) {
+            && $image->compositeImage($reflection, Imagick::COMPOSITE_OVER, 0, $this->height)) {
             // Replace the current image with the reflected image
             $this->im = $image;
 
@@ -188,13 +187,13 @@ class Kohana_Image_Imagick extends Image
         return false;
     }
 
-    protected function _do_watermark(Image $image, $offset_x, $offset_y, $opacity)
+    protected function _do_watermark(Image $image, int $offset_x, int $offset_y, int $opacity)
     {
         // Convert the Image instance into an Imagick instance
         $watermark = new Imagick;
         $watermark->readImageBlob($image->render(), $image->file);
 
-        if ($watermark->getImageAlphaChannel() !== Imagick::ALPHACHANNEL_ACTIVATE) {
+        if (!$watermark->getImageAlphaChannel()) {
             // Force the image to have an alpha channel
             $watermark->setImageAlphaChannel(Imagick::ALPHACHANNEL_OPAQUE);
         }
@@ -210,7 +209,7 @@ class Kohana_Image_Imagick extends Image
         return $this->im->compositeImage($watermark, Imagick::COMPOSITE_DISSOLVE, $offset_x, $offset_y);
     }
 
-    protected function _do_background($r, $g, $b, $opacity)
+    protected function _do_background(int $r, int $g, int $b, int $opacity): bool
     {
         // Create an RGB color for the background
         $color = sprintf('rgb(%d, %d, %d)', $r, $g, $b);
@@ -243,7 +242,7 @@ class Kohana_Image_Imagick extends Image
         return false;
     }
 
-    protected function _do_save($file, $quality)
+    protected function _do_save(string $file, int $quality): bool
     {
         // Get the image format and type
         list($format, $type) = $this->_get_imagetype(pathinfo($file, PATHINFO_EXTENSION));
@@ -265,7 +264,7 @@ class Kohana_Image_Imagick extends Image
         return false;
     }
 
-    protected function _do_render($type, $quality)
+    protected function _do_render(string $type, int $quality): string
     {
         // Get the image format and type
         list($format, $type) = $this->_get_imagetype($type);
@@ -286,11 +285,11 @@ class Kohana_Image_Imagick extends Image
     /**
      * Get the image type and format for an extension.
      *
-     * @param   string  $extension  image extension: png, jpg, etc
-     * @return  string  IMAGETYPE_* constant
+     * @param string $extension Image extension: png, jpg, etc.
+     * @return array Array with normalized format and IMAGETYPE_* constant.
      * @throws  Kohana_Exception
      */
-    protected function _get_imagetype($extension)
+    protected function _get_imagetype(string $extension): array
     {
         // Normalize the extension to a format
         $format = strtolower($extension);

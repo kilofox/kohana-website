@@ -21,7 +21,7 @@ class Kohana_FileTest extends Unittest_TestCase
      *
      * @return array
      */
-    public function provider_mime()
+    public function provider_mime(): array
     {
         return [
             // $value, $result
@@ -37,11 +37,11 @@ class Kohana_FileTest extends Unittest_TestCase
      *
      * @test
      * @dataProvider provider_mime
-     * @param boolean $input Input for File::mime
-     * @param boolean $expected Output for File::mime
+     * @param mixed $input Input for File::mime
+     * @param string $expected Output for File::mime
      * @throws Kohana_Exception
      */
-    public function test_mime($input, $expected)
+    public function test_mime($input, string $expected)
     {
         //@todo: File::mime coverage needs significant improvement or to be dropped for a composer package - it's a "horribly unreliable" method with very little testing
         $this->assertSame($expected, File::mime($input));
@@ -52,7 +52,7 @@ class Kohana_FileTest extends Unittest_TestCase
      *
      * @return array
      */
-    public function provider_split_join()
+    public function provider_split_join(): array
     {
         return [
             // $value, $result
@@ -65,11 +65,11 @@ class Kohana_FileTest extends Unittest_TestCase
      *
      * @test
      * @dataProvider provider_split_join
-     * @param boolean $input    Input for File::split
-     * @param boolean $peices   Input for File::split
-     * @param boolean $expected Output for File::split
+     * @param array|string $input Input for File::split
+     * @param int $peices Input for File::split
+     * @param int $expected Output for File::split
      */
-    public function test_split_join($input, $peices, $expected)
+    public function test_split_join($input, int $peices, int $expected)
     {
         $this->assertSame($expected, File::split($input, $peices));
         $this->assertSame($expected, File::join($input));

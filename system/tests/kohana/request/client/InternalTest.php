@@ -40,7 +40,7 @@ class Kohana_Request_Client_InternalTest extends Unittest_TestCase
         parent::tearDown();
     }
 
-    public function provider_response_failure_status()
+    public function provider_response_failure_status(): array
     {
         return [
             [
@@ -73,7 +73,7 @@ class Kohana_Request_Client_InternalTest extends Unittest_TestCase
      * @test
      * @dataProvider provider_response_failure_status
      *
-     * @return null
+     * @return void
      * @throws Kohana_Exception
      */
     public function test_response_failure_status($directory, $controller, $action, $uri, $expected)

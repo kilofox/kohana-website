@@ -7,11 +7,11 @@
  *
  * @package     Kohana
  * @category    Security
- * @author      Tinsh <kilofox2000@gmail.com>
+ * @author      Loong <loong2460@gmail.com>
  * @copyright   (c) 2018 Kohana Group
  * @license     https://kohana.top/license
  */
-class Kohana_Encrypt_Openssl
+class Kohana_Encrypt_Openssl extends Encrypt
 {
     /**
      * @var string  The cipher method.
@@ -60,7 +60,7 @@ class Kohana_Encrypt_Openssl
      * @param array $config configuration options
      * @throws Kohana_Exception
      */
-    public function __construct($name, $config)
+    public function __construct(string $name, array $config)
     {
         if (!isset($config['key'])) {
             // No default encryption key is provided!
@@ -98,21 +98,16 @@ class Kohana_Encrypt_Openssl
      * to convert it to a string. This string can be stored in a database,
      * displayed, and passed using most other means without corruption.
      *
-     * @param   string  $data   Data to be encrypted.
+     * @param string $data Data to be encrypted.
      * @return  string
      */
-    public function encode($data)
+    public function encode(string $data): string
     {
-        // Use a fake random initialization vector for unit testing.
-        if (isset($this->iv)) {
-            $iv = $this->iv;
-        } else {
-            // Create a random initialization vector of the proper size for the current cipher.
-            $iv = openssl_random_pseudo_bytes($this->ivSize);
-        }
+        // Use a fake IV for unit testing, or generate a secure random IV.
+        $iv = $this->iv ?? openssl_random_pseudo_bytes($this->ivSize);
 
         // Encrypt the data using the configured options and generated IV.
-        if (PHP_VERSION_ID >= 70100 && isset($this->tag)) {
+        if (isset($this->tag)) {
             $data = openssl_encrypt($data, $this->method, $this->key, $this->options, $iv, $this->tag, $this->aad, $this->tagLength);
         } else {
             $data = openssl_encrypt($data, $this->method, $this->key, $this->options, $iv);
@@ -127,11 +122,10 @@ class Kohana_Encrypt_Openssl
      *
      *     $data = $encrypt->decode($data);
      *
-     * @param   string  $data   Encoded string to be decrypted.
-     * @return  false   If decryption fails.
-     * @return  string
+     * @param string $data Encoded string to be decrypted.
+     * @return  string|false Decrypted string on success, or false on failure.
      */
-    public function decode($data)
+    public function decode(string $data)
     {
         // Convert the data back to binary.
         $data = base64_decode($data, true);
@@ -153,7 +147,7 @@ class Kohana_Encrypt_Openssl
         $data = substr($data, $this->ivSize);
 
         // Return the decrypted data, trimming the \0 padding bytes from the end of the data.
-        if (PHP_VERSION_ID >= 70100 && isset($this->tag)) {
+        if (isset($this->tag)) {
             return rtrim(openssl_decrypt($data, $this->method, $this->key, $this->options, $iv, $this->tag, $this->aad), "\0");
         } else {
             return rtrim(openssl_decrypt($data, $this->method, $this->key, $this->options, $iv), "\0");

@@ -41,13 +41,12 @@ class Kohana_Kohana_Exception extends Exception
      *
      *     throw new Kohana_Exception('Something went terrible wrong, :user', [':user' => $user]);
      *
-     * @param   string          $message    error message
-     * @param   array           $variables  translation variables
-     * @param   integer|string  $code       the exception code
-     * @param   Exception       $previous   Previous exception
-     * @return  void
+     * @param string $message error message
+     * @param array|null $variables translation variables
+     * @param int|string $code the exception code
+     * @param Exception|null $previous Previous exception
      */
-    public function __construct($message = "", array $variables = null, $code = 0, Exception $previous = null)
+    public function __construct(string $message = '', array $variables = null, $code = 0, Exception $previous = null)
     {
         // Set the message
         $message = __($message, $variables);
@@ -82,7 +81,7 @@ class Kohana_Kohana_Exception extends Exception
      * @throws Kohana_Exception
      * @uses    Kohana_Exception::response
      */
-    public static function handler($e)
+    public static function handler(Throwable $e)
     {
         $response = Kohana_Exception::_handler($e);
 
@@ -96,11 +95,11 @@ class Kohana_Kohana_Exception extends Exception
      * Exception handler, logs the exception and generates a Response object
      * for display.
      *
-     * @uses    Kohana_Exception::response
      * @param   Throwable   $e
      * @return  Response
+     * @uses    Kohana_Exception::response
      */
-    public static function _handler($e)
+    public static function _handler(Throwable $e): Response
     {
         try {
             // Log the exception
@@ -114,7 +113,7 @@ class Kohana_Kohana_Exception extends Exception
              * but to bail. Hard.
              */
             // Clean the output buffer if one exists
-            ob_get_level() AND ob_clean();
+            ob_get_level() and ob_clean();
 
             // Set the Status code to 500, and Content-Type to text/plain.
             header('Content-Type: text/plain; charset=' . Kohana::$charset, true, 500);
@@ -128,12 +127,12 @@ class Kohana_Kohana_Exception extends Exception
     /**
      * Logs an exception.
      *
-     * @uses    Kohana_Exception::text
      * @param   Throwable   $e
-     * @param   int        $level
+     * @param int $level
      * @return  void
+     * @uses    Kohana_Exception::text
      */
-    public static function log($e, $level = Log::EMERGENCY)
+    public static function log(Throwable $e, int $level = Log::EMERGENCY)
     {
         if (is_object(Kohana::$log)) {
             // Create a text version of the exception
@@ -152,10 +151,10 @@ class Kohana_Kohana_Exception extends Exception
      *
      * Error [ Code ]: Message ~ File [ Line ]
      *
-     * @param   Throwable   $e
+     * @param Throwable $e
      * @return  string
      */
-    public static function text($e)
+    public static function text(Throwable $e): string
     {
         return sprintf('%s [ %s ]: %s ~ %s [ %d ]', get_class($e), $e->getCode(), strip_tags($e->getMessage()), Debug::path($e->getFile()), $e->getLine());
     }
@@ -168,7 +167,7 @@ class Kohana_Kohana_Exception extends Exception
      * @throws Kohana_Exception
      * @uses    Kohana_Exception::text
      */
-    public static function response($e)
+    public static function response(Throwable $e): Response
     {
         try {
             // Get the exception information
@@ -184,7 +183,7 @@ class Kohana_Kohana_Exception extends Exception
              * method. We need to remove that entry from the trace and overwrite
              * the variables from above.
              */
-            if ($e instanceof HTTP_Exception AND $trace[0]['function'] == 'factory') {
+            if ($e instanceof HTTP_Exception && $trace[0]['function'] === 'factory') {
                 extract(array_shift($trace));
             }
 
@@ -194,10 +193,10 @@ class Kohana_Kohana_Exception extends Exception
                  * If XDebug is installed, and this is a fatal error,
                  * use XDebug to generate the stack trace
                  */
-                if (function_exists('xdebug_get_function_stack') AND $code == E_ERROR) {
+                if (function_exists('xdebug_get_function_stack') && $code === E_ERROR) {
                     $trace = array_slice(array_reverse(xdebug_get_function_stack()), 4);
 
-                    foreach ($trace as & $frame) {
+                    foreach ($trace as &$frame) {
                         /**
                          * XDebug pre 2.1.1 doesn't currently set the call type key
                          * http://bugs.xdebug.org/view.php?id=695
@@ -214,7 +213,7 @@ class Kohana_Kohana_Exception extends Exception
                         }
 
                         // XDebug also has a different name for the parameters array
-                        if (isset($frame['params']) AND ! isset($frame['args'])) {
+                        if (isset($frame['params']) && !isset($frame['args'])) {
                             $frame['args'] = $frame['params'];
                         }
                     }
@@ -234,10 +233,8 @@ class Kohana_Kohana_Exception extends Exception
              */
             if (
                 defined('PHPUnit_MAIN_METHOD')
-                OR
-                defined('PHPUNIT_COMPOSER_INSTALL')
-                OR
-                defined('__PHPUNIT_PHAR__')
+                || defined('PHPUNIT_COMPOSER_INSTALL')
+                || defined('__PHPUNIT_PHAR__')
             ) {
                 $trace = array_slice($trace, 0, 2);
             }
@@ -249,7 +246,7 @@ class Kohana_Kohana_Exception extends Exception
             $response = Response::factory();
 
             // Set the response status
-            $response->status(($e instanceof HTTP_Exception) ? $e->getCode() : 500);
+            $response->status($e instanceof HTTP_Exception ? $e->getCode() : 500);
 
             // Set the response headers
             $response->headers('Content-Type', Kohana_Exception::$error_view_content_type . '; charset=' . Kohana::$charset);

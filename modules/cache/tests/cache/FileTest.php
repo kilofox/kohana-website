@@ -77,7 +77,7 @@ class Kohana_Cache_FileTest extends Kohana_CacheBasicMethodsTest
      *
      * @return  array
      */
-    public function provider_utf8()
+    public function provider_utf8(): array
     {
         return [
             [
@@ -140,10 +140,10 @@ class Kohana_Cache_FileTest extends Kohana_CacheBasicMethodsTest
      * Tests if cache file exists given cache id.
      *
      * @param string $id cache id
-     * @return boolean true if file exists false otherwise
+     * @return bool true if file exists false otherwise
      * @throws ReflectionException
      */
-    protected function is_file($id)
+    protected function is_file(string $id): bool
     {
         $cache = $this->cache();
 

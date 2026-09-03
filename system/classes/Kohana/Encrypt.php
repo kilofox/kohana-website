@@ -7,7 +7,7 @@
  *
  * @package    Kohana
  * @category   Security
- * @author     Tinsh <kilofox2000@gmail.com>
+ * @author     Loong <loong2460@gmail.com>
  * @copyright  (c) 2018 Kohana Group
  * @license    https://kohana.top/license
  */
@@ -29,12 +29,12 @@ abstract class Kohana_Encrypt
      *
      *     $encrypt = Encrypt::instance();
      *
-     * @param string $name configuration group name
-     * @param array $config configuration options
+     * @param string|null $name configuration group name
+     * @param array|null $config configuration options
      * @return  Encrypt
      * @throws Kohana_Exception
      */
-    public static function instance($name = null, array $config = null)
+    public static function instance(string $name = null, array $config = null): Encrypt
     {
         if ($name === null) {
             // Use the default instance name
@@ -70,18 +70,17 @@ abstract class Kohana_Encrypt
      * to convert it to a string. This string can be stored in a database,
      * displayed, and passed using most other means without corruption.
      *
-     * @param   string  $data   Data to be encrypted.
+     * @param string $data Data to be encrypted.
      * @return  string
      */
-    abstract public function encode($data);
+    abstract public function encode(string $data): string;
     /**
      * Decrypts an encoded string back to its original value.
      *
      *     $data = $encrypt->decode($data);
      *
-     * @param   string  $data   Encoded string to be decrypted.
-     * @return  false   If decryption fails.
-     * @return  string
+     * @param string $data Encoded string to be decrypted.
+     * @return  string|false Decrypted string on success, or false on failure.
      */
-    abstract public function decode($data);
+    abstract public function decode(string $data);
 }

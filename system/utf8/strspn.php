@@ -9,15 +9,15 @@
  * @copyright  (c) 2005 Harry Fuecks
  * @license    https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
-function _strspn($str, $mask, $offset = null, $length = null)
+function _strspn($str, $mask, $offset = null, $length = null): int
 {
-    if ($str == '' OR $mask == '')
+    if ($str === '' || $mask === '')
         return 0;
 
-    if (UTF8::is_ascii($str) AND UTF8::is_ascii($mask))
-        return ($offset === null) ? strspn($str, $mask) : (($length === null) ? strspn($str, $mask, $offset) : strspn($str, $mask, $offset, $length));
+    if (UTF8::is_ascii($str) && UTF8::is_ascii($mask))
+        return $offset === null ? strspn($str, $mask) : ($length === null ? strspn($str, $mask, $offset) : strspn($str, $mask, $offset, $length));
 
-    if ($offset !== null OR $length !== null) {
+    if ($offset !== null || $length !== null) {
         $str = UTF8::substr($str, $offset, $length);
     }
 

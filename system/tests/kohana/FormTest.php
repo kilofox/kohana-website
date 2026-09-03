@@ -33,7 +33,7 @@ class Kohana_FormTest extends Unittest_TestCase
      *
      * @return array
      */
-    public function provider_open()
+    public function provider_open(): array
     {
         return [
             [
@@ -60,28 +60,28 @@ class Kohana_FormTest extends Unittest_TestCase
      *
      * @test
      * @dataProvider provider_open
-     * @param boolean $input Input for Form::open
-     * @param boolean $expected Output for Form::open
+     * @param array $input Input for Form::open
+     * @param array $expected Output for Form::open
      * @throws Kohana_Exception
      */
-    public function test_open($input, $expected)
+    public function test_open(array $input, array $expected)
     {
         list($action, $attributes) = $input;
 
         $tag = Form::open($action, $attributes);
 
         $matcher = [
-            'tag' => 'form',
-            // Default attributes
-            'attributes' => [
-                'method' => 'post',
-                'accept-charset' => 'utf-8',
-            ],
+            'method' => 'post',
+            'accept-charset' => 'utf-8',
         ];
+        $matcher = $expected + $matcher;
 
-        $matcher['attributes'] = $expected + $matcher['attributes'];
+        $selector = 'form';
+        foreach ($matcher as $attr => $val) {
+            $selector .= '[' . $attr . ($val !== null ? '="' . $val . '"' : '') . ']';
+        }
 
-        $this->assertTag($matcher, $tag);
+        $this->assertSelectEquals($selector, null, true, $tag);
     }
 
     /**
@@ -99,14 +99,13 @@ class Kohana_FormTest extends Unittest_TestCase
      *
      * @return array
      */
-    public function provider_input()
+    public function provider_input(): array
     {
         return [
-            // $value, $result
-            ['input', 'foo', 'bar', null, 'input'],
-            ['input', 'foo', null, null, 'input'],
-            ['hidden', 'foo', 'bar', null, 'hidden'],
-            ['password', 'foo', 'bar', null, 'password'],
+            ['input', 'foo', 'bar', null],
+            ['input', 'foo', null, null],
+            ['hidden', 'foo', 'bar', null],
+            ['password', 'foo', 'bar', null],
         ];
     }
 
@@ -115,34 +114,38 @@ class Kohana_FormTest extends Unittest_TestCase
      *
      * @test
      * @dataProvider provider_input
-     * @param boolean $input  Input for Form::input
-     * @param boolean $expected Output for Form::input
+     * @param string $type
+     * @param string $name
+     * @param string|null $value
+     * @param array|null $attributes
      */
-    public function test_input($type, $name, $value, $attributes)
+    public function test_input(string $type, string $name, ?string $value, ?array $attributes)
     {
-        $matcher = [
-            'tag' => 'input',
-            'attributes' => ['name' => $name, 'type' => $type]
-        ];
+        $matcher = ['name' => $name, 'type' => $type];
 
         // Form::input creates a text input
         if ($type === 'input') {
-            $matcher['attributes']['type'] = 'text';
+            $matcher['type'] = 'text';
         }
 
         // null just means no value
         if ($value !== null) {
-            $matcher['attributes']['value'] = $value;
+            $matcher['value'] = $value;
         }
 
         // Add on any attributes
         if (is_array($attributes)) {
-            $matcher['attributes'] = $attributes + $matcher['attributes'];
+            $matcher = $attributes + $matcher;
+        }
+
+        $selector = 'input';
+        foreach ($matcher as $attr => $val) {
+            $selector .= '[' . $attr . ($val !== null ? '="' . $val . '"' : '') . ']';
         }
 
         $tag = Form::$type($name, $value, $attributes);
 
-        $this->assertTag($matcher, $tag, $tag);
+        $this->assertSelectEquals($selector,null, true, $tag);
     }
 
     /**
@@ -150,7 +153,7 @@ class Kohana_FormTest extends Unittest_TestCase
      *
      * @return array
      */
-    public function provider_file()
+    public function provider_file(): array
     {
         return [
             // $value, $result
@@ -163,10 +166,11 @@ class Kohana_FormTest extends Unittest_TestCase
      *
      * @test
      * @dataProvider provider_file
-     * @param boolean $input  Input for Form::file
-     * @param boolean $expected Output for Form::file
+     * @param string $name
+     * @param array|null $attributes
+     * @param string $expected Output for Form::file
      */
-    public function test_file($name, $attributes, $expected)
+    public function test_file(string $name, ?array $attributes, string $expected)
     {
         $this->assertSame($expected, Form::file($name, $attributes));
     }
@@ -176,7 +180,7 @@ class Kohana_FormTest extends Unittest_TestCase
      *
      * @return array
      */
-    public function provider_check()
+    public function provider_check(): array
     {
         return [
             // $value, $result
@@ -194,30 +198,36 @@ class Kohana_FormTest extends Unittest_TestCase
      *
      * @test
      * @dataProvider provider_check
-     * @param boolean $input  Input for Form::check
-     * @param boolean $expected Output for Form::check
+     * @param string $type
+     * @param string $name
+     * @param string|null $value
+     * @param bool $checked
+     * @param array|null $attributes
      */
-    public function test_check($type, $name, $value, $checked, $attributes)
+    public function test_check(string $type, string $name, ?string $value, bool $checked, ?array $attributes)
     {
-        $matcher = [
-            'tag' => 'input',
-            'attributes' => ['name' => $name, 'type' => $type]
-        ];
+        $matcher = ['name' => $name, 'type' => $type];
 
         if ($value !== null) {
-            $matcher['attributes']['value'] = $value;
+            $matcher['value'] = $value;
         }
 
         if (is_array($attributes)) {
-            $matcher['attributes'] = $attributes + $matcher['attributes'];
+            $matcher = $attributes + $matcher;
         }
 
         if ($checked === true) {
-            $matcher['attributes']['checked'] = 'checked';
+            $matcher['checked'] = 'checked';
+        }
+
+        $selector = 'input';
+        foreach ($matcher as $attr => $val) {
+            $selector .= '[' . $attr . ($val !== null ? '="' . $val . '"' : '') . ']';
         }
 
         $tag = Form::$type($name, $value, $checked, $attributes);
-        $this->assertTag($matcher, $tag, $tag);
+
+        $this->assertSelectEquals($selector,null, true, $tag);
     }
 
     /**
@@ -225,10 +235,9 @@ class Kohana_FormTest extends Unittest_TestCase
      *
      * @return array
      */
-    public function provider_text()
+    public function provider_text(): array
     {
         return [
-            // $value, $result
             ['textarea', 'foo', 'bar', null],
             ['textarea', 'foo', 'bar', ['rows' => 20, 'cols' => 20]],
             ['button', 'foo', 'bar', null],
@@ -242,31 +251,27 @@ class Kohana_FormTest extends Unittest_TestCase
      *
      * @test
      * @dataProvider provider_text
-     * @param boolean $input  Input for Form::textarea
-     * @param boolean $expected Output for Form::textarea
+     * @param string $type
+     * @param string $name
+     * @param string|null $body
+     * @param array|null $attributes
      */
-    public function test_text($type, $name, $body, $attributes)
+    public function test_text(string $type, string $name, ?string $body, ?array $attributes)
     {
-        $matcher = [
-            'tag' => $type,
-            'attributes' => [],
-            'content' => $body,
-        ];
-
-        if ($type !== 'label') {
-            $matcher['attributes'] = ['name' => $name];
-        } else {
-            $matcher['attributes'] = ['for' => $name];
-        }
-
+        $matcher = $type !== 'label' ? ['name' => $name] : ['for' => $name];
 
         if (is_array($attributes)) {
-            $matcher['attributes'] = $attributes + $matcher['attributes'];
+            $matcher = $attributes + $matcher;
+        }
+
+        $selector = $type;
+        foreach ($matcher as $attr => $val) {
+            $selector .= '[' . $attr . ($val !== null ? '="' . $val . '"' : '') . ']';
         }
 
         $tag = Form::$type($name, $body, $attributes);
 
-        $this->assertTag($matcher, $tag, $tag);
+        $this->assertSelectEquals($selector, $body, true, $tag);
     }
 
     /**
@@ -274,7 +279,7 @@ class Kohana_FormTest extends Unittest_TestCase
      *
      * @return array
      */
-    public function provider_select()
+    public function provider_select(): array
     {
         return [
             // $value, $result
@@ -323,10 +328,12 @@ class Kohana_FormTest extends Unittest_TestCase
      *
      * @test
      * @dataProvider provider_select
-     * @param boolean $input  Input for Form::select
-     * @param boolean $expected Output for Form::select
+     * @param string $name
+     * @param array|null $options
+     * @param mixed $selected
+     * @param string $expected Output for Form::select
      */
-    public function test_select($name, $options, $selected, $expected)
+    public function test_select(string $name, ?array $options, $selected, string $expected)
     {
         // Much more efficient just to assertSame() rather than assertTag() on each element
         $this->assertSame($expected, Form::select($name, $options, $selected));
@@ -337,15 +344,10 @@ class Kohana_FormTest extends Unittest_TestCase
      *
      * @return array
      */
-    public function provider_submit()
+    public function provider_submit(): array
     {
         return [
-            // $value, $result
-            [
-                'foo',
-                'Foobar!',
-                '<input type="submit" name="foo" value="Foobar!" />'
-            ],
+            ['foo', 'Foobar!'],
         ];
     }
 
@@ -354,21 +356,23 @@ class Kohana_FormTest extends Unittest_TestCase
      *
      * @test
      * @dataProvider provider_submit
-     * @param boolean $input  Input for Form::submit
-     * @param boolean $expected Output for Form::submit
+     * @param string $name
+     * @param string $value
      */
-    public function test_submit($name, $value, $expected)
+    public function test_submit(string $name, string $value)
     {
         $matcher = [
-            'tag' => 'input',
-            'attributes' => [
-                'name' => $name,
-                'type' => 'submit',
-                'value' => $value
-            ]
+            'name' => $name,
+            'type' => 'submit',
+            'value' => $value
         ];
 
-        $this->assertTag($matcher, Form::submit($name, $value));
+        $selector = 'input';
+        foreach ($matcher as $attr => $val) {
+            $selector .= '[' . $attr . ($val !== null ? '="' . $val . '"' : '') . ']';
+        }
+
+        $this->assertSelectEquals($selector, null, true, Form::submit($name, $value));
     }
 
     /**
@@ -376,7 +380,7 @@ class Kohana_FormTest extends Unittest_TestCase
      *
      * @return array
      */
-    public function provider_image()
+    public function provider_image(): array
     {
         return [
             // $value, $result
@@ -394,13 +398,13 @@ class Kohana_FormTest extends Unittest_TestCase
      *
      * @test
      * @dataProvider provider_image
-     * @param boolean $name Input for Form::image
-     * @param boolean $value Input for Form::image
-     * @param boolean $attributes Input for Form::image
-     * @param boolean $expected Output for Form::image
+     * @param string $name The name attribute for the image input.
+     * @param string $value The value attribute for the image input.
+     * @param array $attributes Additional HTML attributes for the image input.
+     * @param string $expected The expected output from Form::image().
      * @throws Kohana_Exception
      */
-    public function test_image($name, $value, $attributes, $expected)
+    public function test_image(string $name, string $value, array $attributes, string $expected)
     {
         $this->assertSame($expected, Form::image($name, $value, $attributes));
     }
@@ -410,7 +414,7 @@ class Kohana_FormTest extends Unittest_TestCase
      *
      * @return array
      */
-    function provider_label()
+    function provider_label(): array
     {
         return [
             // $value, $result
@@ -461,12 +465,12 @@ class Kohana_FormTest extends Unittest_TestCase
      *
      * @test
      * @dataProvider provider_label
-     * @param boolean $for         Input for Form::label
-     * @param boolean $text        Input for Form::label
-     * @param boolean $attributes  Input for Form::label
-     * @param boolean $expected    Output for Form::label
+     * @param string $for The "for" attribute of the label.
+     * @param string|null $text The text content of the label.
+     * @param array|null $attributes Additional HTML attributes for the label.
+     * @param string $expected The expected output from Form::label().
      */
-    function test_label($for, $text, $attributes, $expected)
+    function test_label(string $for, ?string $text, ?array $attributes, string $expected)
     {
         $this->assertSame($expected, Form::label($for, $text, $attributes));
     }

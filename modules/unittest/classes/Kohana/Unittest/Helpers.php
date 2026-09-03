@@ -9,16 +9,16 @@ class Kohana_Unittest_Helpers
      * Static variable used to work out whether we have an internet
      * connection
      * @see has_internet
-     * @var boolean
+     * @var bool
      */
     static protected $_has_internet = null;
 
     /**
      * Check for internet connectivity
      *
-     * @return boolean Whether an internet connection is available
+     * @return bool Whether an internet connection is available
      */
-    public static function has_internet()
+    public static function has_internet(): ?bool
     {
         if (!isset(self::$_has_internet)) {
             // The @ operator is used here to avoid DNS errors when there is no connection.
@@ -36,7 +36,7 @@ class Kohana_Unittest_Helpers
      * @param string $path
      * @return string
      */
-    static public function dir_separator($path)
+    static public function dir_separator(string $path): string
     {
         return str_replace('/', DIRECTORY_SEPARATOR, $path);
     }
@@ -52,7 +52,7 @@ class Kohana_Unittest_Helpers
 
         while ($dir = readdir($cache_dir)) {
             // Cache files are split into directories based on first two characters of hash
-            if ($dir[0] !== '.' AND strlen($dir) === 2) {
+            if ($dir[0] !== '.' && strlen($dir) === 2) {
                 $dir = self::dir_separator(Kohana::$cache_dir . '/' . $dir . '/');
 
                 $cache = opendir($dir);
@@ -126,9 +126,9 @@ class Kohana_Unittest_Helpers
                 $class->setStaticPropertyValue($var, $value);
             }
             // If this is an environment variable
-            elseif (preg_match('/^[A-Z_-]+$/', $option) OR isset($_SERVER[$option])) {
+            elseif (preg_match('/^[A-Z_-]+$/', $option) || isset($_SERVER[$option])) {
                 if ($backup_needed) {
-                    $this->_environment_backup[$option] = isset($_SERVER[$option]) ? $_SERVER[$option] : '';
+                    $this->_environment_backup[$option] = $_SERVER[$option] ?? '';
                 }
 
                 $_SERVER[$option] = $value;
@@ -150,7 +150,7 @@ class Kohana_Unittest_Helpers
      * Restores the environment to the original state
      *
      * @chainable
-     * @return Kohana_Unittest_Helpers $this
+     * @return void
      * @throws Kohana_Exception
      * @throws ReflectionException
      */

@@ -41,10 +41,10 @@ class Kohana_Inflector
      * case, please report [an issue](http://dev.kohanaphp.com/projects/kohana3/issues).
      *
      * @param string $str word to check
-     * @return  boolean
+     * @return bool
      * @throws Kohana_Exception
      */
-    public static function uncountable($str)
+    public static function uncountable(string $str): bool
     {
         if (Inflector::$uncountable === null) {
             // Cache uncountables
@@ -72,15 +72,15 @@ class Kohana_Inflector
      * [!!] Special inflections are defined in `config/inflector.php`.
      *
      * @param string $str word to make singular
-     * @param integer $count count of thing
+     * @param int|float $count Count of thing
      * @return  string
      * @throws Kohana_Exception
      * @uses    Inflector::uncountable
      */
-    public static function singular($str, $count = null)
+    public static function singular(string $str, $count = null): string
     {
         // $count should always be a float
-        $count = ($count === null) ? 1.0 : (float) $count;
+        $count = $count === null ? 1.0 : (float) $count;
 
         // Do nothing when $count is not 1
         if ($count != 1)
@@ -108,13 +108,13 @@ class Kohana_Inflector
         } elseif (preg_match('/us$/', $str)) {
             // https://en.wikipedia.org/wiki/Plural_form_of_words_ending_in_-us
             // Already singular, do nothing
-        } elseif (preg_match('/[sxz]es$/', $str) OR preg_match('/[^aeioudgkprt]hes$/', $str)) {
+        } elseif (preg_match('/[sxz]es$/', $str) || preg_match('/[^aeioudgkprt]hes$/', $str)) {
             // Remove "es"
             $str = substr($str, 0, -2);
         } elseif (preg_match('/[^aeiou]ies$/', $str)) {
             // Replace "ies" with "y"
             $str = substr($str, 0, -3) . 'y';
-        } elseif (substr($str, -1) === 's' AND substr($str, -2) !== 'ss') {
+        } elseif (substr($str, -1) === 's' && substr($str, -2) !== 'ss') {
             // Remove singular "s"
             $str = substr($str, 0, -1);
         }
@@ -137,15 +137,15 @@ class Kohana_Inflector
      * [!!] Special inflections are defined in `config/inflector.php`.
      *
      * @param string $str word to pluralize
-     * @param integer $count count of thing
+     * @param int|float $count Count of thing
      * @return  string
      * @throws Kohana_Exception
      * @uses    Inflector::uncountable
      */
-    public static function plural($str, $count = null)
+    public static function plural(string $str, $count = null): string
     {
         // $count should always be a float
-        $count = ($count === null) ? 0.0 : (float) $count;
+        $count = $count === null ? 0.0 : (float) $count;
 
         // Do nothing with singular
         if ($count == 1)
@@ -175,7 +175,7 @@ class Kohana_Inflector
             $str = Inflector::$irregular[$str];
         } elseif (in_array($str, Inflector::$irregular)) {
             // Do nothing
-        } elseif (preg_match('/[sxz]$/', $str) OR preg_match('/[^aeioudgkprt]h$/', $str)) {
+        } elseif (preg_match('/[sxz]$/', $str) || preg_match('/[^aeioudgkprt]h$/', $str)) {
             $str .= 'es';
         } elseif (preg_match('/[^aeiou]y$/', $str)) {
             // Change "y" to "ies"
@@ -199,10 +199,10 @@ class Kohana_Inflector
      *     $str = Inflector::camelize('mother cat');     // "motherCat"
      *     $str = Inflector::camelize('kittens in bed'); // "kittensInBed"
      *
-     * @param   string  $str    phrase to camelize
+     * @param string $str Phrase to camelize
      * @return  string
      */
-    public static function camelize($str)
+    public static function camelize(string $str): string
     {
         $str = 'x' . strtolower(trim($str));
         $str = ucwords(preg_replace('/[\s_]+/', ' ', $str));
@@ -216,11 +216,11 @@ class Kohana_Inflector
      *     $str = Inflector::decamelize('houseCat');    // "house cat"
      *     $str = Inflector::decamelize('kingAllyCat'); // "king ally cat"
      *
-     * @param   string  $str    phrase to camelize
-     * @param   string  $sep    word separator
+     * @param string $str    Phrase to camelize
+     * @param string $sep    Word separator
      * @return  string
      */
-    public static function decamelize($str, $sep = ' ')
+    public static function decamelize(string $str, string $sep = ' '): string
     {
         return strtolower(preg_replace('/([a-z])([A-Z])/', '$1' . $sep . '$2', trim($str)));
     }
@@ -230,10 +230,10 @@ class Kohana_Inflector
      *
      *     $str = Inflector::underscore('five cats'); // "five_cats";
      *
-     * @param   string  $str    phrase to underscore
+     * @param string $str Phrase to underscore
      * @return  string
      */
-    public static function underscore($str)
+    public static function underscore(string $str): string
     {
         return preg_replace('/\s+/', '_', trim($str));
     }
@@ -244,10 +244,10 @@ class Kohana_Inflector
      *     $str = Inflector::humanize('kittens-are-cats'); // "kittens are cats"
      *     $str = Inflector::humanize('dogs_as_well');     // "dogs as well"
      *
-     * @param   string  $str    phrase to make human-readable
+     * @param string $str Phrase to make human-readable
      * @return  string
      */
-    public static function humanize($str)
+    public static function humanize(string $str): string
     {
         return preg_replace('/[_-]+/', ' ', trim($str));
     }

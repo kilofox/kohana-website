@@ -21,7 +21,7 @@ class Kohana_InflectorTest extends Unittest_TestCase
      *
      * @return array
      */
-    public function provider_uncountable()
+    public function provider_uncountable(): array
     {
         return [
             // $value, $result
@@ -38,11 +38,11 @@ class Kohana_InflectorTest extends Unittest_TestCase
      *
      * @test
      * @dataProvider provider_uncountable
-     * @param boolean $input Input for File::mime
-     * @param boolean $expected Output for File::mime
+     * @param string $input Input for Inflector::uncountable
+     * @param bool $expected Output for Inflector::uncountable
      * @throws Kohana_Exception
      */
-    public function test_uncountable($input, $expected)
+    public function test_uncountable(string $input, bool $expected)
     {
         $this->assertSame($expected, Inflector::uncountable($input));
     }
@@ -52,7 +52,7 @@ class Kohana_InflectorTest extends Unittest_TestCase
      *
      * @return array
      */
-    public function provider_singular()
+    public function provider_singular(): array
     {
         return [
             // $value, $result
@@ -75,11 +75,12 @@ class Kohana_InflectorTest extends Unittest_TestCase
      *
      * @test
      * @dataProvider provider_singular
-     * @param boolean $input Input for File::mime
-     * @param boolean $expected Output for File::mime
+     * @param string $input Input for Inflector::singular
+     * @param int|float $count Optional count to determine inflection logic
+     * @param string $expected Output for Inflector::mime
      * @throws Kohana_Exception
      */
-    public function test_singular($input, $count, $expected)
+    public function test_singular(string $input, $count, string $expected)
     {
         $this->assertSame($expected, Inflector::singular($input, $count));
     }
@@ -89,7 +90,7 @@ class Kohana_InflectorTest extends Unittest_TestCase
      *
      * @return array
      */
-    public function provider_plural()
+    public function provider_plural(): array
     {
         return [
             // $value, $result
@@ -112,11 +113,12 @@ class Kohana_InflectorTest extends Unittest_TestCase
      *
      * @test
      * @dataProvider provider_plural
-     * @param boolean $input Input for File::mime
-     * @param boolean $expected Output for File::mime
+     * @param string $input Input for Inflector::plural
+     * @param int|float $count Optional count to determine inflection logic
+     * @param string $expected Output for Inflector::plural
      * @throws Kohana_Exception
      */
-    public function test_plural($input, $count, $expected)
+    public function test_plural(string $input, $count, string $expected)
     {
         $this->assertSame($expected, Inflector::plural($input, $count));
     }
@@ -126,7 +128,7 @@ class Kohana_InflectorTest extends Unittest_TestCase
      *
      * @return array
      */
-    public function provider_camelize()
+    public function provider_camelize(): array
     {
         return [
             // $value, $result
@@ -140,14 +142,15 @@ class Kohana_InflectorTest extends Unittest_TestCase
     }
 
     /**
-     * Tests Inflector::camelize
+     * Tests Inflector methods like camelize, underscore, and humanize.
      *
      * @test
      * @dataProvider provider_camelize
-     * @param boolean $input  Input for File::mime
-     * @param boolean $expected Output for File::mime
+     * @param string $input The input string to transform
+     * @param string $method The Inflector method to test
+     * @param string $expected The expected transformed string
      */
-    public function test_camelize($input, $method, $expected)
+    public function test_camelize(string $input, string $method, string $expected)
     {
         $this->assertSame($expected, Inflector::$method($input));
     }
@@ -157,7 +160,7 @@ class Kohana_InflectorTest extends Unittest_TestCase
      *
      * @return array
      */
-    public function provider_decamelize()
+    public function provider_decamelize(): array
     {
         return [
             ['getText', '_', 'get_text'],
@@ -182,7 +185,7 @@ class Kohana_InflectorTest extends Unittest_TestCase
      * @param string $glue Glue
      * @param string $expected Expected string
      */
-    public function test_decamelize($input, $glue, $expected)
+    public function test_decamelize(string $input, string $glue, string $expected)
     {
         $this->assertSame($expected, Inflector::decamelize($input, $glue));
     }

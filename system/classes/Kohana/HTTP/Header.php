@@ -25,7 +25,7 @@ class Kohana_HTTP_Header extends ArrayObject
      * @return  array
      * @since   3.2.0
      */
-    public static function accept_quality(array $parts)
+    public static function accept_quality(array $parts): array
     {
         $parsed = [];
 
@@ -59,11 +59,11 @@ class Kohana_HTTP_Header extends ArrayObject
      * for each supplied media type.
      *
      * @link    https://www.rfc-editor.org/rfc/rfc9110.html#name-accept
-     * @param   string  $accepts    Accept header string to parse
+     * @param string|null $accepts Accept header string to parse
      * @return  array
      * @since   3.2.0
      */
-    public static function parse_accept_header($accepts = null)
+    public static function parse_accept_header(string $accepts = null): array
     {
         $accepts = explode(',', (string) $accepts);
 
@@ -98,17 +98,17 @@ class Kohana_HTTP_Header extends ArrayObject
      * the charset and associated quality.
      *
      * @link    https://www.rfc-editor.org/rfc/rfc9110.html#name-accept-charset
-     * @param   string  $charset    charset string to parse
+     * @param string|null $charset Charset string to parse
      * @return  array
      * @since   3.2.0
      */
-    public static function parse_charset_header($charset = null)
+    public static function parse_charset_header(string $charset = null): array
     {
         if ($charset === null) {
             return ['*' => (float) HTTP_Header::DEFAULT_QUALITY];
         }
 
-        return HTTP_Header::accept_quality(explode(',', (string) $charset));
+        return HTTP_Header::accept_quality(explode(',', $charset));
     }
 
     /**
@@ -116,11 +116,11 @@ class Kohana_HTTP_Header extends ArrayObject
      * the charsets and associated quality.
      *
      * @link    https://www.rfc-editor.org/rfc/rfc9110.html#name-accept-encoding
-     * @param   string  $encoding   charset string to parse
+     * @param string|null $encoding Charset string to parse
      * @return  array
      * @since   3.2.0
      */
-    public static function parse_encoding_header($encoding = null)
+    public static function parse_encoding_header(string $encoding = null): array
     {
         // Accept everything
         if ($encoding === null) {
@@ -128,7 +128,7 @@ class Kohana_HTTP_Header extends ArrayObject
         } elseif ($encoding === '') {
             return ['identity' => (float) HTTP_Header::DEFAULT_QUALITY];
         } else {
-            return HTTP_Header::accept_quality(explode(',', (string) $encoding));
+            return HTTP_Header::accept_quality(explode(',', $encoding));
         }
     }
 
@@ -137,17 +137,17 @@ class Kohana_HTTP_Header extends ArrayObject
      * the languages and associated quality.
      *
      * @link    https://www.rfc-editor.org/rfc/rfc9110.html#name-accept-language
-     * @param   string  $language   charset string to parse
+     * @param string|null $language Charset string to parse
      * @return  array
      * @since   3.2.0
      */
-    public static function parse_language_header($language = null)
+    public static function parse_language_header(string $language = null): array
     {
         if ($language === null) {
             return ['*' => ['*' => (float) HTTP_Header::DEFAULT_QUALITY]];
         }
 
-        $language = HTTP_Header::accept_quality(explode(',', (string) $language));
+        $language = HTTP_Header::accept_quality(explode(',', $language));
 
         $parsed_language = [];
 
@@ -186,12 +186,12 @@ class Kohana_HTTP_Header extends ArrayObject
      * @param   array   $cache_control  Cache-Control to render to string
      * @return  string
      */
-    public static function create_cache_control(array $cache_control)
+    public static function create_cache_control(array $cache_control): string
     {
         $parts = [];
 
         foreach ($cache_control as $key => $value) {
-            $parts[] = (is_int($key)) ? $value : ($key . '=' . $value);
+            $parts[] = is_int($key) ? $value : $key . '=' . $value;
         }
 
         return implode(', ', $parts);
@@ -210,10 +210,10 @@ class Kohana_HTTP_Header extends ArrayObject
      *          $maxAge = $cache_control['max-age'];
      *     }
      *
-     * @param   array   $cache_control Array of headers
-     * @return  mixed
+     * @param string $cache_control Array of headers
+     * @return  array|false
      */
-    public static function parse_cache_control($cache_control)
+    public static function parse_cache_control(string $cache_control)
     {
         $directives = explode(',', strtolower($cache_control));
 
@@ -270,7 +270,7 @@ class Kohana_HTTP_Header extends ArrayObject
         /**
          * HTTP header declarations should be treated as case-insensitive
          */
-        $input = array_change_key_case((array) $input);
+        $input = array_change_key_case($input);
 
         parent::__construct($input, $flags, $iterator_class);
     }
@@ -308,87 +308,88 @@ class Kohana_HTTP_Header extends ArrayObject
      * is `false`, the header will be appended rather than replacing the
      * original setting.
      *
-     * @param   mixed   $index      index to set `$newval` to
-     * @param   mixed   $newval     new value to set
-     * @param   boolean $replace    replace existing value
+     * @param mixed $key The index being set.
+     * @param mixed $value The new value for the index.
+     * @param bool $replace replace existing value
      * @return  void
      * @since   3.2.0
      */
-    public function offsetSet($index, $newval, $replace = true)
+    public function offsetSet($key, $value, bool $replace = true)
     {
         // Ensure the index is lowercase
-        $index = strtolower($index);
+        $key = strtolower($key);
 
-        if ($replace OR !$this->offsetExists($index)) {
-            return parent::offsetSet($index, $newval);
+        if ($replace || !$this->offsetExists($key)) {
+            parent::offsetSet($key, $value);
+            return;
         }
 
-        $current_value = $this->offsetGet($index);
+        $current_value = $this->offsetGet($key);
 
         if (is_array($current_value)) {
-            $current_value[] = $newval;
+            $current_value[] = $value;
         } else {
-            $current_value = [$current_value, $newval];
+            $current_value = [$current_value, $value];
         }
 
-        return parent::offsetSet($index, $current_value);
+        parent::offsetSet($key, $current_value);
     }
 
     /**
      * Overloads the `ArrayObject::offsetExists()` method to ensure keys
      * are lowercase.
      *
-     * @param   string  $index
-     * @return  boolean
+     * @param   string  $key
+     * @return  bool
      * @since   3.2.0
      */
-    public function offsetExists($index)
+    public function offsetExists($key): bool
     {
-        return parent::offsetExists(strtolower($index));
+        return parent::offsetExists(strtolower($key));
     }
 
     /**
      * Overloads the `ArrayObject::offsetUnset()` method to ensure keys
      * are lowercase.
      *
-     * @param   string  $index
+     * @param   string  $key
      * @return  void
      * @since   3.2.0
      */
-    public function offsetUnset($index)
+    public function offsetUnset($key)
     {
-        return parent::offsetUnset(strtolower($index));
+        parent::offsetUnset(strtolower($key));
     }
 
     /**
      * Overload the `ArrayObject::offsetGet()` method to ensure that all
      * keys passed to it are formatted correctly for this object.
      *
-     * @param   string  $index  index to retrieve
+     * @param   string  $key  index to retrieve
      * @return  mixed
      * @since   3.2.0
      */
-    public function offsetGet($index)
+    public function offsetGet($key)
     {
-        return parent::offsetGet(strtolower($index));
+        return parent::offsetGet(strtolower($key));
     }
 
     /**
      * Overloads the `ArrayObject::exchangeArray()` method to ensure that
      * all keys are changed to lowercase.
      *
-     * @param   mixed   $input
+     * @param   mixed   $array
      * @return  array
      * @since   3.2.0
      */
-    public function exchangeArray($input)
+    public function exchangeArray($array): array
     {
         /**
          * HTTP header declarations should be treated as case-insensitive
          */
-        $input = array_change_key_case((array) $input);
+        $array = array_change_key_case((array) $array);
 
-        return parent::exchangeArray($input);
+        return parent::exchangeArray($array);
     }
 
     /**
@@ -397,12 +398,12 @@ class Kohana_HTTP_Header extends ArrayObject
      *     $header = $response->headers();
      *     $header->parse_header_string(null, 'content-type: application/json');
      *
-     * @param   resource    $resource       the resource (required by Curl API)
-     * @param   string      $header_line    the line from the header to parse
+     * @param resource|null $resource The resource (required by cURL API)
+     * @param string $header_line The line from the header to parse
      * @return  int
      * @since   3.2.0
      */
-    public function parse_header_string($resource, $header_line)
+    public function parse_header_string($resource, string $header_line): int
     {
         if (preg_match_all('/(\w[^\s:]*):[ ]*([^\r\n]*(?:\r\n[ \t][^\r\n]*)*)/', $header_line, $matches)) {
             foreach ($matches[0] as $key => $value) {
@@ -429,12 +430,12 @@ class Kohana_HTTP_Header extends ArrayObject
      *     $quality_explicit = $request->headers()->accepts_at_quality('text/plain', true);
      *
      * @param string $type
-     * @param boolean $explicit explicit check, excludes `*`
+     * @param bool $explicit explicit check, excludes `*`
      * @return  mixed
      * @throws Kohana_Exception
      * @since   3.2.0
      */
-    public function accepts_at_quality($type, $explicit = false)
+    public function accepts_at_quality(string $type, bool $explicit = false)
     {
         // Parse Accept header if required
         if ($this->_accept_content === null) {
@@ -458,7 +459,7 @@ class Kohana_HTTP_Header extends ArrayObject
 
             foreach ($mime as $_type) {
                 $quality_check = $this->accepts_at_quality($_type, $explicit);
-                $quality = ($quality_check > $quality) ? $quality_check : $quality;
+                $quality = $quality_check > $quality ? $quality_check : $quality;
             }
 
             return $quality;
@@ -501,12 +502,12 @@ class Kohana_HTTP_Header extends ArrayObject
      *
      *
      * @param array $types the content types to examine
-     * @param boolean $explicit only allow explicit references, no wildcards
+     * @param bool $explicit only allow explicit references, no wildcards
      * @return  string  name of the preferred content type
      * @throws Kohana_Exception
      * @since   3.2.0
      */
-    public function preferred_accept(array $types, $explicit = false)
+    public function preferred_accept(array $types, bool $explicit = false)
     {
         $preferred = false;
         $ceiling = 0;
@@ -532,11 +533,11 @@ class Kohana_HTTP_Header extends ArrayObject
      *      $quality = $header->accepts_charset_at_quality('utf-8');
      *            // $quality = (float) 1
      *
-     * @param   string  $charset    charset to examine
+     * @param string $charset Charset to examine
      * @return  float   the quality of the charset
      * @since   3.2.0
      */
-    public function accepts_charset_at_quality($charset)
+    public function accepts_charset_at_quality(string $charset): float
     {
         if ($this->_accept_charset === null) {
             if ($this->offsetExists('Accept-Charset')) {
@@ -600,12 +601,12 @@ class Kohana_HTTP_Header extends ArrayObject
      *      $encoding = $header->accepts_encoding_at_quality('gzip');
      *      // $encoding = (float) 1.0s
      *
-     * @param   string  $encoding   encoding type to interrogate
-     * @param   boolean $explicit   explicit check, ignoring wildcards and `identity`
+     * @param string $encoding Encoding type to interrogate
+     * @param bool $explicit Explicit check, ignoring wildcards and `identity`
      * @return  float
      * @since   3.2.0
      */
-    public function accepts_encoding_at_quality($encoding, $explicit = false)
+    public function accepts_encoding_at_quality(string $encoding, bool $explicit = false): float
     {
         if ($this->_accept_encoding === null) {
             if ($this->offsetExists('Accept-Encoding')) {
@@ -647,11 +648,11 @@ class Kohana_HTTP_Header extends ArrayObject
      *     // $encoding = 'gzip';
      *
      * @param   array   $encodings  encodings to test against
-     * @param   boolean $explicit   explicit check, if `true` wildcards are excluded
+     * @param bool $explicit Explicit check, if `true` wildcards are excluded
      * @return  mixed
      * @since   3.2.0
      */
-    public function preferred_encoding(array $encodings, $explicit = false)
+    public function preferred_encoding(array $encodings, bool $explicit = false)
     {
         $ceiling = 0;
         $preferred = false;
@@ -683,12 +684,12 @@ class Kohana_HTTP_Header extends ArrayObject
      *     $lang3 = $header->accepts_language_at_quality('en-au', true);
      *     // $lang3 = (float) 0.0
      *
-     * @param   string  $language   language to interrogate
-     * @param   boolean $explicit   explicit interrogation, `true` ignores wildcards
+     * @param string $language Language to interrogate
+     * @param bool $explicit Explicit interrogation, `true` ignores wildcards
      * @return  float
      * @since   3.2.0
      */
-    public function accepts_language_at_quality($language, $explicit = false)
+    public function accepts_language_at_quality(string $language, bool $explicit = false): float
     {
         if ($this->_accept_language === null) {
             if ($this->offsetExists('Accept-Language')) {
@@ -707,7 +708,7 @@ class Kohana_HTTP_Header extends ArrayObject
             if (isset($language_parts[1])) {
                 if (isset($this->_accept_language[$language_parts[0]][$language_parts[1]])) {
                     return $this->_accept_language[$language_parts[0]][$language_parts[1]];
-                } elseif ($explicit === false AND isset($this->_accept_language[$language_parts[0]]['*'])) {
+                } elseif ($explicit === false && isset($this->_accept_language[$language_parts[0]]['*'])) {
                     return $this->_accept_language[$language_parts[0]]['*'];
                 }
             } elseif (isset($this->_accept_language[$language_parts[0]]['*'])) {
@@ -715,7 +716,7 @@ class Kohana_HTTP_Header extends ArrayObject
             }
         }
 
-        if ($explicit === false AND isset($this->_accept_language['*'])) {
+        if ($explicit === false && isset($this->_accept_language['*'])) {
             return $this->_accept_language['*'];
         }
 
@@ -732,11 +733,11 @@ class Kohana_HTTP_Header extends ArrayObject
      *      ]); // $lang = 'en-gb'
      *
      * @param   array   $languages
-     * @param   boolean $explicit
+     * @param bool $explicit
      * @return  mixed
      * @since   3.2.0
      */
-    public function preferred_language(array $languages, $explicit = false)
+    public function preferred_language(array $languages, bool $explicit = false)
     {
         $ceiling = 0;
         $preferred = false;
@@ -761,14 +762,14 @@ class Kohana_HTTP_Header extends ArrayObject
      * [!!] if you supply a custom header handler via `$callback`, it is
      *  recommended that `$response` is returned
      *
-     * @param HTTP_Response $response header to send
-     * @param boolean $replace replace existing value
-     * @param callback $callback optional callback to replace PHP header function
+     * @param HTTP_Response|null $response header to send
+     * @param bool $replace replace existing value
+     * @param callable|null $callback optional callback to replace PHP header function
      * @return  mixed
      * @throws Kohana_Exception
      * @since   3.2.0
      */
-    public function send_headers(HTTP_Response $response = null, $replace = false, $callback = null)
+    public function send_headers(HTTP_Response $response = null, bool $replace = false, callable $callback = null)
     {
         $protocol = $response->protocol();
         $status = $response->status();
@@ -791,7 +792,7 @@ class Kohana_HTTP_Header extends ArrayObject
             $processed_headers[] = 'Content-Type: ' . Kohana::$content_type . '; charset=' . Kohana::$charset;
         }
 
-        if (Kohana::$expose AND ! isset($headers['x-powered-by'])) {
+        if (Kohana::$expose && !isset($headers['x-powered-by'])) {
             $processed_headers[] = 'X-Powered-By: ' . Kohana::version();
         }
 
@@ -814,19 +815,19 @@ class Kohana_HTTP_Header extends ArrayObject
      * are included in the message they will be handled appropriately.
      *
      * @param array $headers headers to send to php
-     * @param boolean $replace replace existing headers
+     * @param bool $replace replace existing headers
      * @return  self
      * @throws Kohana_Exception
      * @since   3.2.0
      */
-    protected function _send_headers_to_php(array $headers, $replace)
+    protected function _send_headers_to_php(array $headers, bool $replace): Kohana_HTTP_Header
     {
         // If the headers have been sent, get out
         if (headers_sent())
             return $this;
 
         foreach ($headers as $key => $line) {
-            if ($key == 'Set-Cookie' AND is_array($line)) {
+            if ($key === 'Set-Cookie' && is_array($line)) {
                 // Send cookies
                 foreach ($line as $name => $value) {
                     Cookie::set($name, $value['value'], $value['expiration']);

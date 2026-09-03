@@ -28,7 +28,7 @@ class Model_Auth_User extends ORM
      *
      * @return array Rules
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'username' => [
@@ -54,7 +54,7 @@ class Model_Auth_User extends ORM
      * @return array Filters
      * @throws Kohana_Exception
      */
-    public function filters()
+    public function filters(): array
     {
         return [
             'password' => [
@@ -68,7 +68,7 @@ class Model_Auth_User extends ORM
      *
      * @return array Labels
      */
-    public function labels()
+    public function labels(): array
     {
         return [
             'username' => 'username',
@@ -89,7 +89,7 @@ class Model_Auth_User extends ORM
     {
         if ($this->_loaded) {
             // Update the number of logins
-            $this->logins = new Database_Expression('logins + 1');
+            $this->logins++;
 
             // Set the last login date
             $this->last_login = time();
@@ -102,14 +102,14 @@ class Model_Auth_User extends ORM
     /**
      * Tests if a unique key value exists in the database.
      *
-     * @param mixed    the value to test
-     * @param string   field name
-     * @return  boolean
+     * @param mixed $value the value to test
+     * @param string|null $field Field name
+     * @return bool
      * @throws Kohana_Exception
      */
-    public function unique_key_exists($value, $field = NULL)
+    public function unique_key_exists($value, string $field = null): bool
     {
-        if ($field === NULL) {
+        if ($field === null) {
             // Automatically determine field by looking at the value
             $field = $this->unique_key($value);
         }
@@ -125,10 +125,10 @@ class Model_Auth_User extends ORM
     /**
      * Allows a model use both email and username as unique identifiers for login
      *
-     * @param   string  unique value
+     * @param string $value unique value
      * @return  string  field name
      */
-    public function unique_key($value)
+    public function unique_key(string $value): string
     {
         return Valid::email($value) ? 'email' : 'username';
     }
@@ -139,7 +139,7 @@ class Model_Auth_User extends ORM
      * @param array $values
      * @return Validation
      */
-    public static function get_password_validation($values)
+    public static function get_password_validation(array $values): Validation
     {
         return Validation::factory($values)
                 ->rule('password', 'min_length', [':value', 8])
@@ -168,7 +168,7 @@ class Model_Auth_User extends ORM
      * @throws ORM_Validation_Exception
      * @throws ReflectionException
      */
-    public function create_user($values, $expected)
+    public function create_user(array $values, array $expected): ORM
     {
         // Validation for passwords
         $extra_validation = Model_User::get_password_validation($values)
@@ -195,13 +195,13 @@ class Model_Auth_User extends ORM
      * ~~~
      *
      * @param array $values
-     * @param array $expected
+     * @param array|null $expected
      * @return ORM
      * @throws Kohana_Exception
      * @throws ORM_Validation_Exception
      * @throws ReflectionException
      */
-    public function update_user($values, $expected = NULL)
+    public function update_user(array $values, array $expected = null): ORM
     {
         if (empty($values['password'])) {
             unset($values['password'], $values['password_confirm']);

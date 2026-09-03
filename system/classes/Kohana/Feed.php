@@ -15,20 +15,17 @@ class Kohana_Feed
      * Parses a remote feed into an array.
      *
      * @param string $feed remote feed URL
-     * @param integer $limit item limit to fetch
+     * @param int $limit item limit to fetch
      * @return  array
      * @throws HTTP_Exception_404
      * @throws Kohana_Exception
      * @throws Request_Exception
      */
-    public static function parse($feed, $limit = 0)
+    public static function parse(string $feed, int $limit = 0): array
     {
         // Check if SimpleXML is installed
         if (!function_exists('simplexml_load_file'))
             throw new Kohana_Exception('SimpleXML must be installed!');
-
-        // Make limit an integer
-        $limit = (int) $limit;
 
         // Disable error reporting while opening the feed
         $error_level = error_reporting(0);
@@ -62,7 +59,7 @@ class Kohana_Feed
         $items = [];
 
         foreach ($feed as $item) {
-            if ($limit > 0 AND $i++ === $limit)
+            if ($limit > 0 && $i++ === $limit)
                 break;
             $item_fields = (array) $item;
 
@@ -85,7 +82,7 @@ class Kohana_Feed
      * @return  string
      * @throws Kohana_Exception
      */
-    public static function create($info, $items, $encoding = 'UTF-8')
+    public static function create(array $info, array $items, string $encoding = 'UTF-8'): string
     {
         $info += ['title' => 'Generated Feed', 'link' => '', 'generator' => 'KohanaPHP'];
 
@@ -116,10 +113,10 @@ class Kohana_Feed
                 $image->addChild('url', $value['url']);
                 $image->addChild('title', $value['title']);
             } else {
-                if (($name === 'pubDate' OR $name === 'lastBuildDate') AND ( is_int($value) OR ctype_digit($value))) {
+                if (($name === 'pubDate' || $name === 'lastBuildDate') && (is_int($value) || ctype_digit($value))) {
                     // Convert timestamps to RFC 822 formatted dates
                     $value = date('r', $value);
-                } elseif (($name === 'link' OR $name === 'docs') AND strpos($value, '://') === false) {
+                } elseif (($name === 'link' || $name === 'docs') && strpos($value, '://') === false) {
                     // Convert URIs to URLs
                     $value = URL::site($value, 'http');
                 }
@@ -134,10 +131,10 @@ class Kohana_Feed
             $row = $feed->channel->addChild('item');
 
             foreach ($item as $name => $value) {
-                if ($name === 'pubDate' AND ( is_int($value) OR ctype_digit($value))) {
+                if ($name === 'pubDate' && (is_int($value) || ctype_digit($value))) {
                     // Convert timestamps to RFC 822 formatted dates
                     $value = date('r', $value);
-                } elseif (($name === 'link' OR $name === 'guid') AND strpos($value, '://') === false) {
+                } elseif (($name === 'link' || $name === 'guid') && strpos($value, '://') === false) {
                     // Convert URIs to URLs
                     $value = URL::site($value, 'http');
                 }

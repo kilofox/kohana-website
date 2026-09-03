@@ -9,7 +9,7 @@
  * @copyright  (c) 2009-2012 Kohana Team
  * @license    https://kohana.top/license
  */
-class Kohana_CacheTest extends PHPUnit_Framework_TestCase
+class Kohana_CacheTest extends PHPUnit\Framework\TestCase
 {
     const BAD_GROUP_DEFINITION = 1010;
     const EXPECT_SELF = 1001;
@@ -21,7 +21,7 @@ class Kohana_CacheTest extends PHPUnit_Framework_TestCase
      * @throws Cache_Exception
      * @throws Kohana_Exception
      */
-    public function provider_instance()
+    public function provider_instance(): array
     {
         $base = [];
 
@@ -40,14 +40,10 @@ class Kohana_CacheTest extends PHPUnit_Framework_TestCase
             ];
         }
 
-
-        return [
-            // Test bad group definition
-            $base + [
-            Kohana_CacheTest::BAD_GROUP_DEFINITION,
-            'Failed to load Kohana Cache group: 1010'
-            ],
-        ];
+        return $base + [
+                // Test bad group definition
+                [Kohana_CacheTest::BAD_GROUP_DEFINITION, 'Failed to load Kohana Cache group: 1010'],
+            ];
     }
 
     /**
@@ -63,7 +59,7 @@ class Kohana_CacheTest extends PHPUnit_Framework_TestCase
      */
     public function test_instance($group, $expected)
     {
-        if ($group == Kohana_CacheTest::BAD_GROUP_DEFINITION) {
+        if ($group === Kohana_CacheTest::BAD_GROUP_DEFINITION) {
             $this->expectException('Cache_Exception');
         }
 
@@ -79,23 +75,20 @@ class Kohana_CacheTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Tests that `clone($cache)` will be prevented to maintain singleton
+     * Tests that `clone $cache` will be prevented to maintain singleton
      *
      * @return  void
-     * @expectedException Cache_Exception
      */
     public function test_cloning_fails()
     {
+        $this->expectException(Cache_Exception::class);
+        $this->expectExceptionMessage('Cloning of Kohana_Cache objects is forbidden');
+
         $cache = $this->getMockBuilder('Cache')
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
 
-        try {
-            clone($cache);
-        } catch (Cache_Exception $e) {
-            $this->assertSame('Cloning of Kohana_Cache objects is forbidden', $e->getMessage());
-            throw $e;
-        }
+        clone $cache;
     }
 
     /**
@@ -103,7 +96,7 @@ class Kohana_CacheTest extends PHPUnit_Framework_TestCase
      *
      * @return  array
      */
-    public function provider_config()
+    public function provider_config(): array
     {
         return [
             [
@@ -148,10 +141,10 @@ class Kohana_CacheTest extends PHPUnit_Framework_TestCase
      *
      * @dataProvider provider_config
      *
-     * @param   mixed    key value to set or get
-     * @param   mixed    value to set to key
-     * @param   mixed    expected result from [Cache::config()]
-     * @param   array    expected config within cache
+     * @param mixed $key key value to set or get
+     * @param mixed $value value to set to key
+     * @param mixed $expected_result expected result from [Cache::config()]
+     * @param array $expected_config expected config within cache
      * @return  void
      */
     public function test_config($key, $value, $expected_result, array $expected_config)
@@ -174,7 +167,7 @@ class Kohana_CacheTest extends PHPUnit_Framework_TestCase
      *
      * @return  array
      */
-    public function provider_sanitize_id()
+    public function provider_sanitize_id(): array
     {
         return [
             [
@@ -211,12 +204,12 @@ class Kohana_CacheTest extends PHPUnit_Framework_TestCase
      *
      * @dataProvider provider_sanitize_id
      *
-     * @param string    id
-     * @param string    expected
+     * @param string $id id
+     * @param string $expected expected
      * @return  void
      * @throws ReflectionException
      */
-    public function test_sanitize_id($id, $expected)
+    public function test_sanitize_id(string $id, string $expected)
     {
         $cache = $this->createMock('Cache');
 

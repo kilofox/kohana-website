@@ -33,14 +33,15 @@ class Kohana_Database_MySQLi extends Database
 
         // Extract the connection parameters, adding required variables
         extract($this->_config['connection'] + [
-            'database' => '',
-            'hostname' => '',
-            'username' => '',
-            'password' => '',
-            'socket' => '',
-            'port' => 3306,
-            'ssl' => null,
-        ]);
+                'hostname' => '',
+                'username' => '',
+                'password' => '',
+                'database' => '',
+                'port' => 3306,
+                'socket' => null,
+                'flags' => null,
+                'ssl' => null,
+            ]);
 
         // Prevent this information from showing up in traces
         unset($this->_config['connection']['username'], $this->_config['connection']['password']);
@@ -51,7 +52,7 @@ class Kohana_Database_MySQLi extends Database
                 $this->_connection->ssl_set(
                     Arr::get($ssl, 'client_key_path'), Arr::get($ssl, 'client_cert_path'), Arr::get($ssl, 'ca_cert_path'), Arr::get($ssl, 'ca_dir_path'), Arr::get($ssl, 'cipher')
                 );
-                $this->_connection->real_connect($hostname, $username, $password, $database, $port, $socket, MYSQLI_CLIENT_SSL);
+                $this->_connection->real_connect($hostname, $username, $password, $database, $port, $socket, MYSQLI_CLIENT_SSL | $flags);
             } else {
                 $this->_connection = new mysqli($hostname, $username, $password, $database, $port, $socket);
             }
@@ -82,7 +83,12 @@ class Kohana_Database_MySQLi extends Database
         }
     }
 
-    public function disconnect()
+    /**
+     * Disconnect from the database.
+     *
+     * @return bool
+     */
+    public function disconnect(): bool
     {
         try {
             // Database is assumed disconnected
@@ -105,7 +111,7 @@ class Kohana_Database_MySQLi extends Database
         return $status;
     }
 
-    public function set_charset($charset)
+    public function set_charset(string $charset)
     {
         // Make sure the database is connected
         $this->_connection or $this->connect();
@@ -123,7 +129,17 @@ class Kohana_Database_MySQLi extends Database
         }
     }
 
-    public function query($type, $sql, $as_object = false, array $params = null)
+    /**
+     * Perform an SQL query of the given type.
+     *
+     * @param int $type Database::SELECT, Database::INSERT, etc.
+     * @param string $sql SQL query
+     * @param mixed $as_object result object class string, true for stdClass, false for assoc array
+     * @param array|null $params object construct parameters for result class
+     * @return Database_Result|array|int Database_Result for SELECT queries, list (insert ID, row count) for INSERT queries, or number of affected rows for all other queries
+     * @throws Database_Exception
+     */
+    public function query(int $type, string $sql, $as_object = false, array $params = null)
     {
         // Make sure the database is connected
         $this->_connection or $this->connect();
@@ -168,7 +184,13 @@ class Kohana_Database_MySQLi extends Database
         }
     }
 
-    public function datatype($type)
+    /**
+     * Returns a normalized array describing the SQL data type.
+     *
+     * @param string $type SQL data type
+     * @return array
+     */
+    public function datatype(string $type): array
     {
         static $types = [
             'blob' => ['type' => 'string', 'binary' => true, 'character_maximum_length' => '65535'],
@@ -220,16 +242,16 @@ class Kohana_Database_MySQLi extends Database
      *
      * @link http://dev.mysql.com/doc/refman/5.0/en/set-transaction.html
      *
-     * @param string $mode Isolation level
-     * @return boolean
+     * @param string|null $mode Isolation level
+     * @return bool
      * @throws Database_Exception
      */
-    public function begin($mode = null)
+    public function begin(string $mode = null): bool
     {
         // Make sure the database is connected
         $this->_connection or $this->connect();
 
-        if ($mode AND !$this->_connection->query("SET TRANSACTION ISOLATION LEVEL $mode")) {
+        if ($mode && !$this->_connection->query("SET TRANSACTION ISOLATION LEVEL $mode")) {
             throw new Database_Exception(':error', [':error' => $this->_connection->error], $this->_connection->errno);
         }
 
@@ -239,10 +261,10 @@ class Kohana_Database_MySQLi extends Database
     /**
      * Commit a SQL transaction
      *
-     * @return boolean
+     * @return bool
      * @throws Database_Exception
      */
-    public function commit()
+    public function commit(): bool
     {
         // Make sure the database is connected
         $this->_connection or $this->connect();
@@ -253,10 +275,10 @@ class Kohana_Database_MySQLi extends Database
     /**
      * Rollback a SQL transaction
      *
-     * @return boolean
+     * @return bool
      * @throws Database_Exception
      */
-    public function rollback()
+    public function rollback(): bool
     {
         // Make sure the database is connected
         $this->_connection or $this->connect();
@@ -264,7 +286,7 @@ class Kohana_Database_MySQLi extends Database
         return (bool) $this->_connection->query('ROLLBACK');
     }
 
-    public function list_tables($like = null)
+    public function list_tables(string $like = null): array
     {
         if (is_string($like)) {
             // Search for table names
@@ -282,10 +304,10 @@ class Kohana_Database_MySQLi extends Database
         return $tables;
     }
 
-    public function list_columns($table, $like = null, $add_prefix = true)
+    public function list_columns(string $table, string $like = null, bool $add_prefix = true): array
     {
         // Quote the table name
-        $table = ($add_prefix === true) ? $this->quote_table($table) : $table;
+        $table = $add_prefix === true ? $this->quote_table($table) : $table;
 
         if (is_string($like)) {
             // Search for column names
@@ -305,7 +327,7 @@ class Kohana_Database_MySQLi extends Database
             $column['column_name'] = $row['Field'];
             $column['column_default'] = $row['Default'];
             $column['data_type'] = $type;
-            $column['is_nullable'] = ($row['Null'] == 'YES');
+            $column['is_nullable'] = $row['Null'] === 'YES';
             $column['ordinal_position'] = ++$count;
 
             switch ($column['type']) {
@@ -329,6 +351,8 @@ class Kohana_Database_MySQLi extends Database
                         case 'char':
                         case 'varchar':
                             $column['character_maximum_length'] = $length;
+                            $column['collation_name'] = $row['Collation'];
+                            break;
                         case 'text':
                         case 'tinytext':
                         case 'mediumtext':
@@ -356,12 +380,12 @@ class Kohana_Database_MySQLi extends Database
         return $columns;
     }
 
-    public function escape($value)
+    public function escape(string $value): string
     {
         // Make sure the database is connected
         $this->_connection or $this->connect();
 
-        if (($value = $this->_connection->real_escape_string((string) $value)) === false) {
+        if (($value = $this->_connection->real_escape_string($value)) === false) {
             throw new Database_Exception(':error', [':error' => $this->_connection->error], $this->_connection->errno);
         }
 

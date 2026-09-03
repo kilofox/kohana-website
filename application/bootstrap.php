@@ -1,15 +1,18 @@
 <?php
 
+// Register the Composer autoloader
+require DOCROOT . '../vendor/autoload.php';
+
 // -- Environment setup --------------------------------------------------------
 // Load the core Kohana class
-require SYSPATH . 'classes/Kohana/Core' . EXT;
+require SYSPATH . 'classes/Kohana/Core.php';
 
-if (is_file(APPPATH . 'classes/Kohana' . EXT)) {
+if (is_file(APPPATH . 'classes/Kohana.php')) {
     // Application extends the core
-    require APPPATH . 'classes/Kohana' . EXT;
+    require APPPATH . 'classes/Kohana.php';
 } else {
     // Load empty core extension
-    require SYSPATH . 'classes/Kohana' . EXT;
+    require SYSPATH . 'classes/Kohana.php';
 }
 
 /**
@@ -140,7 +143,7 @@ Kohana::$expose = true;
  * If you have not defined a cookie salt in your Cookie class then
  * uncomment the line below and define a preferably long salt.
  */
- Cookie::$salt = 'null';
+ Cookie::$salt = '12345';
 
 /**
  * Set the routes. Each route must have a minimum of a name, a URI and a set of

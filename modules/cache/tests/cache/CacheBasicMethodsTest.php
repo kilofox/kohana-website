@@ -9,7 +9,7 @@
  * @copyright  (c) 2009-2012 Kohana Team
  * @license    https://kohana.top/license
  */
-abstract class Kohana_CacheBasicMethodsTest extends PHPUnit_Framework_TestCase
+abstract class Kohana_CacheBasicMethodsTest extends PHPUnit\Framework\TestCase
 {
     /**
      * @var     Cache driver for this test
@@ -36,8 +36,7 @@ abstract class Kohana_CacheBasicMethodsTest extends PHPUnit_Framework_TestCase
     /**
      * Accessor method to `$_cache_driver`.
      *
-     * @return  Cache
-     * @return  self
+     * @return Cache|Kohana_CacheBasicMethodsTest
      */
     public function cache(Cache $cache = null)
     {
@@ -53,7 +52,7 @@ abstract class Kohana_CacheBasicMethodsTest extends PHPUnit_Framework_TestCase
      *
      * @return  array
      */
-    public function provider_set_get()
+    public function provider_set_get(): array
     {
         $object = new StdClass;
         $object->foo = 'foo';
@@ -87,7 +86,7 @@ TESTTEXT;
                     'value' => 101010,
                     'ttl' => 0,
                     'wait' => false,
-                    'type' => 'integer',
+                    'type' => 'int',
                     'default' => null
                 ],
                 101010
@@ -126,7 +125,7 @@ TESTTEXT;
                     'value' => true,
                     'ttl' => 0,
                     'wait' => false,
-                    'type' => 'boolean',
+                    'type' => 'bool',
                     'default' => null
                 ],
                 true
@@ -243,8 +242,8 @@ TESTTEXT;
      *
      * @dataProvider provider_set_get
      *
-     * @param array    data
-     * @param mixed    expected
+     * @param array $data data
+     * @param mixed $expected expected
      * @return  void
      * @throws Cache_Exception
      */
@@ -262,7 +261,7 @@ TESTTEXT;
 
         $result = $cache->get($id, $default);
         $this->assertEquals($expected, $result);
-        $this->assertInternalType($type, $result);
+        $this->{($type === 'null' ? 'assert' : 'assertIs') . ucfirst($type)}($result);
 
         unset($id, $value, $ttl, $wait, $type, $default);
     }

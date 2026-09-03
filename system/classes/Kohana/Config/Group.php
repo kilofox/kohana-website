@@ -63,7 +63,7 @@ class Kohana_Config_Group extends ArrayObject
      *
      * @return array Array copy of the group's config
      */
-    public function as_array()
+    public function as_array(): array
     {
         return $this->getArrayCopy();
     }
@@ -73,7 +73,7 @@ class Kohana_Config_Group extends ArrayObject
      *
      * @return string The group name
      */
-    public function group_name()
+    public function group_name(): string
     {
         return $this->_group_name;
     }
@@ -83,11 +83,11 @@ class Kohana_Config_Group extends ArrayObject
      *
      *     $value = $config->get($key);
      *
-     * @param   string  $key        array key
+     * @param string $key Array key
      * @param   mixed   $default    default value
      * @return  mixed
      */
-    public function get($key, $default = null)
+    public function get(string $key, $default = null)
     {
         return $this->offsetExists($key) ? $this->offsetGet($key) : $default;
     }
@@ -97,11 +97,11 @@ class Kohana_Config_Group extends ArrayObject
      *
      *     $config->set($key, $new_value);
      *
-     * @param   string  $key    array key
+     * @param string $key Array key
      * @param   mixed   $value  array value
      * @return  $this
      */
-    public function set($key, $value)
+    public function set(string $key, $value): Kohana_Config_Group
     {
         $this->offsetSet($key, $value);
 
@@ -120,12 +120,13 @@ class Kohana_Config_Group extends ArrayObject
      *
      * @param string $key   The key of the config item we're changing
      * @param mixed  $value The new array value
+     * @return void
      */
     public function offsetSet($key, $value)
     {
         $this->_parent_instance->_write_config($this->_group_name, $key, $value);
 
-        return parent::offsetSet($key, $value);
+        parent::offsetSet($key, $value);
     }
 
 }

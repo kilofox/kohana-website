@@ -33,8 +33,7 @@ class Kohana_Database_Query_Builder_Select extends Database_Query_Builder_Where
     /**
      * Sets the initial columns to select from.
      *
-     * @param   array  $columns  column list
-     * @return  void
+     * @param array|null $columns column list
      */
     public function __construct(array $columns = null)
     {
@@ -50,12 +49,12 @@ class Kohana_Database_Query_Builder_Select extends Database_Query_Builder_Where
     /**
      * Enables or disables selecting only unique columns using "SELECT DISTINCT"
      *
-     * @param   boolean  $value  enable or disable distinct columns
+     * @param bool $value enable or disable distinct columns
      * @return  $this
      */
-    public function distinct($value)
+    public function distinct(bool $value): Kohana_Database_Query_Builder_Select
     {
-        $this->_distinct = (bool) $value;
+        $this->_distinct = $value;
 
         return $this;
     }
@@ -63,13 +62,11 @@ class Kohana_Database_Query_Builder_Select extends Database_Query_Builder_Where
     /**
      * Choose the columns to select from.
      *
-     * @param   mixed  $columns  column name or [$column, $alias] or object
+     * @param mixed ...$columns column name or [$column, $alias] or object
      * @return  $this
      */
-    public function select($columns = null)
+    public function select(...$columns): Kohana_Database_Query_Builder_Select
     {
-        $columns = func_get_args();
-
         $this->_select = array_merge($this->_select, $columns);
 
         return $this;
@@ -81,7 +78,7 @@ class Kohana_Database_Query_Builder_Select extends Database_Query_Builder_Where
      * @param   array  $columns  list of column names or aliases
      * @return  $this
      */
-    public function select_array(array $columns)
+    public function select_array(array $columns): Kohana_Database_Query_Builder_Select
     {
         $this->_select = array_merge($this->_select, $columns);
 
@@ -91,13 +88,11 @@ class Kohana_Database_Query_Builder_Select extends Database_Query_Builder_Where
     /**
      * Choose the tables to select "FROM ..."
      *
-     * @param   mixed  $table  table name or [$table, $alias] or object
+     * @param mixed ...$tables table name or [$table, $alias] or object
      * @return  $this
      */
-    public function from($tables)
+    public function from(...$tables): Kohana_Database_Query_Builder_Select
     {
-        $tables = func_get_args();
-
         $this->_from = array_merge($this->_from, $tables);
 
         return $this;
@@ -107,10 +102,10 @@ class Kohana_Database_Query_Builder_Select extends Database_Query_Builder_Where
      * Adds addition tables to "JOIN ...".
      *
      * @param   mixed   $table  column name or [$column, $alias] or object
-     * @param   string  $type   join type (LEFT, RIGHT, INNER, etc.)
+     * @param string|null $type Join type (LEFT, RIGHT, INNER, etc.)
      * @return  $this
      */
-    public function join($table, $type = null)
+    public function join($table, string $type = null): Kohana_Database_Query_Builder_Select
     {
         $this->_join[] = $this->_last_join = new Database_Query_Builder_Join($table, $type);
 
@@ -121,11 +116,11 @@ class Kohana_Database_Query_Builder_Select extends Database_Query_Builder_Where
      * Adds "ON ..." conditions for the last created JOIN statement.
      *
      * @param   mixed   $c1  column name or [$column, $alias] or object
-     * @param   string  $op  logic operator
+     * @param string $op Logic operator
      * @param   mixed   $c2  column name or [$column, $alias] or object
      * @return  $this
      */
-    public function on($c1, $op, $c2)
+    public function on($c1, string $op, $c2): Kohana_Database_Query_Builder_Select
     {
         $this->_last_join->on($c1, $op, $c2);
 
@@ -135,13 +130,11 @@ class Kohana_Database_Query_Builder_Select extends Database_Query_Builder_Where
     /**
      * Adds "USING ..." conditions for the last created JOIN statement.
      *
-     * @param   string  $columns  column name
+     * @param string ...$columns column name
      * @return  $this
      */
-    public function using($columns)
+    public function using(...$columns): Kohana_Database_Query_Builder_Select
     {
-        $columns = func_get_args();
-
         call_user_func_array([$this->_last_join, 'using'], $columns);
 
         return $this;
@@ -150,13 +143,11 @@ class Kohana_Database_Query_Builder_Select extends Database_Query_Builder_Where
     /**
      * Creates a "GROUP BY ..." filter.
      *
-     * @param   mixed   $columns  column name or [$column, $alias] or object
+     * @param mixed ...$columns column name or [$column, $alias] or object
      * @return  $this
      */
-    public function group_by($columns)
+    public function group_by(...$columns): Kohana_Database_Query_Builder_Select
     {
-        $columns = func_get_args();
-
         $this->_group_by = array_merge($this->_group_by, $columns);
 
         return $this;
@@ -166,11 +157,11 @@ class Kohana_Database_Query_Builder_Select extends Database_Query_Builder_Where
      * Alias of and_having()
      *
      * @param   mixed   $column  column name or [$column, $alias] or object
-     * @param   string  $op      logic operator
+     * @param string $op Logic operator
      * @param   mixed   $value   column value
      * @return  $this
      */
-    public function having($column, $op, $value = null)
+    public function having($column, string $op, $value = null): Kohana_Database_Query_Builder_Select
     {
         return $this->and_having($column, $op, $value);
     }
@@ -179,11 +170,11 @@ class Kohana_Database_Query_Builder_Select extends Database_Query_Builder_Where
      * Creates a new "AND HAVING" condition for the query.
      *
      * @param   mixed   $column  column name or [$column, $alias] or object
-     * @param   string  $op      logic operator
+     * @param string $op Logic operator
      * @param   mixed   $value   column value
      * @return  $this
      */
-    public function and_having($column, $op, $value = null)
+    public function and_having($column, string $op, $value = null): Kohana_Database_Query_Builder_Select
     {
         $this->_having[] = ['AND' => [$column, $op, $value]];
 
@@ -194,11 +185,11 @@ class Kohana_Database_Query_Builder_Select extends Database_Query_Builder_Where
      * Creates a new "OR HAVING" condition for the query.
      *
      * @param   mixed   $column  column name or [$column, $alias] or object
-     * @param   string  $op      logic operator
+     * @param string $op Logic operator
      * @param   mixed   $value   column value
      * @return  $this
      */
-    public function or_having($column, $op, $value = null)
+    public function or_having($column, string $op, $value = null): Kohana_Database_Query_Builder_Select
     {
         $this->_having[] = ['OR' => [$column, $op, $value]];
 
@@ -210,7 +201,7 @@ class Kohana_Database_Query_Builder_Select extends Database_Query_Builder_Where
      *
      * @return  $this
      */
-    public function having_open()
+    public function having_open(): Kohana_Database_Query_Builder_Select
     {
         return $this->and_having_open();
     }
@@ -220,7 +211,7 @@ class Kohana_Database_Query_Builder_Select extends Database_Query_Builder_Where
      *
      * @return  $this
      */
-    public function and_having_open()
+    public function and_having_open(): Kohana_Database_Query_Builder_Select
     {
         $this->_having[] = ['AND' => '('];
 
@@ -232,7 +223,7 @@ class Kohana_Database_Query_Builder_Select extends Database_Query_Builder_Where
      *
      * @return  $this
      */
-    public function or_having_open()
+    public function or_having_open(): Kohana_Database_Query_Builder_Select
     {
         $this->_having[] = ['OR' => '('];
 
@@ -244,7 +235,7 @@ class Kohana_Database_Query_Builder_Select extends Database_Query_Builder_Where
      *
      * @return  $this
      */
-    public function having_close()
+    public function having_close(): Kohana_Database_Query_Builder_Select
     {
         return $this->and_having_close();
     }
@@ -254,7 +245,7 @@ class Kohana_Database_Query_Builder_Select extends Database_Query_Builder_Where
      *
      * @return  $this
      */
-    public function and_having_close()
+    public function and_having_close(): Kohana_Database_Query_Builder_Select
     {
         $this->_having[] = ['AND' => ')'];
 
@@ -266,7 +257,7 @@ class Kohana_Database_Query_Builder_Select extends Database_Query_Builder_Where
      *
      * @return  $this
      */
-    public function or_having_close()
+    public function or_having_close(): Kohana_Database_Query_Builder_Select
     {
         $this->_having[] = ['OR' => ')'];
 
@@ -278,11 +269,11 @@ class Kohana_Database_Query_Builder_Select extends Database_Query_Builder_Where
      *
      * @param mixed $select If a string, it must be the name of a table.
      * Otherwise, it must be an instance of Database_Query_Builder_Select.
-     * @param boolean $all Determines if it's a UNION or UNION ALL clause.
+     * @param bool $all Determines if it's a UNION or UNION ALL clause.
      * @return $this
      * @throws Kohana_Exception
      */
-    public function union($select, $all = true)
+    public function union($select, bool $all = true): Kohana_Database_Query_Builder_Select
     {
         if (is_string($select)) {
             $select = DB::select()->from($select);
@@ -296,12 +287,12 @@ class Kohana_Database_Query_Builder_Select extends Database_Query_Builder_Where
     /**
      * Start returning results after "OFFSET ..."
      *
-     * @param   integer   $number  starting result number or null to reset
+     * @param int|null $number Starting result number or null to reset
      * @return  $this
      */
-    public function offset($number)
+    public function offset(?int $number): Kohana_Database_Query_Builder_Select
     {
-        $this->_offset = ($number === null) ? null : (int) $number;
+        $this->_offset = $number;
 
         return $this;
     }
@@ -314,7 +305,7 @@ class Kohana_Database_Query_Builder_Select extends Database_Query_Builder_Where
      * @throws Database_Exception
      * @throws Kohana_Exception
      */
-    public function compile($db = null)
+    public function compile($db = null): string
     {
         if (!is_object($db)) {
             // Get the database instance
@@ -399,7 +390,11 @@ class Kohana_Database_Query_Builder_Select extends Database_Query_Builder_Where
         return parent::compile($db);
     }
 
-    public function reset()
+    /**
+     * @return $this
+     * @deprecated 3.5.0
+     */
+    public function reset(): Kohana_Database_Query_Builder_Select
     {
         $this->_select = $this->_from = $this->_join = $this->_where = $this->_group_by = $this->_having = $this->_order_by = $this->_union = [];
 

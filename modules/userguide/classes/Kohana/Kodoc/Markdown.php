@@ -1,5 +1,7 @@
 <?php
 
+use Michelf\MarkdownExtra;
+
 /**
  * Custom Markdown parser for Kohana documentation.
  *
@@ -9,7 +11,7 @@
  * @copyright  (c) 2008-2013 Kohana Team
  * @license    https://kohana.top/license
  */
-class Kohana_Kodoc_Markdown extends MarkdownExtra_Parser
+class Kohana_Kodoc_Markdown extends MarkdownExtra
 {
     /**
      * @var  string  base URL for links
@@ -43,12 +45,11 @@ class Kohana_Kodoc_Markdown extends MarkdownExtra_Parser
     /**
      * Transform some text using [Kodoc_Markdown]
      *
-     * @see Markdown()
-     *
-     * @param   string  Text to parse
+     * @param string $text Text to parse
      * @return  string  Transformed text
+     * @see Markdown()
      */
-    public static function markdown($text)
+    public static function markdown(string $text): string
     {
         static $instance;
 
@@ -89,23 +90,19 @@ class Kohana_Kodoc_Markdown extends MarkdownExtra_Parser
      * Heading 1
      * =========
      *
-     * @param   array   Matches from regex call
+     * @param array $matches Matches from regex call
      * @return  string  Generated HTML
      */
-    function _doHeaders_callback_setext($matches)
+    function _doHeaders_callback_setext($matches): string
     {
-        if ($matches[3] == '-' AND preg_match('{^- }', $matches[1]))
+        if ($matches[3] === '-' && preg_match('{^- }', $matches[1]))
             return $matches[0];
-        $level = ($matches[3]{0} == '=') ? 1 : 2;
-        $attr = $this->_doHeaders_attr($matches[2]);
-
-        // Only auto-generate id if one doesn't exist
-        if (empty($attr)) {
-            $attr = ' id="' . $this->make_heading_id($matches[1]) . '"';
-        }
+        $level = $matches[3][0] === '=' ? 1 : 2;
+        $defaultId = $this->make_heading_id($matches[1]);
+        $attr = $this->doExtraAttributes("h$level", $matches[2] ?? '', $defaultId);
 
         // Add this header to the page toc
-        $this->_add_to_toc($level, $matches[1], $this->make_heading_id($matches[1]));
+        $this->_add_to_toc($level, $matches[1], $defaultId);
 
         $block = "<h$level$attr>" . $this->runSpanGamut($matches[1]) . "</h$level>";
         return "\n" . $this->hashBlock($block) . "\n\n";
@@ -116,21 +113,17 @@ class Kohana_Kodoc_Markdown extends MarkdownExtra_Parser
      *
      * # Heading 1
      *
-     * @param   array   Matches from regex call
+     * @param array $matches Matches from regex call
      * @return  string  Generated HTML
      */
-    function _doHeaders_callback_atx($matches)
+    function _doHeaders_callback_atx($matches): string
     {
         $level = strlen($matches[1]);
-        $attr = $this->_doHeaders_attr(isset($matches[3]) ? $matches[3] : '');
-
-        // Only auto-generate id if one doesn't exist
-        if (empty($attr)) {
-            $attr = ' id="' . $this->make_heading_id($matches[2]) . '"';
-        }
+        $defaultId = $this->make_heading_id($matches[2]);
+        $attr = $this->doExtraAttributes("h$level", $matches[3] ?? '', $defaultId);
 
         // Add this header to the page toc
-        $this->_add_to_toc($level, $matches[2], $this->make_heading_id(empty($matches[3]) ? $matches[2] : $matches[3]));
+        $this->_add_to_toc($level, $matches[2], $defaultId);
 
         $block = "<h$level$attr>" . $this->runSpanGamut($matches[2]) . "</h$level>";
         return "\n" . $this->hashBlock($block) . "\n\n";
@@ -140,10 +133,10 @@ class Kohana_Kodoc_Markdown extends MarkdownExtra_Parser
      * Makes a heading id from the heading text
      * If any heading share the same name then subsequent headings will have an integer appended
      *
-     * @param   string  The heading text
+     * @param string $heading The heading text
      * @return  string  ID for the heading
      */
-    function make_heading_id($heading)
+    function make_heading_id(string $heading): string
     {
         $id = url::title($heading, '-', true);
 
@@ -152,7 +145,7 @@ class Kohana_Kodoc_Markdown extends MarkdownExtra_Parser
 
             $count = 0;
 
-            while (isset($this->_heading_ids[$id]) AND ++ $count) {
+            while (isset($this->_heading_ids[$id]) && ++$count) {
                 $id .= $count;
             }
         }
@@ -195,10 +188,10 @@ class Kohana_Kodoc_Markdown extends MarkdownExtra_Parser
      *
      *     [filesystem](about.filesystem "Optional title")
      *
-     * @param   string  Span text
+     * @param string $text Span text
      * @return  string
      */
-    public function doBaseURL($text)
+    public function doBaseURL(string $text): string
     {
         // URLs containing "://" are left untouched
         return preg_replace('~(?<!!)(\[.+?\]\()(?!\w++://)(?!#)(\S*(?:\s*+".+?")?\))~', '$1' . Kodoc_Markdown::$base_url . '$2', $text);
@@ -209,10 +202,10 @@ class Kohana_Kodoc_Markdown extends MarkdownExtra_Parser
      *
      *     ![Install Page](img/install.png "Optional title")
      *
-     * @param   string  Span text
+     * @param string $text Span text
      * @return  string
      */
-    public function doImageURL($text)
+    public function doImageURL(string $text): string
     {
         // URLs containing "://" are left untouched
         return preg_replace('~(!\[.+?\]\()(?!\w++://)(\S*(?:\s*+".+?")?\))~', '$1' . Kodoc_Markdown::$image_url . '$2', $text);
@@ -223,10 +216,10 @@ class Kohana_Kodoc_Markdown extends MarkdownExtra_Parser
      *
      *     [Class_Name], [Class::method] or [Class::$property]
      *
-     * @param   string  Span text
+     * @param string $text Span text
      * @return  string
      */
-    public function doAPI($text)
+    public function doAPI(string $text): string
     {
         return preg_replace_callback('/\[' . Kodoc::$regex_class_member . '\]/i', 'Kodoc::link_class_member', $text);
     }
@@ -236,10 +229,10 @@ class Kohana_Kodoc_Markdown extends MarkdownExtra_Parser
      *
      *     [!!] Remember the milk!
      *
-     * @param   string  Span text
+     * @param string $text Span text
      * @return  string
      */
-    public function doNotes($text)
+    public function doNotes(string $text): string
     {
         if (!preg_match('/^\[!!\]\s*+(.+?)(?=\n{2,}|$)/s', $text, $match)) {
             return $text;
@@ -260,7 +253,7 @@ class Kohana_Kodoc_Markdown extends MarkdownExtra_Parser
     public function doTOC($text)
     {
         // Only add the toc do userguide pages, not api since they already have one
-        if (self::$show_toc AND Route::name(Request::current()->route()) == "docs/guide") {
+        if (self::$show_toc && Route::name(Request::current()->route()) === "docs/guide") {
             $toc = View::factory('userguide/page-toc')
                 ->set('array', self::$_toc)
                 ->render();

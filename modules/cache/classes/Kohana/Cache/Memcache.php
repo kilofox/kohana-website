@@ -6,7 +6,6 @@
  * ### Supported cache engines
  *
  * *  [Memcache](https://www.php.net/manual/en/book.memcache.php)
- * *  [Memcached-tags](https://code.google.com/archive/p/memcached-tags/)
  *
  * ### Configuration example
  *
@@ -75,7 +74,7 @@
  *
  * *  Kohana 3.0.x
  * *  PHP 5.2.4 or greater
- * *  Memcache (plus Memcached-tags for native tagging support)
+ * *  Memcache
  * *  Zlib
  *
  * @package    Kohana/Cache
@@ -174,19 +173,18 @@ class Kohana_Cache_Memcache extends Cache implements Cache_Arithmetic
      *     // Retrieve cache entry from memcache group and return 'bar' if missing
      *     $data = Cache::instance('memcache')->get('foo', 'bar');
      *
-     * @param   string  $id       id of cache to entry
-     * @param   string  $default  default value to return if cache miss
+     * @param string $id ID of cache entry
+     * @param mixed $default Default value to return if cache miss
      * @return  mixed
-     * @throws  Cache_Exception
      */
-    public function get($id, $default = null)
+    public function get(string $id, $default = null)
     {
         // Get the value from Memcache
         $value = $this->_memcache->get($this->_sanitize_id($id));
 
         // If the value wasn't found, normalise it
         if ($value === false) {
-            $value = (null === $default) ? null : $default;
+            $value = null === $default ? null : $default;
         }
 
         // Return the value
@@ -205,12 +203,12 @@ class Kohana_Cache_Memcache extends Cache implements Cache_Arithmetic
      *          return
      *     }
      *
-     * @param   string   $id        id of cache entry
+     * @param string $id ID of cache entry
      * @param   mixed    $data      data to set to cache
-     * @param   integer  $lifetime  lifetime in seconds, maximum value 2592000
-     * @return  boolean
+     * @param int $lifetime Lifetime in seconds, maximum value 2592000
+     * @return  bool
      */
-    public function set($id, $data, $lifetime = 3600)
+    public function set(string $id, $data, int $lifetime = 3600): bool
     {
         // If the lifetime is greater than the ceiling
         if ($lifetime > Cache_Memcache::CACHE_CEILING) {
@@ -240,11 +238,11 @@ class Kohana_Cache_Memcache extends Cache implements Cache_Arithmetic
      *     // Delete the 'bar' cache entry after 30 seconds
      *     Cache::instance('memcache')->delete('bar', 30);
      *
-     * @param   string   $id       id of entry to delete
-     * @param   integer  $timeout  timeout of entry, if zero item is deleted immediately, otherwise the item will delete after the specified value in seconds
-     * @return  boolean
+     * @param string $id ID of entry to delete
+     * @param int $timeout Timeout of entry, if zero item is deleted immediately, otherwise the item will delete after the specified value in seconds
+     * @return  bool
      */
-    public function delete($id, $timeout = 0)
+    public function delete(string $id, int $timeout = 0): bool
     {
         // Delete the id
         return $this->_memcache->delete($this->_sanitize_id($id), $timeout);
@@ -260,9 +258,9 @@ class Kohana_Cache_Memcache extends Cache implements Cache_Arithmetic
      *     // Delete all cache entries in the default group
      *     Cache::instance('memcache')->delete_all();
      *
-     * @return  boolean
+     * @return bool
      */
-    public function delete_all()
+    public function delete_all(): bool
     {
         $result = $this->_memcache->flush();
 
@@ -278,12 +276,12 @@ class Kohana_Cache_Memcache extends Cache implements Cache_Arithmetic
      * on a particular server fails. This method switches off that instance of the
      * server if the configuration setting `instant_death` is set to `true`.
      *
-     * @param   string   $hostname
-     * @param   integer  $port
+     * @param string $hostname
+     * @param int $port
      * @return  void|boolean
      * @since   3.0.8
      */
-    public function _failed_request($hostname, $port)
+    public function _failed_request(string $hostname, int $port)
     {
         if (!$this->_config['instant_death'])
             return;
@@ -296,7 +294,7 @@ class Kohana_Cache_Memcache extends Cache implements Cache_Arithmetic
             // Merge the defaults, since they won't always be set
             $server += $this->_default_config;
             // We're looking at the failed server
-            if ($hostname == $server['host'] and $port == $server['port']) {
+            if ($hostname === $server['host'] && $port === $server['port']) {
                 // Server to disable, since it failed
                 $host = $server;
             }
@@ -318,12 +316,11 @@ class Kohana_Cache_Memcache extends Cache implements Cache_Arithmetic
      * Useful for shared counters and other persistent integer based
      * tracking.
      *
-     * @param   string    id of cache entry to increment
-     * @param   int       step value to increment by
-     * @return  integer
-     * @return  boolean
+     * @param string $id id of cache entry to increment
+     * @param int $step step value to increment by
+     * @return int|false
      */
-    public function increment($id, $step = 1)
+    public function increment(string $id, int $step = 1)
     {
         return $this->_memcache->increment($id, $step);
     }
@@ -333,12 +330,11 @@ class Kohana_Cache_Memcache extends Cache implements Cache_Arithmetic
      * Useful for shared counters and other persistent integer based
      * tracking.
      *
-     * @param   string    id of cache entry to decrement
-     * @param   int       step value to decrement by
-     * @return  integer
-     * @return  boolean
+     * @param string $id id of cache entry to decrement
+     * @param int $step step value to decrement by
+     * @return int|false
      */
-    public function decrement($id, $step = 1)
+    public function decrement(string $id, int $step = 1)
     {
         return $this->_memcache->decrement($id, $step);
     }
