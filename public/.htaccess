@@ -1,4 +1,4 @@
-<FilesMatch 3\.[123]{1}\-index\.php$>
+<FilesMatch 3\.[123]-index\.php$>
     FcgidWrapper "${PHP56Wrapper}" .php
 </FilesMatch>
 
@@ -18,15 +18,15 @@ RewriteBase /
 RewriteCond %{HTTP_HOST} ^www.kohana.top$ [NC]
 RewriteRule ^(.*)$ https://kohana.top/$1 [R=301,L]
 
-# Redirect from /guide/ to /3.4/guide/
-RewriteRule ^guide.* /3.4/guide/$1 [R=301,L]
+# Redirect from /guide/ to /3.5/guide/
+RewriteRule ^guide.* /3.5/guide/$1 [R=301,L]
 
 # Allow any files or directories that exist to be displayed directly
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
 # Rewrite for the guides
-RewriteRule ^([\d\.]+)/(guide.*) $1-index.php?/$2 [QSA,L]
+RewriteRule ^([\d.]+)/(guide.*) $1-index.php?/$2 [QSA,L]
 
 # Allow any files or directories that exist to be displayed directly
 RewriteCond %{REQUEST_FILENAME} !-f
