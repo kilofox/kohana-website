@@ -48,12 +48,12 @@ class Kohana_HTML
     );
 
     /**
-     * @var  boolean  use strict XHTML mode?
+     * @var bool use strict XHTML mode?
      */
     public static $strict = true;
 
     /**
-     * @var  boolean  automatically target external URLs to a new window?
+     * @var bool automatically target external URLs to a new window?
      */
     public static $windowed_urls = false;
 
@@ -63,8 +63,8 @@ class Kohana_HTML
      *
      *     echo HTML::chars($username);
      *
-     * @param   string  $value          string to convert
-     * @param   boolean $double_encode  encode existing entities
+     * @param string $value String to convert
+     * @param bool $double_encode Encode existing entities
      * @return  string
      */
     public static function chars($value, $double_encode = true)
@@ -79,8 +79,8 @@ class Kohana_HTML
      *
      *     echo HTML::entities($username);
      *
-     * @param   string  $value          string to convert
-     * @param   boolean $double_encode  encode existing entities
+     * @param string $value String to convert
+     * @param bool $double_encode Encode existing entities
      * @return  string
      */
     public static function entities($value, $double_encode = true)
@@ -95,10 +95,10 @@ class Kohana_HTML
      *     echo HTML::anchor('/user/profile', 'My Profile');
      *
      * @param string $uri URL or URI string
-     * @param string $title link text
-     * @param array $attributes HTML anchor attributes
+     * @param string|null $title link text
+     * @param array|null $attributes HTML anchor attributes
      * @param mixed $protocol protocol to pass to URL::base()
-     * @param boolean $index include the index page
+     * @param bool $index include the index page
      * @return  string
      * @throws Kohana_Exception
      * @uses    URL::base
@@ -117,11 +117,11 @@ class Kohana_HTML
             $uri = URL::base($protocol, $index);
         } else {
             if (strpos($uri, '://') !== false) {
-                if (HTML::$windowed_urls === true AND empty($attributes['target'])) {
+                if (HTML::$windowed_urls === true && empty($attributes['target'])) {
                     // Make the link open in a new window
                     $attributes['target'] = '_blank';
                 }
-            } elseif ($uri[0] !== '#' AND $uri[0] !== '?') {
+            } elseif ($uri[0] !== '#' && $uri[0] !== '?') {
                 // Make the URI absolute for non-fragment and non-query anchors
                 $uri = URL::site($uri, $protocol, $index);
             }
@@ -140,10 +140,10 @@ class Kohana_HTML
      *     echo HTML::file_anchor('media/doc/user_guide.pdf', 'User Guide');
      *
      * @param string $file name of file to link to
-     * @param string $title link text
-     * @param array $attributes HTML anchor attributes
+     * @param string|null $title link text
+     * @param array|null $attributes HTML anchor attributes
      * @param mixed $protocol protocol to pass to URL::base()
-     * @param boolean $index include the index page
+     * @param bool $index include the index page
      * @return  string
      * @throws Kohana_Exception
      * @uses    HTML::attributes
@@ -168,9 +168,9 @@ class Kohana_HTML
      *
      *     echo HTML::mailto($address);
      *
-     * @param   string  $email      email address to send to
-     * @param   string  $title      link text
-     * @param   array   $attributes HTML anchor attributes
+     * @param string $email email address to send to
+     * @param string|null $title link text
+     * @param array|null $attributes HTML anchor attributes
      * @return  string
      * @uses    HTML::attributes
      */
@@ -190,9 +190,9 @@ class Kohana_HTML
      *     echo HTML::style('media/css/screen.css');
      *
      * @param string $file file name
-     * @param array $attributes default attributes
+     * @param array|null $attributes default attributes
      * @param mixed $protocol protocol to pass to URL::base()
-     * @param boolean $index include the index page
+     * @param bool $index include the index page
      * @return  string
      * @throws Kohana_Exception
      * @uses    HTML::attributes
@@ -200,7 +200,7 @@ class Kohana_HTML
      */
     public static function style($file, array $attributes = null, $protocol = null, $index = false)
     {
-        if (strpos($file, '://') === false AND strpos($file, '//') !== 0) {
+        if (strpos($file, '://') === false && strpos($file, '//') !== 0) {
             // Add the base URL
             $file = URL::site($file, $protocol, $index);
         }
@@ -223,9 +223,9 @@ class Kohana_HTML
      *     echo HTML::script('media/js/jquery.min.js');
      *
      * @param string $file file name
-     * @param array $attributes default attributes
+     * @param array|null $attributes default attributes
      * @param mixed $protocol protocol to pass to URL::base()
-     * @param boolean $index include the index page
+     * @param bool $index include the index page
      * @return  string
      * @throws Kohana_Exception
      * @uses    HTML::attributes
@@ -233,7 +233,7 @@ class Kohana_HTML
      */
     public static function script($file, array $attributes = null, $protocol = null, $index = false)
     {
-        if (strpos($file, '://') === false AND strpos($file, '//') !== 0) {
+        if (strpos($file, '://') === false && strpos($file, '//') !== 0) {
             // Add the base URL
             $file = URL::site($file, $protocol, $index);
         }
@@ -253,9 +253,9 @@ class Kohana_HTML
      *     echo HTML::image('media/img/logo.png', ['alt' => 'My Company']);
      *
      * @param string $file file name
-     * @param array $attributes default attributes
+     * @param array|null $attributes default attributes
      * @param mixed $protocol protocol to pass to URL::base()
-     * @param boolean $index include the index page
+     * @param bool $index include the index page
      * @return  string
      * @throws Kohana_Exception
      * @uses    HTML::attributes
@@ -280,7 +280,7 @@ class Kohana_HTML
      *
      *     echo '<div'.HTML::attributes($attrs).'>'.$content.'</div>';
      *
-     * @param   array   $attributes attribute list
+     * @param array|null $attributes attribute list
      * @return  string
      */
     public static function attributes(array $attributes = null)
@@ -319,7 +319,7 @@ class Kohana_HTML
             // Add the attribute key
             $compiled .= ' ' . $key;
 
-            if ($value OR HTML::$strict) {
+            if ($value || HTML::$strict) {
                 // Add the attribute value
                 $compiled .= '="' . HTML::chars($value) . '"';
             }

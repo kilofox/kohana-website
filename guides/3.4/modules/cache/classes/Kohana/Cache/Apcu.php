@@ -66,10 +66,9 @@ class Kohana_Cache_Apcu extends Cache implements Cache_Arithmetic
      *     // Retrieve cache entry from apcu group and return 'bar' if missing
      *     $data = Cache::instance('apcu')->get('foo', 'bar');
      *
-     * @param   string  $id       id of cache to entry
-     * @param   string  $default  default value to return if cache miss
+     * @param string $id ID of cache to entry
+     * @param mixed $default Default value to return if cache miss
      * @return  mixed
-     * @throws  Cache_Exception
      */
     public function get($id, $default = null)
     {
@@ -89,10 +88,10 @@ class Kohana_Cache_Apcu extends Cache implements Cache_Arithmetic
      *     // Set 'bar' to 'foo' in apcu group for 30 seconds
      *     Cache::instance('apcu')->set('foo', $data, 30);
      *
-     * @param   string   $id        id of cache entry
-     * @param   string   $data      data to set to cache
-     * @param   integer  $lifetime  lifetime in seconds
-     * @return  boolean
+     * @param string $id ID of cache entry
+     * @param string $data Data to set to cache
+     * @param int|null $lifetime Lifetime in seconds
+     * @return  bool
      */
     public function set($id, $data, $lifetime = null)
     {
@@ -109,8 +108,8 @@ class Kohana_Cache_Apcu extends Cache implements Cache_Arithmetic
      *     // Delete 'foo' entry from the apcu group
      *     Cache::instance('apcu')->delete('foo');
      *
-     * @param   string  $id  id to remove from cache
-     * @return  boolean
+     * @param string $id ID to remove from cache
+     * @return  bool
      */
     public function delete($id)
     {
@@ -127,7 +126,7 @@ class Kohana_Cache_Apcu extends Cache implements Cache_Arithmetic
      *     // Delete all cache entries in the apcu group
      *     Cache::instance('apcu')->delete_all();
      *
-     * @return  boolean
+     * @return bool
      */
     public function delete_all()
     {
@@ -139,10 +138,9 @@ class Kohana_Cache_Apcu extends Cache implements Cache_Arithmetic
      * Useful for shared counters and other persistent integer based
      * tracking.
      *
-     * @param   string    id of cache entry to increment
-     * @param   int       step value to increment by
-     * @return  integer
-     * @return  boolean
+     * @param string $id id of cache entry to increment
+     * @param int $step step value to increment by
+     * @return int|false
      */
     public function increment($id, $step = 1)
     {
@@ -158,10 +156,9 @@ class Kohana_Cache_Apcu extends Cache implements Cache_Arithmetic
      * Useful for shared counters and other persistent integer based
      * tracking.
      *
-     * @param   string    id of cache entry to decrement
-     * @param   int       step value to decrement by
-     * @return  integer
-     * @return  boolean
+     * @param string $id id of cache entry to decrement
+     * @param int $step step value to decrement by
+     * @return int|false
      */
     public function decrement($id, $step = 1)
     {

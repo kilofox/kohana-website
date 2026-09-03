@@ -75,7 +75,7 @@ class Kohana_CookieTest extends Unittest_TestCase
     }
 
     /**
-     * @param int $expiration
+     * @param int|null $expiration
      * @param int $expect_expiry
      *
      * @throws Kohana_Exception
@@ -179,10 +179,11 @@ class Kohana_CookieTest extends Unittest_TestCase
 
     /**
      * @covers Cookie::salt
-     * @expectedException Kohana_Exception
      */
     public function test_salt_throws_with_no_configured_salt()
     {
+        $this->expectException(Kohana_Exception::class);
+
         Cookie::$salt = null;
         Cookie::salt('key', 'value');
     }
@@ -261,7 +262,7 @@ class Kohana_CookieTest extends Unittest_TestCase
      * @covers       Cookie::salt
      * @throws Kohana_Exception
      */
-    public function test_salt_creates_different_hash_for_different_data($first_args, $changed_args)
+    public function test_salt_creates_different_hash_for_different_data(array $first_args, array $changed_args)
     {
         $second_args = array_merge($first_args, $changed_args);
         $hashes = [];
@@ -304,7 +305,7 @@ class Kohana_CookieTest extends Unittest_TestCase
      * @param array $expected
      */
     // @codingStandardsIgnoreStart
-    protected function assertSetCookieWith($expected)
+    protected function assertSetCookieWith(array $expected)
     // @codingStandardsIgnoreEnd
     {
         $this->assertCount(1, Kohana_CookieTest_TestableCookie::$_mock_cookies_set);
@@ -315,7 +316,7 @@ class Kohana_CookieTest extends Unittest_TestCase
     /**
      * Configure the $_SERVER[HTTP_USER_AGENT] environment variable for the test
      *
-     * @param string $user_agent
+     * @param string|null $user_agent
      */
     protected function set_or_remove_http_user_agent($user_agent)
     {

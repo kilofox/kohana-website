@@ -18,16 +18,14 @@ class Kohana_Debug
      *     // Displays the type and value of each variable
      *     echo Debug::vars($foo, $bar, $baz);
      *
-     * @param   mixed   $var,...    variable to debug
+     * @param mixed ...$variables variable to debug
      * @return  string
      */
-    public static function vars()
+    public static function vars(...$variables)
     {
-        if (func_num_args() === 0)
-            return;
-
-        // Get all passed variables
-        $variables = func_get_args();
+        if (empty($variables)) {
+            return '';
+        }
 
         $output = [];
         foreach ($variables as $var) {
@@ -43,8 +41,8 @@ class Kohana_Debug
      * Borrows heavily on concepts from the Debug class of [Nette](http://nettephp.com/).
      *
      * @param   mixed   $value              variable to dump
-     * @param   integer $length             maximum length of strings
-     * @param   integer $level_recursion    recursion limit
+     * @param int $length Maximum length of strings
+     * @param int $level_recursion Recursion limit
      * @return  string
      */
     public static function dump($value, $length = 128, $level_recursion = 10)
@@ -56,20 +54,26 @@ class Kohana_Debug
      * Helper for Debug::dump(), handles recursion in arrays and objects.
      *
      * @param   mixed   $var    variable to dump
-     * @param   integer $length maximum length of strings
-     * @param   integer $limit  recursion limit
-     * @param   integer $level  current recursion level (internal usage only!)
+     * @param int $length Maximum length of strings
+     * @param int $limit Recursion limit
+     * @param int $level Current recursion level (internal usage only!)
      * @return  string
      */
-    protected static function _dump(& $var, $length = 128, $limit = 10, $level = 0)
+    protected static function _dump(&$var, $length = 128, $limit = 10, $level = 0)
     {
         if ($var === null) {
             return '<small>NULL</small>';
-        } elseif (is_bool($var)) {
+        }
+
+        if (is_bool($var)) {
             return '<small>bool</small> ' . ($var ? 'TRUE' : 'FALSE');
-        } elseif (is_float($var)) {
+        }
+
+        if (is_float($var)) {
             return '<small>float</small> ' . $var;
-        } elseif (is_resource($var)) {
+        }
+
+        if (is_resource($var)) {
             if (($type = get_resource_type($var)) === 'stream') {
                 $meta = stream_get_meta_data($var);
 
@@ -85,10 +89,12 @@ class Kohana_Debug
 
                     return '<small>resource</small><span>(' . $type . ')</span> ' . htmlspecialchars($file, ENT_NOQUOTES, Kohana::$charset);
                 }
-            } else {
-                return '<small>resource</small><span>(' . $type . ')</span>';
             }
-        } elseif (is_string($var)) {
+
+            return '<small>resource</small><span>(' . $type . ')</span>';
+        }
+
+        if (is_string($var)) {
             // Clean invalid multibyte characters. iconv is only invoked
             // if there are non ASCII characters in the string, so this
             // isn't too much of a hit.
@@ -103,7 +109,9 @@ class Kohana_Debug
             }
 
             return '<small>string</small><span>(' . strlen($var) . ')</span> "' . $str . '"';
-        } elseif (is_array($var)) {
+        }
+
+        if (is_array($var)) {
             $output = [];
 
             // Indentation for this variable
@@ -124,7 +132,7 @@ class Kohana_Debug
                 $output[] = "<span>(";
 
                 $var[$marker] = true;
-                foreach ($var as $key => & $val) {
+                foreach ($var as $key => &$val) {
                     if ($key === $marker)
                         continue;
                     if (!is_int($key)) {
@@ -142,7 +150,9 @@ class Kohana_Debug
             }
 
             return '<small>array</small><span>(' . count($var) . ')</span> ' . implode("\n", $output);
-        } elseif (is_object($var)) {
+        }
+
+        if (is_object($var)) {
             // Copy the object as an array
             $array = (array) $var;
 
@@ -164,10 +174,10 @@ class Kohana_Debug
                 $output[] = "<code>{";
 
                 $objects[$hash] = true;
-                foreach ($array as $key => & $val) {
+                foreach ($array as $key => &$val) {
                     if ($key[0] === "\x00") {
                         // Determine if the access is protected or protected
-                        $access = '<small>' . (($key[1] === '*') ? 'protected' : 'private') . '</small>';
+                        $access = '<small>' . ($key[1] === '*' ? 'protected' : 'private') . '</small>';
 
                         // Remove the access level from the variable name
                         $key = substr($key, strrpos($key, "\x00") + 1);
@@ -186,20 +196,20 @@ class Kohana_Debug
             }
 
             return '<small>object</small> <span>' . get_class($var) . '(' . count($array) . ')</span> ' . implode("\n", $output);
-        } else {
-            return '<small>' . gettype($var) . '</small> ' . htmlspecialchars(print_r($var, true), ENT_NOQUOTES, Kohana::$charset);
         }
+
+        return '<small>' . gettype($var) . '</small> ' . htmlspecialchars(print_r($var, true), ENT_NOQUOTES, Kohana::$charset);
     }
 
     /**
-     * Removes application, system, modpath, or docroot from a filename,
+     * Removes application, system, modpath, vendor, or docroot from a filename,
      * replacing them with the plain text equivalents. Useful for debugging
      * when you want to display a shorter path.
      *
      *     // Displays SYSPATH/classes/kohana.php
      *     echo Debug::path(Kohana::find_file('classes', 'kohana'));
      *
-     * @param   string  $file   path to debug
+     * @param string $file Path to debug
      * @return  string
      */
     public static function path($file)
@@ -210,6 +220,8 @@ class Kohana_Debug
             $file = 'SYSPATH' . DIRECTORY_SEPARATOR . substr($file, strlen(SYSPATH));
         } elseif (strpos($file, MODPATH) === 0) {
             $file = 'MODPATH' . DIRECTORY_SEPARATOR . substr($file, strlen(MODPATH));
+        } elseif (strpos($file, VENDOR_PATH) === 0) {
+            $file = 'VENDOR_PATH' . DIRECTORY_SEPARATOR . substr($file, strlen(VENDOR_PATH));
         } elseif (strpos($file, DOCROOT) === 0) {
             $file = 'DOCROOT' . DIRECTORY_SEPARATOR . substr($file, strlen(DOCROOT));
         }
@@ -224,15 +236,14 @@ class Kohana_Debug
      *     // Highlights the current line of the current file
      *     echo Debug::source(__FILE__, __LINE__);
      *
-     * @param   string  $file           file to open
-     * @param   integer $line_number    line number to highlight
-     * @param   integer $padding        number of padding lines
-     * @return  string  source of file
-     * @return  false   File is unreadable
+     * @param string $file File to open
+     * @param int $line_number Line number to highlight
+     * @param int $padding Number of padding lines
+     * @return  string|false Source of file if readable, false otherwise.
      */
     public static function source($file, $line_number, $padding = 5)
     {
-        if (!$file OR ! is_readable($file)) {
+        if (!$file || !is_readable($file)) {
             // Continuing will cause errors
             return false;
         }
@@ -284,8 +295,8 @@ class Kohana_Debug
      *     // Displays the entire current backtrace
      *     echo implode('<br/>', Debug::trace());
      *
-     * @param array $trace
-     * @return  string
+     * @param array|null $trace
+     * @return array
      * @throws ReflectionException
      */
     public static function trace(array $trace = null)
@@ -305,7 +316,7 @@ class Kohana_Debug
                 continue;
             }
 
-            if (isset($step['file']) AND isset($step['line'])) {
+            if (isset($step['file']) && isset($step['line'])) {
                 // Include the source of this step
                 $source = Debug::source($step['file'], $step['line']);
             }
@@ -330,7 +341,7 @@ class Kohana_Debug
                     $args = [$step['args'][0]];
                 }
             } elseif (isset($step['args'])) {
-                if (!function_exists($step['function']) OR strpos($step['function'], '{closure}') !== false) {
+                if (!isset($step['class']) && !function_exists($step['function']) || strpos($step['function'], '{closure}') !== false) {
                     // Introspection on closures or language constructs in a stack trace is impossible
                     $params = null;
                 } else {

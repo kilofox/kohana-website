@@ -25,12 +25,12 @@ class Kohana_ORM_Validation_Exception extends Kohana_Exception
     /**
      * Constructs a new exception for the specified model
      *
-     * @param  string     $alias       The alias to use when looking for error messages
-     * @param  Validation $object      The Validation object of the model
-     * @param  string     $message     The error message
-     * @param  array      $values      The array of values for the error message
-     * @param  integer    $code        The error code for the exception
-     * @return void
+     * @param string $alias The alias to use when looking for error messages
+     * @param Validation $object The Validation object of the model
+     * @param string $message The error message
+     * @param array|null $values The array of values for the error message
+     * @param int $code The error code for the exception
+     * @param Exception|null $previous
      */
     public function __construct($alias, Validation $object, $message = 'Failed to validate array', array $values = null, $code = 0, Exception $previous = null)
     {
@@ -55,15 +55,15 @@ class Kohana_ORM_Validation_Exception extends Kohana_Exception
      *     //     ]
      *     // ];
      *
-     * @param  string     $alias    The relationship alias from the model
+     * @param string $alias The relationship alias from the model
      * @param  Validation $object   The Validation object to merge
      * @param  mixed      $has_many The array key to use if this exception can be merged multiple times
-     * @return ORM_Validation_Exception
+     * @return Kohana_ORM_Validation_Exception
      */
     public function add_object($alias, Validation $object, $has_many = false)
     {
         // We will need this when generating errors
-        $this->_objects[$alias]['_has_many'] = ($has_many !== false);
+        $this->_objects[$alias]['_has_many'] = $has_many !== false;
 
         if ($has_many === true) {
             // This is most likely a has_many relationship
@@ -84,14 +84,14 @@ class Kohana_ORM_Validation_Exception extends Kohana_Exception
      *
      * @param  ORM_Validation_Exception $object   The exception to merge
      * @param  mixed                    $has_many The array key to use if this exception can be merged multiple times
-     * @return ORM_Validation_Exception
+     * @return Kohana_ORM_Validation_Exception
      */
     public function merge(ORM_Validation_Exception $object, $has_many = false)
     {
         $alias = $object->alias();
 
         // We will need this when generating errors
-        $this->_objects[$alias]['_has_many'] = ($has_many !== false);
+        $this->_objects[$alias]['_has_many'] = $has_many !== false;
 
         if ($has_many === true) {
             // This is most likely a has_many relationship
@@ -112,7 +112,7 @@ class Kohana_ORM_Validation_Exception extends Kohana_Exception
      *     // Will load Model_User errors from messages/orm-validation/user.php
      *     $e->errors('orm-validation');
      *
-     * @param   string  $directory Directory to load error messages from
+     * @param string|null $directory Directory to load error messages from
      * @param   mixed   $translate Translate the message
      * @return  array
      * @see generate_errors()
@@ -125,9 +125,9 @@ class Kohana_ORM_Validation_Exception extends Kohana_Exception
     /**
      * Recursive method to fetch all the errors in this exception
      *
-     * @param  string $alias     Alias to use for messages file
+     * @param string $alias Alias to use for messages file
      * @param  array  $array     Array of Validation objects to get errors from
-     * @param  string $directory Directory to load error messages from
+     * @param string $directory Directory to load error messages from
      * @param  mixed  $translate Translate the message
      * @return array
      */
@@ -137,7 +137,7 @@ class Kohana_ORM_Validation_Exception extends Kohana_Exception
 
         foreach ($array as $key => $object) {
             if (is_array($object)) {
-                $errors[$key] = ($key === '_external')
+                $errors[$key] = $key === '_external'
                     // Search for errors in $alias/_external.php
                     ? $this->generate_errors($alias . '/' . $key, $object, $directory, $translate)
                     // Regular models get their own file not nested within $alias

@@ -83,7 +83,7 @@ class Kohana_Config_Group extends ArrayObject
      *
      *     $value = $config->get($key);
      *
-     * @param   string  $key        array key
+     * @param string $key Array key
      * @param   mixed   $default    default value
      * @return  mixed
      */
@@ -97,7 +97,7 @@ class Kohana_Config_Group extends ArrayObject
      *
      *     $config->set($key, $new_value);
      *
-     * @param   string  $key    array key
+     * @param string $key Array key
      * @param   mixed   $value  array value
      * @return  $this
      */
@@ -120,12 +120,13 @@ class Kohana_Config_Group extends ArrayObject
      *
      * @param string $key   The key of the config item we're changing
      * @param mixed  $value The new array value
+     * @return void
      */
     public function offsetSet($key, $value)
     {
         $this->_parent_instance->_write_config($this->_group_name, $key, $value);
 
-        return parent::offsetSet($key, $value);
+        parent::offsetSet($key, $value);
     }
 
 }

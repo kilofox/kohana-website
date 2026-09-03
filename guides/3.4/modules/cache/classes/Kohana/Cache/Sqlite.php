@@ -44,7 +44,7 @@ class Kohana_Cache_Sqlite extends Cache implements Cache_Tagging, Cache_GarbageC
         $result = $this->_db->query("SELECT * FROM sqlite_master WHERE name = 'caches' AND type = 'table'")->fetchAll();
 
         // If there is no table, create a new one
-        if (0 == count($result)) {
+        if (0 === count($result)) {
             $database_schema = Arr::get($this->_config, 'schema');
 
             if ($database_schema === null) {
@@ -63,8 +63,8 @@ class Kohana_Cache_Sqlite extends Cache implements Cache_Tagging, Cache_GarbageC
     /**
      * Retrieve a value based on an id
      *
-     * @param   string  $id       id
-     * @param   string  $default  default [Optional] Default value to return if id not found
+     * @param string $id ID
+     * @param mixed $default Default value to return if ID not found
      * @return  mixed
      * @throws  Cache_Exception
      */
@@ -85,7 +85,7 @@ class Kohana_Cache_Sqlite extends Cache implements Cache_Tagging, Cache_GarbageC
         }
 
         // If the cache has expired
-        if ($result->expiration != 0 and $result->expiration <= time()) {
+        if ((int) $result->expiration !== 0 && $result->expiration <= time()) {
             // Delete it and return default value
             $this->delete($id);
             return $default;
@@ -109,10 +109,10 @@ class Kohana_Cache_Sqlite extends Cache implements Cache_Tagging, Cache_GarbageC
     /**
      * Set a value based on an id. Optionally add tags.
      *
-     * @param string $id id
-     * @param mixed $data data
-     * @param integer $lifetime lifetime [Optional]
-     * @return  boolean
+     * @param string $id ID
+     * @param mixed $data Data to set to cache.
+     * @param int|null $lifetime Lifetime [Optional]
+     * @return bool
      * @throws Cache_Exception
      */
     public function set($id, $data, $lifetime = null)
@@ -123,8 +123,8 @@ class Kohana_Cache_Sqlite extends Cache implements Cache_Tagging, Cache_GarbageC
     /**
      * Delete a cache entry based on id
      *
-     * @param   string  $id  id
-     * @return  boolean
+     * @param string $id ID of cache entry to delete.
+     * @return  bool
      * @throws  Cache_Exception
      */
     public function delete($id)
@@ -145,7 +145,7 @@ class Kohana_Cache_Sqlite extends Cache implements Cache_Tagging, Cache_GarbageC
     /**
      * Delete all cache entries
      *
-     * @return  boolean
+     * @return bool
      * @throws Cache_Exception
      */
     public function delete_all()
@@ -166,12 +166,12 @@ class Kohana_Cache_Sqlite extends Cache implements Cache_Tagging, Cache_GarbageC
     /**
      * Set a value based on an id. Optionally add tags.
      *
-     * @param   string   $id        id
-     * @param   mixed    $data      data
-     * @param   integer  $lifetime  lifetime [Optional]
-     * @param   array    $tags      tags [Optional]
-     * @return  boolean
-     * @throws  Cache_Exception
+     * @param string $id id
+     * @param mixed $data data
+     * @param int|null $lifetime lifetime [Optional]
+     * @param array|null $tags tags [Optional]
+     * @return  bool
+     * @throws Cache_Exception
      */
     public function set_with_tags($id, $data, $lifetime = null, array $tags = null)
     {
@@ -179,13 +179,13 @@ class Kohana_Cache_Sqlite extends Cache implements Cache_Tagging, Cache_GarbageC
         $data = serialize($data);
 
         // Normalise tags
-        $tags = (null === $tags) ? null : ('<' . implode('>,<', $tags) . '>');
+        $tags = null === $tags ? null : '<' . implode('>,<', $tags) . '>';
 
         // Setup lifetime
         if ($lifetime === null) {
-            $lifetime = (0 === Arr::get($this->_config, 'default_expire')) ? 0 : (Arr::get($this->_config, 'default_expire', Cache::DEFAULT_EXPIRE) + time());
+            $lifetime = 0 === Arr::get($this->_config, 'default_expire') ? 0 : Arr::get($this->_config, 'default_expire', Cache::DEFAULT_EXPIRE) + time();
         } else {
-            $lifetime = (0 === $lifetime) ? 0 : ($lifetime + time());
+            $lifetime = 0 === $lifetime ? 0 : $lifetime + time();
         }
 
         // Prepare statement
@@ -205,8 +205,8 @@ class Kohana_Cache_Sqlite extends Cache implements Cache_Tagging, Cache_GarbageC
     /**
      * Delete cache entries based on a tag
      *
-     * @param   string  $tag  tag
-     * @return  boolean
+     * @param string $tag Tag label identifying cache entries to be deleted.
+     * @return  bool
      * @throws  Cache_Exception
      */
     public function delete_tag($tag)
@@ -227,7 +227,7 @@ class Kohana_Cache_Sqlite extends Cache implements Cache_Tagging, Cache_GarbageC
     /**
      * Find cache entries based on a tag
      *
-     * @param   string  $tag  tag
+     * @param string $tag Tag label used to find associated cache entries.
      * @return  array
      * @throws  Cache_Exception
      */
@@ -282,8 +282,8 @@ class Kohana_Cache_Sqlite extends Cache implements Cache_Tagging, Cache_GarbageC
     /**
      * Tests whether an id exists or not
      *
-     * @param   string  $id  id
-     * @return  boolean
+     * @param string $id ID
+     * @return  bool
      * @throws  Cache_Exception
      */
     protected function exists($id)

@@ -3,14 +3,14 @@
 class Kohana_HTTP_Exception_401 extends HTTP_Exception_Expected
 {
     /**
-     * @var   integer    HTTP 401 Unauthorized
+     * @var int HTTP 401 Unauthorized
      */
     protected $_code = 401;
 
     /**
      * Specifies the WWW-Authenticate challenge.
      *
-     * @param  string  $challenge  WWW-Authenticate challenge (e.g. `Basic realm="Control Panel"`)
+     * @param string|null $challenge WWW-Authenticate challenge (e.g. `Basic realm="Control Panel"`)
      */
     public function authenticate($challenge = null)
     {

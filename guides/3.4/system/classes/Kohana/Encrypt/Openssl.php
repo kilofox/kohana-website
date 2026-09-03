@@ -7,11 +7,11 @@
  *
  * @package     Kohana
  * @category    Security
- * @author      Tinsh <kilofox2000@gmail.com>
+ * @author      Loong <loong2460@gmail.com>
  * @copyright   (c) 2018 Kohana Group
  * @license     https://kohana.top/license
  */
-class Kohana_Encrypt_Openssl
+class Kohana_Encrypt_Openssl extends Encrypt
 {
     /**
      * @var string  The cipher method.
@@ -60,7 +60,7 @@ class Kohana_Encrypt_Openssl
      * @param array $config configuration options
      * @throws Kohana_Exception
      */
-    public function __construct($name, $config)
+    public function __construct($name, array $config)
     {
         if (!isset($config['key'])) {
             // No default encryption key is provided!
@@ -98,7 +98,7 @@ class Kohana_Encrypt_Openssl
      * to convert it to a string. This string can be stored in a database,
      * displayed, and passed using most other means without corruption.
      *
-     * @param   string  $data   Data to be encrypted.
+     * @param string $data Data to be encrypted.
      * @return  string
      */
     public function encode($data)
@@ -127,9 +127,8 @@ class Kohana_Encrypt_Openssl
      *
      *     $data = $encrypt->decode($data);
      *
-     * @param   string  $data   Encoded string to be decrypted.
-     * @return  false   If decryption fails.
-     * @return  string
+     * @param string $data Encoded string to be decrypted.
+     * @return  string|false Decrypted string on success, or false on failure.
      */
     public function decode($data)
     {

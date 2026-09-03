@@ -6,7 +6,7 @@
  * extend this class, and get a warning in the API browser.
  *
  * @package    Kohana/Userguide
- * @category   Undocumented
+ * @category   Base
  * @author     Kohana Team
  * @copyright  (c) 2008-2013 Kohana Team
  * @license    https://kohana.top/license
@@ -21,8 +21,8 @@ abstract class Kohana_Kodoc_Missing
      *
      * [!!] All classes created will extend [Kodoc_Missing].
      *
-     * @param   string   class name
-     * @return  boolean
+     * @param string $class class name
+     * @return bool
      * @since   3.0.7
      */
     public static function create_class($class)

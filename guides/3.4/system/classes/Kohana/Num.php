@@ -63,12 +63,12 @@ class Kohana_Num
      *     echo 10, Num::ordinal(10); // "10th"
      *     echo 33, Num::ordinal(33); // "33rd"
      *
-     * @param   integer $number
+     * @param int $number
      * @return  string
      */
     public static function ordinal($number)
     {
-        if ($number % 100 > 10 AND $number % 100 < 14) {
+        if ($number % 100 > 10 && $number % 100 < 14) {
             return 'th';
         }
 
@@ -97,9 +97,9 @@ class Kohana_Num
      *     // In Portuguese, "1.200.05"
      *     echo Num::format(1200.05, 2, true);
      *
-     * @param   float   $number     number to format
-     * @param   integer $places     decimal places
-     * @param   boolean $monetary   monetary formatting?
+     * @param float $number Number to format
+     * @param int $places Decimal places
+     * @param bool $monetary Monetary formatting?
      * @return  string
      * @since   3.0.2
      */
@@ -122,9 +122,9 @@ class Kohana_Num
      * Round a number to a specified precision, using a specified tie breaking technique
      *
      * @param float $value Number to round
-     * @param integer $precision Desired precision
-     * @param integer $mode Tie breaking mode, accepts the PHP_ROUND_HALF_* constants
-     * @param boolean $native Set to "false" to force use of the userland implementation
+     * @param int $precision Desired precision
+     * @param int $mode Tie breaking mode, accepts the PHP_ROUND_HALF_* constants
+     * @param bool $native Set to "false" to force use of the userland implementation
      * @return float Rounded number
      */
     public static function round($value, $precision = 0, $mode = self::ROUND_HALF_UP, $native = true)
@@ -133,38 +133,37 @@ class Kohana_Num
             return round($value, $precision, $mode);
         }
 
-        if ($mode === self::ROUND_HALF_UP) {
-            return round($value, $precision);
-        } else {
-            $factor = ($precision === 0) ? 1 : pow(10, $precision);
+        switch ($mode) {
+            case self::ROUND_HALF_UP:
+            default:
+                return round($value, $precision);
+            case self::ROUND_HALF_DOWN:
+            case self::ROUND_HALF_EVEN:
+            case self::ROUND_HALF_ODD:
+                $factor = $precision === 0 ? 1 : pow(10, $precision);
 
-            switch ($mode) {
-                case self::ROUND_HALF_DOWN:
-                case self::ROUND_HALF_EVEN:
-                case self::ROUND_HALF_ODD:
-                    // Check if we have a rounding tie, otherwise we can just call round()
-                    if (($value * $factor) - floor($value * $factor) === 0.5) {
-                        if ($mode === self::ROUND_HALF_DOWN) {
-                            // Round down operation, so we round down unless the value
-                            // is -ve because up is down and down is up down there. ;)
-                            $up = ($value < 0);
-                        } else {
-                            // Round up if the integer is odd and the round mode is set to even
-                            // or the integer is even and the round mode is set to odd.
-                            // Any other instance round down.
-                            $up = (!(!(floor($value * $factor) & 1)) === ($mode === self::ROUND_HALF_EVEN));
-                        }
-
-                        if ($up) {
-                            $value = ceil($value * $factor);
-                        } else {
-                            $value = floor($value * $factor);
-                        }
-                        return $value / $factor;
+                // Check if we have a rounding tie, otherwise we can just call round()
+                if ($value * $factor - floor($value * $factor) === 0.5) {
+                    if ($mode === self::ROUND_HALF_DOWN) {
+                        // Round down operation, so we round down unless the value
+                        // is -ve because up is down and down is up down there. ;)
+                        $up = $value < 0;
                     } else {
-                        return round($value, $precision);
+                        // Round up if the integer is odd and the round mode is set to even
+                        // or the integer is even and the round mode is set to odd.
+                        // Any other instance round down.
+                        $up = !!(floor($value * $factor) & 1) === ($mode === self::ROUND_HALF_EVEN);
                     }
-            }
+
+                    if ($up) {
+                        $value = ceil($value * $factor);
+                    } else {
+                        $value = floor($value * $factor);
+                    }
+                    return $value / $factor;
+                } else {
+                    return round($value, $precision);
+                }
         }
     }
 
@@ -179,7 +178,7 @@ class Kohana_Num
      *     echo Num::bytes('1000');  // 1000
      *     echo Num::bytes('2.5GB'); // 2684354560
      *
-     * @param string $bytes file size in SB format
+     * @param string $size file size in SB format
      * @return  float
      * @throws Kohana_Exception
      */

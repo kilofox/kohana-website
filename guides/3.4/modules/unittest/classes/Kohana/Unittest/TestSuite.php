@@ -21,17 +21,11 @@ abstract class Kohana_Unittest_TestSuite extends PHPUnit_Framework_TestSuite
     /**
      * Runs the tests and collects their result in a TestResult.
      *
-     * @param  PHPUnit_Framework_TestResult $result
-     * @param  mixed                        $filter
-     * @param  array                        $groups
-     * @param  array                        $excludeGroups
-     * @param  boolean                      $processIsolation
+     * @param PHPUnit_Framework_TestResult|null $result
      * @return PHPUnit_Framework_TestResult
-     * @throws InvalidArgumentException
      */
-    public function run(PHPUnit_Framework_TestResult $result = null, $filter = false, array $groups = [], array $excludeGroups = [], $processIsolation = false)
+    public function run(PHPUnit_Framework_TestResult $result = null)
     {
-
         // Get the code coverage filter from the suite's result object
         $coverage = $result->getCodeCoverage();
 
@@ -46,7 +40,7 @@ abstract class Kohana_Unittest_TestSuite extends PHPUnit_Framework_TestSuite
             }
         }
 
-        return parent::run($result, $filter, $groups, $excludeGroups, $processIsolation);
+        return parent::run($result);
     }
 
     /**

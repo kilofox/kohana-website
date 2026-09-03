@@ -20,7 +20,7 @@ class Kohana_Image_Imagick extends Image
      * Checks if ImageMagick is enabled.
      *
      * @throws  Kohana_Exception
-     * @return  boolean
+     * @return  bool
      */
     public static function check()
     {
@@ -64,7 +64,6 @@ class Kohana_Image_Imagick extends Image
     public function __destruct()
     {
         $this->im->clear();
-        $this->im->destroy();
     }
 
     protected function _do_resize($width, $height)
@@ -124,10 +123,10 @@ class Kohana_Image_Imagick extends Image
     protected function _do_sharpen($amount)
     {
         // ImageMagick does not support $amount under 5 (0.15)
-        $amount = ($amount < 5) ? 5 : $amount;
+        $amount = max($amount, 5);
 
         // Amount should be in the range of 0.0 to 3.0
-        $amount = ($amount * 3.0) / 100;
+        $amount = $amount * 3.0 / 100;
 
         return $this->im->sharpenImage(0, $amount);
     }
@@ -174,7 +173,7 @@ class Kohana_Image_Imagick extends Image
 
         // Place the image and reflection into the container
         if ($image->compositeImage($this->im, Imagick::COMPOSITE_SRC, 0, 0)
-            AND $image->compositeImage($reflection, Imagick::COMPOSITE_OVER, 0, $this->height)) {
+            && $image->compositeImage($reflection, Imagick::COMPOSITE_OVER, 0, $this->height)) {
             // Replace the current image with the reflected image
             $this->im = $image;
 
@@ -194,7 +193,7 @@ class Kohana_Image_Imagick extends Image
         $watermark = new Imagick;
         $watermark->readImageBlob($image->render(), $image->file);
 
-        if ($watermark->getImageAlphaChannel() !== Imagick::ALPHACHANNEL_ACTIVATE) {
+        if (!$watermark->getImageAlphaChannel()) {
             // Force the image to have an alpha channel
             $watermark->setImageAlphaChannel(Imagick::ALPHACHANNEL_OPAQUE);
         }
@@ -286,8 +285,8 @@ class Kohana_Image_Imagick extends Image
     /**
      * Get the image type and format for an extension.
      *
-     * @param   string  $extension  image extension: png, jpg, etc
-     * @return  string  IMAGETYPE_* constant
+     * @param string $extension Image extension: png, jpg, etc.
+     * @return array Array with normalized format and IMAGETYPE_* constant.
      * @throws  Kohana_Exception
      */
     protected function _get_imagetype($extension)

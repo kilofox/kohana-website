@@ -46,8 +46,8 @@ abstract class Kohana_Database
      *     // Create a custom configured instance
      *     $db = Database::instance('custom', $config);
      *
-     * @param string $name instance name
-     * @param array $config configuration parameters
+     * @param string|null $name instance name
+     * @param array|null $config configuration parameters
      * @return  Database
      * @throws Kohana_Exception
      */
@@ -158,7 +158,7 @@ abstract class Kohana_Database
      *
      *     $db->disconnect();
      *
-     * @return  boolean
+     * @return bool
      */
     public function disconnect()
     {
@@ -172,11 +172,12 @@ abstract class Kohana_Database
      *
      *     $db->set_charset('utf8');
      *
-     * @throws  Database_Exception
      * @param   string   $charset  character set name
      * @return  void
+     * @throws  Database_Exception
      */
     abstract public function set_charset($charset);
+
     /**
      * Perform an SQL query of the given type.
      *
@@ -186,13 +187,11 @@ abstract class Kohana_Database
      *     // Make a SELECT query and use "Model_User" for the results
      *     $db->query(Database::SELECT, 'SELECT * FROM users LIMIT 1', 'Model_User');
      *
-     * @param   integer  $type       Database::SELECT, Database::INSERT, etc
-     * @param   string   $sql        SQL query
-     * @param   mixed    $as_object  result object class string, true for stdClass, false for assoc array
-     * @param   array    $params     object construct parameters for result class
-     * @return  object   Database_Result for SELECT queries
-     * @return  array    list (insert id, row count) for INSERT queries
-     * @return  integer  number of affected rows for all other queries
+     * @param int $type Database::SELECT, Database::INSERT, etc.
+     * @param string $sql SQL query
+     * @param mixed $as_object result object class string, true for stdClass, false for assoc array
+     * @param array|null $params object construct parameters for result class
+     * @return  Database_Result|array|int Database_Result for SELECT queries, list (insert ID, row count) for INSERT queries, number of affected rows for all other queries.
      */
     abstract public function query($type, $sql, $as_object = false, array $params = null);
     /**
@@ -213,8 +212,8 @@ abstract class Kohana_Database
      *          $db->rollback();
      *      }
      *
-     * @param string $mode  transaction mode
-     * @return  boolean
+     * @param string|null $mode Transaction mode
+     * @return bool
      */
     abstract public function begin($mode = null);
     /**
@@ -223,7 +222,7 @@ abstract class Kohana_Database
      *     // Commit the database changes
      *     $db->commit();
      *
-     * @return  boolean
+     * @return bool
      */
     abstract public function commit();
     /**
@@ -232,7 +231,7 @@ abstract class Kohana_Database
      *     // Undo the changes
      *     $db->rollback();
      *
-     * @return  boolean
+     * @return bool
      */
     abstract public function rollback();
 
@@ -243,7 +242,7 @@ abstract class Kohana_Database
      *     $count = $db->count_records('users');
      *
      * @param mixed $table table name string or [query, alias]
-     * @return  integer
+     * @return int
      * @throws Kohana_Exception
      */
     public function count_records($table)
@@ -260,7 +259,7 @@ abstract class Kohana_Database
      *
      *     $db->datatype('char');
      *
-     * @param   string  $type  SQL data type
+     * @param string $type SQL data type
      * @return  array
      */
     public function datatype($type)
@@ -331,7 +330,7 @@ abstract class Kohana_Database
      *     // Get all user-related tables
      *     $tables = $db->list_tables('user%');
      *
-     * @param   string   $like  table to search for
+     * @param string|null $like Table to search for
      * @return  array
      */
     abstract public function list_tables($like = null);
@@ -348,9 +347,9 @@ abstract class Kohana_Database
      *     // Get the columns from a table that doesn't use the table prefix
      *     $columns = $db->list_columns('users', null, false);
      *
-     * @param   string  $table       table to get columns from
-     * @param   string  $like        column to search for
-     * @param   boolean $add_prefix  whether to add the table prefix automatically or not
+     * @param string $table Table to get columns from
+     * @param string|null $like Column to search for
+     * @param bool $add_prefix Whether to add the table prefix automatically or not
      * @return  array
      */
     abstract public function list_columns($table, $like = null, $add_prefix = true);
@@ -360,7 +359,7 @@ abstract class Kohana_Database
      *     // Returns: ['CHAR', '6']
      *     list($type, $length) = $db->_parse_type('CHAR(6)');
      *
-     * @param   string  $type
+     * @param string $type
      * @return  array   list containing the type and length, if any
      */
     protected function _parse_type($type)
@@ -497,7 +496,7 @@ abstract class Kohana_Database
                     $parts[$offset] = $prefix . $parts[$offset];
                 }
 
-                foreach ($parts as & $part) {
+                foreach ($parts as &$part) {
                     if ($part !== '*') {
                         // Quote each of the parts
                         $part = $this->_identifier . $part . $this->_identifier;
@@ -566,7 +565,7 @@ abstract class Kohana_Database
                     $parts[$offset] = $prefix . $parts[$offset];
                 }
 
-                foreach ($parts as & $part) {
+                foreach ($parts as &$part) {
                     // Quote each of the parts
                     $part = $this->_identifier . $part . $this->_identifier;
                 }
@@ -623,7 +622,7 @@ abstract class Kohana_Database
             if (strpos($value, '.') !== false) {
                 $parts = explode('.', $value);
 
-                foreach ($parts as & $part) {
+                foreach ($parts as &$part) {
                     // Quote each of the parts
                     $part = $this->_identifier . $part . $this->_identifier;
                 }
@@ -647,7 +646,7 @@ abstract class Kohana_Database
      *
      *     $value = $db->escape('any string');
      *
-     * @param   string   $value  value to quote
+     * @param string $value Value to quote
      * @return  string
      */
     abstract public function escape($value);

@@ -1,5 +1,17 @@
 <?php
 
+/**
+ * Minion CLI helper class for command-line interaction utilities.
+ *
+ * Provides methods for parsing command-line options, reading user input (including hidden passwords), writing output
+ * with replaceable lines, waiting with countdown, and applying ANSI color codes.
+ *
+ * @package    Kohana
+ * @category   Minion
+ * @author     Kohana Team
+ * @copyright  (c) 2009-2011 Kohana Team
+ * @license    https://kohana.top/license
+ */
 class Kohana_Minion_CLI
 {
     public static $wait_msg = 'Press any key to continue...';
@@ -41,14 +53,11 @@ class Kohana_Minion_CLI
      *     // Get the values of "username" and "password"
      *     $auth = Minion_CLI::options('username', 'password');
      *
-     * @param   string  $options,...    option name
+     * @param string ...$options option name
      * @return  array
      */
-    public static function options($options = null)
+    public static function options(...$options)
     {
-        // Get all the requested options
-        $options = func_get_args();
-
         // Found option values
         $values = [];
 
@@ -81,16 +90,14 @@ class Kohana_Minion_CLI
             $values[$opt] = $value;
         }
 
-        if ($options) {
-            foreach ($values as $opt => $value) {
-                if (!in_array($opt, $options)) {
-                    // Set the given value
-                    unset($values[$opt]);
-                }
+        foreach ($values as $opt => $value) {
+            if (!in_array($opt, $options)) {
+                // Set the given value
+                unset($values[$opt]);
             }
         }
 
-        return count($options) == 1 ? array_pop($values) : $values;
+        return count($options) === 1 ? array_pop($values) : $values;
     }
 
     /**
@@ -107,8 +114,8 @@ class Kohana_Minion_CLI
      * // Will only accept the options in the array
      * $ready = Minion_CLI::read('Are you ready?', ['y','n']);
      *
-     * @param  string  $text    text to show user before waiting for input
-     * @param  array   $options array of options the user is shown
+     * @param string $text text to show user before waiting for input
+     * @param array|null $options array of options the user is shown
      * @return string  the user input
      */
     public static function read($text = '', array $options = null)
@@ -144,8 +151,9 @@ class Kohana_Minion_CLI
      *
      * $password = Minion_CLI::password('Enter your password');
      *
-     * @author Mathew Davies.
+     * @param string $text
      * @return string
+     * @author Mathew Davies
      */
     public static function password($text = '')
     {
@@ -200,8 +208,8 @@ class Kohana_Minion_CLI
      *     // Done writing this line
      *     Minion_CLI::write_replace('100%', true);
      *
-     * @param string  $text      the text to output
-     * @param boolean $end_line  whether the line is done being replaced
+     * @param string $text The text to output
+     * @param bool $end_line whether the line is done being replaced
      */
     public static function write_replace($text = '', $end_line = false)
     {
@@ -214,12 +222,12 @@ class Kohana_Minion_CLI
      * Waits a certain number of seconds, optionally showing a wait message and
      * waiting for a key press.
      *
-     * @author     Fuel Development Team
-     * @license    MIT License
-     * @copyright  2010 - 2011 Fuel Development Team
-     * @link       http://fuelphp.com
      * @param int $seconds number of seconds
      * @param bool $countdown show a countdown or not
+     * @copyright  2010 - 2011 Fuel Development Team
+     * @link       http://fuelphp.com
+     * @author     Fuel Development Team
+     * @license    MIT License
      */
     public static function wait($seconds = 0, $countdown = false)
     {
@@ -249,7 +257,7 @@ class Kohana_Minion_CLI
      *
      * @param string $text the text to color
      * @param string $foreground the foreground color
-     * @param string $background the background color
+     * @param string|null $background The background color
      * @return string the color coded string
      * @throws Kohana_Exception
      * @license    MIT License
@@ -268,7 +276,7 @@ class Kohana_Minion_CLI
             throw new Kohana_Exception('Invalid CLI foreground color: ' . $foreground);
         }
 
-        if ($background !== null and ! array_key_exists($background, Minion_CLI::$background_colors)) {
+        if ($background !== null && !array_key_exists($background, Minion_CLI::$background_colors)) {
             throw new Kohana_Exception('Invalid CLI background color: ' . $background);
         }
 

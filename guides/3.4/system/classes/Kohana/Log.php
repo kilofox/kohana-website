@@ -24,7 +24,7 @@ class Kohana_Log
     const DEBUG = LOG_DEBUG;    // 7
 
     /**
-     * @var  boolean  immediately write when logs are added
+     * @var bool immediately write when logs are added
      */
     public static $write_on_add = false;
 
@@ -71,8 +71,8 @@ class Kohana_Log
      *
      * @param   Log_Writer  $writer     instance
      * @param   mixed       $levels     array of messages levels to write OR max level to write
-     * @param   integer     $min_level  min level to write IF $levels is not an array
-     * @return  Log
+     * @param int $min_level Min level to write IF $levels is not an array
+     * @return  Kohana_Log
      */
     public function attach(Log_Writer $writer, $levels = [], $min_level = 0)
     {
@@ -94,7 +94,7 @@ class Kohana_Log
      *     $log->detach($writer);
      *
      * @param   Log_Writer  $writer instance
-     * @return  Log
+     * @return  Kohana_Log
      */
     public function detach(Log_Writer $writer)
     {
@@ -112,11 +112,11 @@ class Kohana_Log
      *         ':user' => $username,
      *     ]);
      *
-     * @param   string  $level       level of message
-     * @param   string  $message     message body
-     * @param   array   $values      values to replace in the message
-     * @param   array   $additional  additional custom parameters to supply to the log writer
-     * @return  Log
+     * @param string $level level of message
+     * @param string $message message body
+     * @param array|null $values values to replace in the message
+     * @param array|null $additional additional custom parameters to supply to the log writer
+     * @return  Kohana_Log
      */
     public function add($level, $message, array $values = null, array $additional = null)
     {
@@ -140,7 +140,7 @@ class Kohana_Log
             }
         }
 
-        if ($additional == null) {
+        if ($additional === null) {
             $additional = [];
         }
 

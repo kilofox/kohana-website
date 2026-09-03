@@ -45,9 +45,9 @@ class Kohana_Date
      * <https://www.php.net/timezones>.
      *
      * @param string $remote timezone that to find the offset of
-     * @param string $local timezone used as the baseline
+     * @param string|null $local Timezone used as the baseline
      * @param mixed $now UNIX timestamp or date string
-     * @return  integer
+     * @return int
      * @throws Exception
      */
     public static function offset($remote, $local = null, $now = null)
@@ -80,9 +80,9 @@ class Kohana_Date
      *
      *     $seconds = Date::seconds(); // 01, 02, 03, ..., 58, 59, 60
      *
-     * @param   integer $step   amount to increment each step by, 1 to 30
-     * @param   integer $start  start value
-     * @param   integer $end    end value
+     * @param int $step Amount to increment each step by, 1 to 30
+     * @param int $start Start value
+     * @param int $end End value
      * @return  array   A mirrored (foo => foo) array from 1-60.
      */
     public static function seconds($step = 1, $start = 0, $end = 60)
@@ -105,9 +105,9 @@ class Kohana_Date
      *
      *     $minutes = Date::minutes(); // 05, 10, 15, ..., 50, 55, 60
      *
-     * @uses    Date::seconds
-     * @param   integer $step   amount to increment each step by, 1 to 30
+     * @param   int $step amount to increment each step by, 1 to 30
      * @return  array   A mirrored (foo => foo) array from 1-60.
+     * @uses    Date::seconds
      */
     public static function minutes($step = 5)
     {
@@ -124,9 +124,9 @@ class Kohana_Date
      *
      *     $hours = Date::hours(); // 01, 02, 03, ..., 10, 11, 12
      *
-     * @param   integer $step   amount to increment each step by
-     * @param   boolean $long   use 24-hour time
-     * @param   integer $start  the hour to start at
+     * @param int $step Amount to increment each step by
+     * @param bool $long Use 24-hour time
+     * @param int|null $start The hour to start at
      * @return  array   A mirrored (foo => foo) array from start-12 or start-23.
      */
     public static function hours($step = 1, $long = false, $start = null)
@@ -137,13 +137,13 @@ class Kohana_Date
 
         // Set the default start if none was specified.
         if ($start === null) {
-            $start = ($long === false) ? 1 : 0;
+            $start = $long === false ? 1 : 0;
         }
 
         $hours = [];
 
         // 24-hour time has 24 hours, instead of 12
-        $size = ($long === true) ? 23 : 12;
+        $size = $long === true ? 23 : 12;
 
         for ($i = $start; $i <= $size; $i += $step) {
             $hours[$i] = (string) $i;
@@ -158,7 +158,7 @@ class Kohana_Date
      *     $type = Date::ampm(12); // PM
      *     $type = Date::ampm(1);  // AM
      *
-     * @param   integer $hour   number of the hour
+     * @param int $hour Number of the hour
      * @return  string
      */
     public static function ampm($hour)
@@ -166,7 +166,7 @@ class Kohana_Date
         // Always integer
         $hour = (int) $hour;
 
-        return ($hour > 11) ? 'PM' : 'AM';
+        return $hour > 11 ? 'PM' : 'AM';
     }
 
     /**
@@ -174,8 +174,8 @@ class Kohana_Date
      *
      *     $hour = Date::adjust(3, 'pm'); // 15
      *
-     * @param   integer $hour   hour to adjust
-     * @param   string  $ampm   AM or PM
+     * @param int $hour Hour to adjust
+     * @param string $ampm AM or PM
      * @return  string
      */
     public static function adjust($hour, $ampm)
@@ -185,7 +185,7 @@ class Kohana_Date
 
         switch ($ampm) {
             case 'am':
-                if ($hour == 12) {
+                if ($hour === 12) {
                     $hour = 0;
                 }
                 break;
@@ -205,8 +205,8 @@ class Kohana_Date
      *
      *     Date::days(4, 2010); // 1, 2, 3, ..., 28, 29, 30
      *
-     * @param   integer $month  number of month
-     * @param   integer $year   number of year to check month, defaults to the current year
+     * @param int $month Number of month
+     * @param   int $year   number of year to check month, defaults to the current year
      * @return  array   A mirrored (foo => foo) array of the days.
      */
     public static function days($month, $year = false)
@@ -256,15 +256,15 @@ class Kohana_Date
      *     Date::months(Date::MONTHS_SHORT);
      *     // [1 => 'Jan', 2 => 'Feb', ..., 12 => 'Dec']
      *
-     * @uses    Date::hours
-     * @param   string  $format The format to use for months
+     * @param   string|null  $format The format to use for months
      * @return  array   An array of months based on the specified format
+     * @uses    Date::hours
      */
     public static function months($format = null)
     {
         $months = [];
 
-        if ($format === Date::MONTHS_LONG OR $format === Date::MONTHS_SHORT) {
+        if ($format === Date::MONTHS_LONG || $format === Date::MONTHS_SHORT) {
             for ($i = 1; $i <= 12; ++$i) {
                 $months[$i] = strftime($format, mktime(0, 0, 0, $i, 1));
             }
@@ -282,15 +282,15 @@ class Kohana_Date
      *
      *     $years = Date::years(2000, 2010); // 2000, 2001, ..., 2009, 2010
      *
-     * @param   integer $start  starting year (default is current year - 5)
-     * @param   integer $end    ending year (default is current year + 5)
+     * @param   int $start  starting year (default is current year - 5)
+     * @param   int $end    ending year (default is current year + 5)
      * @return  array
      */
     public static function years($start = false, $end = false)
     {
         // Default values
-        $start = ($start === false) ? (date('Y') - 5) : (int) $start;
-        $end = ($end === false) ? (date('Y') + 5) : (int) $end;
+        $start = $start === false ? date('Y') - 5 : (int) $start;
+        $end = $end === false ? date('Y') + 5 : (int) $end;
 
         $years = [];
 
@@ -309,11 +309,10 @@ class Kohana_Date
      *     $span = Date::span(60, 182, 'minutes,seconds'); // ['minutes' => 2, 'seconds' => 2]
      *     $span = Date::span(60, 182, 'minutes'); // 2
      *
-     * @param   integer $remote timestamp to find the span of
-     * @param   integer $local  timestamp to use as the baseline
-     * @param   string  $output formatting string
-     * @return  string   when only a single output is requested
-     * @return  array    associative list of all outputs requested
+     * @param int $remote Timestamp to find the span of
+     * @param int $local Timestamp to use as the baseline
+     * @param string $output Formatting string
+     * @return string|array Returns a string when only a single output is requested, or an associative array of all outputs requested.
      */
     public static function span($remote, $local = null, $output = 'years,months,weeks,days,hours,minutes,seconds')
     {
@@ -391,13 +390,13 @@ class Kohana_Date
      * however this parameter shouldn't be needed in normal usage and is only
      * included for unit tests
      *
-     * @param   integer $timestamp          "remote" timestamp
-     * @param   integer $local_timestamp    "local" timestamp, defaults to time()
+     * @param int $timestamp "Remote" timestamp
+     * @param int|null $local_timestamp "Local" timestamp, defaults to time()
      * @return  string
      */
     public static function fuzzy_span($timestamp, $local_timestamp = null)
     {
-        $local_timestamp = ($local_timestamp === null) ? time() : (int) $local_timestamp;
+        $local_timestamp = $local_timestamp === null ? time() : (int) $local_timestamp;
 
         // Determine the difference in seconds
         $offset = abs($local_timestamp - $timestamp);
@@ -460,24 +459,24 @@ class Kohana_Date
      *
      *     $dos = Date::unix2dos($unix);
      *
-     * @param   integer $timestamp  UNIX timestamp
-     * @return  integer
+     * @param   int $timestamp UNIX timestamp
+     * @return  int
      */
     public static function unix2dos($timestamp = false)
     {
-        $timestamp = ($timestamp === false) ? getdate() : getdate($timestamp);
+        $timestamp = $timestamp === false ? getdate() : getdate($timestamp);
 
         if ($timestamp['year'] < 1980) {
-            return (1 << 21 | 1 << 16);
+            return 1 << 21 | 1 << 16;
         }
 
         $timestamp['year'] -= 1980;
 
         // What voodoo is this? I have no idea... Geert can explain it though,
         // and that's good enough for me.
-        return ($timestamp['year'] << 25 | $timestamp['mon'] << 21 |
+        return $timestamp['year'] << 25 | $timestamp['mon'] << 21 |
             $timestamp['mday'] << 16 | $timestamp['hours'] << 11 |
-            $timestamp['minutes'] << 5 | $timestamp['seconds'] >> 1);
+            $timestamp['minutes'] << 5 | $timestamp['seconds'] >> 1;
     }
 
     /**
@@ -487,8 +486,8 @@ class Kohana_Date
      *
      *     $unix = Date::dos2unix($dos);
      *
-     * @param   integer $timestamp  DOS timestamp
-     * @return  integer
+     * @param   int $timestamp DOS timestamp
+     * @return  int
      */
     public static function dos2unix($timestamp = false)
     {
@@ -509,22 +508,21 @@ class Kohana_Date
      *
      * @link    https://www.php.net/datetime.construct
      * @param string $datetime_str datetime string
-     * @param string $timestamp_format timestamp format
-     * @param string $timezone timezone identifier
+     * @param string|null $timestamp_format Timestamp format
+     * @param string|null $timezone Timezone identifier
      * @return  string
      * @throws Exception
      */
     public static function formatted_time($datetime_str = 'now', $timestamp_format = null, $timezone = null)
     {
-        $timestamp_format = ($timestamp_format == null) ? Date::$timestamp_format : $timestamp_format;
-        $timezone = ($timezone === null) ? Date::$timezone : $timezone;
+        $timestamp_format = $timestamp_format === null ? Date::$timestamp_format : $timestamp_format;
+        $timezone = $timezone === null ? Date::$timezone : $timezone;
 
         $tz = new DateTimeZone($timezone ?: date_default_timezone_get());
         $time = new DateTime($datetime_str, $tz);
 
         // Convert the time back to the expected timezone if required (in case the datetime_str provided a timezone,
-        // offset or unix timestamp). This also ensures that the timezone reported by the object is correct on HHVM
-        // (see https://github.com/facebook/hhvm/issues/2302).
+        // offset or unix timestamp).
         $time->setTimeZone($tz);
 
         return $time->format($timestamp_format);

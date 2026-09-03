@@ -2,13 +2,19 @@
 
 ## Requirements
 
-Kohana 3.4 supports PHP versions 5.6, 7.0, and 7.1. Compatibility with other PHP versions has not been fully tested, and certain features may not function as expected.
+Kohana 3.4 supports PHP versions 5.6, 7.0, and 7.1. Compatibility with other PHP versions has not been fully tested, and
+certain features may not function as expected.
 
 ## Changes
 
+- The `composer install` command is required for dependency installation since Kohana 3.4.4. Remember to run this
+  command after upgrading from a previous version.
+- A new `VENDOR_PATH` constant has been added since Kohana 3.4.4. This constant is used to locate the vendor directory.
+- The global `EXT` constant has been deprecated. Explicitly specify `.php` or another file extension instead.
+
 ### Auth
 
- - The `Auth::hash_password()` method has been removed. Use `Auth::hash()` instead.
+- The `Auth::hash_password()` method has been removed. Use `Auth::hash()` instead.
 
 ### Cache
 
@@ -19,7 +25,7 @@ Kohana 3.4 supports PHP versions 5.6, 7.0, and 7.1. Compatibility with other PHP
 
 ### Core
 
-- The `Core::CODENAME` constant was deprecated.
+- The `Kohana::CODENAME` constant was deprecated.
 
 ### Database
 
@@ -32,7 +38,10 @@ Kohana 3.4 supports PHP versions 5.6, 7.0, and 7.1. Compatibility with other PHP
 
 ### Security
 
-- The `Security::strip_image_tags()` method has been removed for [security reasons](https://github.com/kohana/kohana/issues/107) as it is not reliable to parse and sanitize HTML with regular expressions. You should either encode HTML tags entirely, e.g. with `HTML::chars()`, or use a more robust HTML filtering solution such as [HTML Purifier](http://htmlpurifier.org).
+- The `Security::strip_image_tags()` method has been removed
+  for [security reasons](https://github.com/kohana/kohana/issues/107) as it is not reliable to parse and sanitize HTML
+  with regular expressions. You should either encode HTML tags entirely, e.g. with `HTML::chars()`, or use a more robust
+  HTML filtering solution such as [HTML Purifier](http://htmlpurifier.org).
 
 ### Validation
 

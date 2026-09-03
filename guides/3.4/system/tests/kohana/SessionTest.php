@@ -19,6 +19,7 @@ class Kohana_SessionTest extends Unittest_TestCase
     /**
      * Gets a mock of the session class
      *
+     * @param array $config
      * @return Session
      */
     // @codingStandardsIgnoreStart
@@ -256,7 +257,7 @@ class Kohana_SessionTest extends Unittest_TestCase
     {
         $session = $this->getMockSession();
 
-        $data_ref = & $session->as_array();
+        $data_ref = &$session->as_array();
 
         $data_ref['something'] = 'pie';
 
@@ -305,7 +306,7 @@ class Kohana_SessionTest extends Unittest_TestCase
         $session = $this->getMockSession();
 
         // A bit of a hack for mass-loading session data
-        $data = & $session->as_array();
+        $data = &$session->as_array();
 
         $data += [
             'a' => 'A',

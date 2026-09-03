@@ -23,7 +23,7 @@ class Kohana_Kodoc
      * @return  string
      * @throws Kohana_Exception
      */
-    public static function link_class_member($matches)
+    public static function link_class_member(array $matches)
     {
         $link = $matches[1];
         $class = $matches[2];
@@ -51,7 +51,7 @@ class Kohana_Kodoc
     /**
      * Creates an HTML list of all classes sorted by category (or package if no category)
      *
-     * @return   string   the HTML for the menu
+     * @return View The View object for rendering the menu
      * @throws Kohana_Exception
      */
     public static function menu()
@@ -101,7 +101,7 @@ class Kohana_Kodoc
     /**
      * Returns an array of all the classes available, built by listing all files in the classes folder.
      *
-     * @param   array   array of files, obtained using Kohana::list_files
+     * @param array|null $list array of files, obtained using Kohana::list_files
      * @return  array   an array of all the class names
      */
     public static function classes(array $list = null)
@@ -163,7 +163,7 @@ class Kohana_Kodoc
                     $declares = $child;
                 }
 
-                if ($declares === $_class->name OR $declares === "Core") {
+                if ($declares === $_class->name || $declares === "Core") {
                     $methods[] = $_method->name;
                 }
             }
@@ -211,7 +211,7 @@ class Kohana_Kodoc
             return HTML::anchor(
                     $route->uri(['class' => $text]), $text
             );
-        } elseif ($tag === 'see' OR $tag === 'uses') {
+        } elseif ($tag === 'see' || $tag === 'uses') {
             if (preg_match('/^' . Kodoc::$regex_class_member . '/', $text, $matches))
                 return Kodoc::link_class_member($matches);
         }
@@ -225,8 +225,7 @@ class Kohana_Kodoc
      * [!!] Converting the output to HTML in this method is deprecated in 3.3
      *
      * @param string $comment The DocBlock to parse
-     * @param boolean $html Whether to convert the return values
-     *   to HTML (deprecated)
+     * @param bool $html Whether to convert the return values to HTML (deprecated)
      * @return  array   [string $description, array $tags]
      * @throws Kohana_Exception
      */
@@ -249,7 +248,7 @@ class Kohana_Kodoc
          * @return  void
          * @throws Kohana_Exception
          */
-        $add_tag = function ($tag, $text) use ($html, & $tags) {
+        $add_tag = function ($tag, $text) use ($html, &$tags) {
             // Don't show @access lines, they are shown elsewhere
             if ($tag !== 'access') {
                 if ($html) {
@@ -294,7 +293,7 @@ class Kohana_Kodoc
 
         $comment = trim($comment, "\n");
 
-        if ($comment AND $html) {
+        if ($comment && $html) {
             // Parse the comment with Markdown
             $comment = Kodoc_Markdown::markdown($comment);
         }
@@ -305,9 +304,9 @@ class Kohana_Kodoc
     /**
      * Get the source of a function
      *
-     * @param  string   the filename
-     * @param  int      start line?
-     * @param  int      end line?
+     * @param string $file the filename
+     * @param int $start start line?
+     * @param int $end end line?
      */
     public static function source($file, $start, $end)
     {
@@ -321,7 +320,7 @@ class Kohana_Kodoc
         if (preg_match('/^(\s+)/', $file[0], $matches)) {
             $padding = strlen($matches[1]);
 
-            foreach ($file as & $line) {
+            foreach ($file as &$line) {
                 $line = substr($line, $padding);
             }
         }
@@ -332,7 +331,7 @@ class Kohana_Kodoc
     /**
      * Test whether a class should be shown, based on the api_packages config option
      *
-     * @param Kodoc_Class  the class to test
+     * @param Kodoc_Class $class the class to test
      * @return  bool  whether this class should be shown
      * @throws Kohana_Exception
      */
@@ -377,11 +376,11 @@ class Kohana_Kodoc
      * namespaces and exclude them from the userguide.
      *
      * @param string $class The name of the class to check for transparency
-     * @param array $classes An optional list of all defined classes
+     * @param array|null $classes An optional list of all defined classes
      * @return  false                     If this is not a transparent extension class
      * @throws Kohana_Exception
      */
-    public static function is_transparent($class, $classes = null)
+    public static function is_transparent($class, array $classes = null)
     {
 
         static $transparent_prefixes = null;
@@ -393,7 +392,7 @@ class Kohana_Kodoc
         // Split the class name at the first underscore
         $segments = explode('_', $class, 2);
 
-        if ((count($segments) == 2) AND ( isset($transparent_prefixes[$segments[0]]))) {
+        if (count($segments) === 2 && isset($transparent_prefixes[$segments[0]])) {
             if ($segments[1] === 'Core') {
                 // Cater for Module extends Module_Core naming
                 $child_class = $segments[0];
@@ -403,7 +402,7 @@ class Kohana_Kodoc
             }
 
             // It is only a transparent class if the unprefixed class also exists
-            if ($classes AND ! isset($classes[$child_class]))
+            if ($classes && !isset($classes[$child_class]))
                 return false;
 
             // Return the name of the child class

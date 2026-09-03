@@ -20,7 +20,7 @@ abstract class Kohana_Minion_Task
     /**
      * Converts a task (e.g. db:migrate to a class name)
      *
-     * @param string  Task name
+     * @param string $task Task name
      * @return string Class name
      */
     public static function convert_task_to_class_name($task)
@@ -36,7 +36,7 @@ abstract class Kohana_Minion_Task
     /**
      * Gets the task name of a task class / task object
      *
-     * @param  string|Minion_Task The task class / object
+     * @param string|Minion_Task $class The task class / object
      * @return string             The task name
      */
     public static function convert_class_to_task($class)
@@ -51,11 +51,11 @@ abstract class Kohana_Minion_Task
     /**
      * Factory for loading minion tasks
      *
-     * @param  array An array of command line options. It should contain the 'task' key
-     * @throws Minion_Exception_InvalidTask
+     * @param array $options An array of command line options. It should contain the 'task' key
      * @return Minion_Task The Minion task
+     * @throws Minion_Exception_InvalidTask
      */
-    public static function factory($options)
+    public static function factory(array $options)
     {
         if (($task = Arr::get($options, 'task')) !== null) {
             unset($options['task']);
@@ -141,8 +141,8 @@ abstract class Kohana_Minion_Task
     /**
      * Sets options for this task
      *
-     * $param  array  the array of options to set
-     * @return this
+     * $param array $options The array of options to set
+     * @return Kohana_Minion_Task
      */
     public function set_options(array $options)
     {
@@ -182,7 +182,7 @@ abstract class Kohana_Minion_Task
      *             ->rule('paramname', 'not_empty'); // Require this param
      *     }
      *
-     * @param  Validation   the validation object to add rules to
+     * @param Validation $validation the validation object to add rules to
      *
      * @return Validation
      */
@@ -209,7 +209,7 @@ abstract class Kohana_Minion_Task
     /**
      * Execute the task with the specified set of options
      *
-     * @return null
+     * @return void
      * @throws ReflectionException
      * @throws View_Exception
      */
@@ -221,7 +221,7 @@ abstract class Kohana_Minion_Task
         $validation = Validation::factory($options);
         $validation = $this->build_validation($validation);
 
-        if ($this->_method != '_help' AND !$validation->check()) {
+        if ($this->_method !== '_help' && !$validation->check()) {
             echo View::factory('minion/error/validation')
                 ->set('task', Minion_Task::convert_class_to_task($this))
                 ->set('errors', $validation->errors($this->get_errors_file()));
@@ -237,7 +237,7 @@ abstract class Kohana_Minion_Task
     /**
      * Outputs help for this task
      *
-     * @return null
+     * @return void
      * @throws View_Exception
      */
     protected function _help(array $params)
@@ -268,7 +268,7 @@ abstract class Kohana_Minion_Task
      *
      * Based on the code in Kodoc::parse()
      *
-     * @param string The comment to parse
+     * @param string $comment The comment to parse
      * @return array First element is the comment, second is an array of tags
      */
     protected function _parse_doccomment($comment)
@@ -308,8 +308,8 @@ abstract class Kohana_Minion_Task
     /**
      * Compiles a list of available tasks from a directory structure
      *
-     * @param  array Directory structure of tasks
-     * @param  string prefix
+     * @param array $files Directory structure of tasks
+     * @param string $prefix prefix
      * @return array Compiled tasks
      */
     protected function _compile_task_list(array $files, $prefix = '')
@@ -319,7 +319,7 @@ abstract class Kohana_Minion_Task
         foreach ($files as $file => $path) {
             $file = substr($file, strrpos($file, DIRECTORY_SEPARATOR) + 1);
 
-            if (is_array($path) AND count($path)) {
+            if (is_array($path) && count($path)) {
                 $task = $this->_compile_task_list($path, $prefix . $file . Minion_Task::$task_separator);
 
                 if ($task) {

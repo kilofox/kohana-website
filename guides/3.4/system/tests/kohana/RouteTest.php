@@ -14,6 +14,9 @@
  * @copyright  (c) 2008-2012 Kohana Team
  * @license    https://kohana.top/license
  */
+
+use PHPUnit\Framework\MockObject\MockObject;
+
 include Kohana::find_file('tests', 'test_data/callback_routes');
 
 class Kohana_RouteTest extends Unittest_TestCase
@@ -50,20 +53,18 @@ class Kohana_RouteTest extends Unittest_TestCase
      * If Route::get() is asked for a route that does not exist then
      * it should throw a Kohana_Exception
      *
-     * Note use of @expectedException
-     *
      * @test
      * @covers Route::get
-     * @expectedException Kohana_Exception
      */
     public function test_get_throws_exception_if_route_dnx()
     {
+        $this->expectException(Kohana_Exception::class);
+
         Route::get('HAHAHAHAHAHAHAHAHA');
     }
 
     /**
-     * Route::all() should return all routes defined via Route::set()
-     * and not through new Route()
+     * Route::all() should return the same routes as stored in Route::$_routes property.
      *
      * @test
      * @covers Route::all
@@ -714,12 +715,12 @@ class Kohana_RouteTest extends Unittest_TestCase
      * @test
      * @dataProvider provider_composing_url_from_route
      * @param string $expected
-     * @param array $params
-     * @param boolean $protocol
+     * @param array|null $params
+     * @param mixed $protocol
      * @throws Kohana_Exception
      * @throws ReflectionException
      */
-    public function test_composing_url_from_route($expected, $params = null, $protocol = null)
+    public function test_composing_url_from_route($expected, array $params = null, $protocol = null)
     {
         Route::set('foobar', '(<controller>(/<action>(/<id>)))')
             ->defaults(['controller' => 'welcome']);
@@ -915,7 +916,7 @@ class Kohana_RouteTest extends Unittest_TestCase
      * in order to avoid the fatal errors
      *
      * @param string $uri
-     * @return type
+     * @return PHPUnit_Framework_MockObject_MockObject|(Request&MockObject)
      */
     public function get_request_mock($uri)
     {

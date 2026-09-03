@@ -61,7 +61,7 @@ abstract class Kohana_Controller_Userguide extends Controller_Template
         $this->template->show_comments = false;
 
         // If we are in a module and that module has a menu, show that
-        if ($module = $this->request->param('module') AND $this->file($module . '/menu') AND Kohana::$config->load('userguide.modules.' . $module . '.enabled')) {
+        if (($module = $this->request->param('module')) && $this->file($module . '/menu') && Kohana::$config->load('userguide.modules.' . $module . '.enabled')) {
             // Namespace the Markdown parser
             Kodoc_Markdown::$base_url = URL::site($this->guide->uri()) . '/' . $module . '/';
             Kodoc_Markdown::$image_url = URL::site($this->media->uri()) . '/' . $module . '/';
@@ -74,7 +74,7 @@ abstract class Kohana_Controller_Userguide extends Controller_Template
             ];
         }
         // If we are in the api browser, show the menu and show the api browser in the breadcrumbs
-        elseif (Route::name($this->request->route()) == 'docs/api') {
+        elseif (Route::name($this->request->route()) === 'docs/api') {
             $this->template->menu = Kodoc::menu();
 
             // Bind the breadcrumb
@@ -101,17 +101,20 @@ abstract class Kohana_Controller_Userguide extends Controller_Template
 
         // If no module provided in the URL, show the user guide index page, which lists the modules.
         if (!$module) {
-            return $this->index();
+            $this->index();
+            return;
         }
 
         // If this module's userguide pages are disabled, show the error page
         if (!Kohana::$config->load('userguide.modules.' . $module . '.enabled')) {
-            return $this->error('That module doesn\'t exist, or has userguide pages disabled.');
+            $this->error('That module doesn\'t exist, or has userguide pages disabled.');
+            return;
         }
 
         // Prevent "guide/module" and "guide/module/index" from having duplicate content
-        if ($page == 'index') {
-            return $this->error('Userguide page not found');
+        if ($page === 'index') {
+            $this->error('Userguide page not found');
+            return;
         }
 
         // If a module is set, but no page was provided in the URL, show the index page
@@ -124,7 +127,8 @@ abstract class Kohana_Controller_Userguide extends Controller_Template
 
         // If it's not found, show the error page
         if (!$file) {
-            return $this->error('Userguide page not found');
+            $this->error('Userguide page not found');
+            return;
         }
 
         // Namespace the Markdown parser
@@ -132,7 +136,7 @@ abstract class Kohana_Controller_Userguide extends Controller_Template
         Kodoc_Markdown::$image_url = URL::site($this->media->uri()) . '/' . $module . '/';
 
         // Set the page title
-        $this->template->title = ($page == 'index') ? Kohana::$config->load('userguide.modules.' . $module . '.name') : $this->title($page);
+        $this->template->title = $page === 'index' ? Kohana::$config->load('userguide.modules.' . $module . '.name') : $this->title($page);
 
         // Parse the page contents into the template
         Kodoc_Markdown::$show_toc = true;
@@ -152,7 +156,7 @@ abstract class Kohana_Controller_Userguide extends Controller_Template
 
         // TODO try and get parent category names (from menu).  Regex magic or javascript dom stuff perhaps?
         // Only add the current page title to breadcrumbs if it isn't the index, otherwise we get repeats.
-        if ($page != 'index') {
+        if ($page !== 'index') {
             $breadcrumb[] = $this->template->title;
         }
 
@@ -182,17 +186,21 @@ abstract class Kohana_Controller_Userguide extends Controller_Template
 
             // If the class requested and the actual class name are different
             // (different case, orm vs ORM, auth vs Auth) redirect
-            if ($_class->class->name != $class) {
+            if ($_class->class->name !== $class) {
                 $this->redirect($this->request->route()->uri(['class' => $_class->class->name]));
             }
 
             // If this classes immediate parent is Kodoc_Missing, then it should 404
-            if ($_class->class->getParentClass() AND $_class->class->getParentClass()->name == 'Kodoc_Missing')
-                return $this->error('That class was not found. Check your URL and make sure that the module with that class is enabled.');
+            if ($_class->class->getParentClass() && $_class->class->getParentClass()->name === 'Kodoc_Missing') {
+                $this->error('That class was not found. Check your URL and make sure that the module with that class is enabled.');
+                return;
+            }
 
             // If this classes package has been disabled via the config, 404
-            if (!Kodoc::show_class($_class))
-                return $this->error('That class is in package that is hidden.  Check the <code>api_packages</code> config setting.');
+            if (!Kodoc::show_class($_class)) {
+                $this->error('That class is in package that is hidden. Check the <code>api_packages</code> config setting.');
+                return;
+            }
 
             // Everything is fine, display the class.
             $this->template->title = $class;
@@ -270,7 +278,7 @@ abstract class Kohana_Controller_Userguide extends Controller_Template
             $this->template->translations = Kohana::message('userguide', 'translations');
         }
 
-        return parent::after();
+        parent::after();
     }
 
     /**
@@ -292,8 +300,7 @@ abstract class Kohana_Controller_Userguide extends Controller_Template
 
         // Strip optional .md or .markdown suffix from the passed filename
         $info = pathinfo($page);
-        if (isset($info['extension'])
-            AND ( ($info['extension'] === 'md') OR ( $info['extension'] === 'markdown'))) {
+        if (isset($info['extension']) && (($info['extension'] === 'md') || ($info['extension'] === 'markdown'))) {
             $page = $info['dirname'] . DIRECTORY_SEPARATOR . $info['filename'];
         }
         return Kohana::find_file('guide', $page, 'md');
@@ -331,7 +338,7 @@ abstract class Kohana_Controller_Userguide extends Controller_Template
             // Get menu items
             $file = $this->file($this->request->param('module') . '/menu');
 
-            if ($file AND $text = file_get_contents($file)) {
+            if ($file && ($text = file_get_contents($file))) {
                 // Add spans around non-link categories. This is a terrible hack.
                 $text = preg_replace('/^(\s*[\-\*\+]\s*)([^\[\]]+)$/m', '$1<span>$2</span>', $text);
                 $markdown .= $text;

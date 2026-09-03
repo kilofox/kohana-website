@@ -69,14 +69,14 @@ class Kohana_Database_PDO extends Database
      * @link https://www.php.net/manual/en/pdo.sqlitecreateaggregate.php
      *
      * @param string $name Name of the SQL function to be created or redefined
-     * @param callback $step Called for each row of a result set
-     * @param callback $final Called after all rows of a result set have been processed
-     * @param integer $arguments Number of arguments that the SQL function takes
+     * @param callable $step Called for each row of a result set
+     * @param callable $final Called after all rows of a result set have been processed
+     * @param int $arguments Number of arguments that the SQL function takes
      *
-     * @return  boolean
+     * @return bool
      * @throws Database_Exception
      */
-    public function create_aggregate($name, $step, $final, $arguments = -1)
+    public function create_aggregate($name, callable $step, callable $final, $arguments = -1)
     {
         $this->_connection or $this->connect();
 
@@ -93,13 +93,13 @@ class Kohana_Database_PDO extends Database
      * @link https://www.php.net/manual/en/pdo.sqlitecreatefunction.php
      *
      * @param string $name Name of the SQL function to be created or redefined
-     * @param callback $callback Callback which implements the SQL function
-     * @param integer $arguments Number of arguments that the SQL function takes
+     * @param callable $callback Callback which implements the SQL function
+     * @param int $arguments Number of arguments that the SQL function takes
      *
-     * @return  boolean
+     * @return bool
      * @throws Database_Exception
      */
-    public function create_function($name, $callback, $arguments = -1)
+    public function create_function($name, callable $callback, $arguments = -1)
     {
         $this->_connection or $this->connect();
 
@@ -119,7 +119,7 @@ class Kohana_Database_PDO extends Database
     public function set_charset($charset)
     {
         // Make sure the database is connected
-        $this->_connection OR $this->connect();
+        $this->_connection or $this->connect();
 
         // This SQL-92 syntax is not supported by all drivers
         $this->_connection->exec('SET NAMES ' . $this->quote($charset));
@@ -170,7 +170,7 @@ class Kohana_Database_PDO extends Database
             $result = $result->fetchAll();
 
             // Return an iterator of results
-            return new Database_Result_Cached($result, $sql, $as_object, $params);
+            return new Database_Result_Cached($result, $sql, $as_object);
         } elseif ($type === Database::INSERT) {
             // Return a list of insert id and rows created
             return [

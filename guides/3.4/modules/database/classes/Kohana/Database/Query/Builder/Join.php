@@ -25,11 +25,13 @@ class Kohana_Database_Query_Builder_Join extends Database_Query_Builder
      * can be specified as the second parameter.
      *
      * @param   mixed   $table  column name or [$column, $alias] or object
-     * @param   string  $type   type of JOIN: INNER, RIGHT, LEFT, etc
+     * @param string|null $type Type of JOIN: INNER, RIGHT, LEFT, etc.
      * @return  void
      */
     public function __construct($table, $type = null)
     {
+        parent::__construct(null, null);
+
         // Set the table to JOIN on
         $this->_table = $table;
 
@@ -62,17 +64,15 @@ class Kohana_Database_Query_Builder_Join extends Database_Query_Builder
     /**
      * Adds a new condition for joining.
      *
-     * @param string $columns column name
+     * @param string ...$columns column name
      * @return  $this
      * @throws Kohana_Exception
      */
-    public function using($columns)
+    public function using(...$columns)
     {
         if (!empty($this->_on)) {
             throw new Kohana_Exception('JOIN ... ON ... cannot be combined with JOIN ... USING ...');
         }
-
-        $columns = func_get_args();
 
         $this->_using = array_merge($this->_using, $columns);
 

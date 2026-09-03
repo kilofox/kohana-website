@@ -4,7 +4,7 @@
  * "Expected" HTTP exception class. Used for all [HTTP_Exception]'s where a standard
  * Kohana error page should never be shown.
  *
- * Eg [HTTP_Exception_301], [HTTP_Exception_302] etc
+ * E.g. [HTTP_Exception_301], [HTTP_Exception_302].
  *
  * @package    Kohana
  * @category   Exceptions
@@ -26,9 +26,9 @@ abstract class Kohana_HTTP_Exception_Expected extends HTTP_Exception
      *         ':user' => $user
      *     ]);
      *
-     * @param string $message status message, custom content to display with error
-     * @param array $variables translation variables
-     * @return  void
+     * @param string|null $message Status message, custom content to display with error
+     * @param array|null $variables translation variables
+     * @param Exception|null $previous
      * @throws Kohana_Exception
      */
     public function __construct($message = null, array $variables = null, Exception $previous = null)
@@ -45,7 +45,7 @@ abstract class Kohana_HTTP_Exception_Expected extends HTTP_Exception
      *
      * @see     [Response::headers]
      * @param   mixed   $key
-     * @param   string  $value
+     * @param   string|null $value
      * @return  mixed
      */
     public function headers($key = null, $value = null)
@@ -61,7 +61,6 @@ abstract class Kohana_HTTP_Exception_Expected extends HTTP_Exception
     /**
      * Validate this exception contains everything needed to continue.
      *
-     * @throws Kohana_Exception
      * @return bool
      */
     public function check()
@@ -73,7 +72,6 @@ abstract class Kohana_HTTP_Exception_Expected extends HTTP_Exception
      * Generate a Response for the current Exception
      *
      * @return Response
-     * @throws Kohana_Exception
      * @uses   Kohana_Exception::response()
      */
     public function get_response()

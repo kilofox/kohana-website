@@ -39,8 +39,7 @@ class Kohana_ResponseTest extends Unittest_TestCase
      *
      * @test
      * @dataProvider provider_body
-     *
-     * @return null
+     * @return void
      */
     public function test_body($source, $expected)
     {
@@ -127,12 +126,12 @@ class Kohana_ResponseTest extends Unittest_TestCase
      *
      * @test
      * @dataProvider provider_cookie_set
-     * @param string $key
-     * @param string $value
+     * @param string|array $key
+     * @param string|null $value
      * @param array $expected
      * @return void
      */
-    public function test_cookie_set($key, $value, $expected)
+    public function test_cookie_set($key, $value,array $expected)
     {
         // Set up the Response and apply cookie
         $response = new Response;

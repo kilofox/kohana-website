@@ -156,8 +156,8 @@ class Kohana_URLTest extends Unittest_TestCase
      *
      * @test
      * @dataProvider provider_base
-     * @param boolean $protocol Parameter for Url::base()
-     * @param boolean $index Parameter for Url::base()
+     * @param mixed $protocol Parameter for Url::base()
+     * @param bool $index Parameter for Url::base()
      * @param string $expected Expected URL
      * @param array $enviroment Array of environment vars to change @see Kohana_URLTest::setEnvironment()
      * @throws Kohana_Exception
@@ -270,7 +270,7 @@ class Kohana_URLTest extends Unittest_TestCase
      * @test
      * @dataProvider provider_site
      * @param string $uri URI to use
-     * @param boolean|string $protocol Protocol to use
+     * @param mixed $protocol Protocol to use
      * @param string $expected Expected result
      * @param array $enviroment Array of environment vars to set
      * @throws Kohana_Exception
@@ -500,12 +500,12 @@ class Kohana_URLTest extends Unittest_TestCase
      * @dataProvider provider_query
      * @param array $enviroment Set environment
      * @param string $expected Expected result
-     * @param array $params Query string
-     * @param boolean $use_get Combine with GET parameters
+     * @param array|null $params Query string
+     * @param bool $use_get Combine with GET parameters
      * @throws Kohana_Exception
      * @throws ReflectionException
      */
-    public function test_query($enviroment, $expected, $params, $use_get = true)
+    public function test_query(array $enviroment, $expected, $params, $use_get = true)
     {
         $this->setEnvironment($enviroment);
 
@@ -555,10 +555,10 @@ class Kohana_URLTest extends Unittest_TestCase
      * @dataProvider provider_is_trusted_host
      * @param string $host the given host
      * @param array $trusted_hosts list of trusted hosts
-     * @param boolean $expected true if host is trusted, false otherwise
+     * @param bool $expected true if host is trusted, false otherwise
      * @throws Kohana_Exception
      */
-    public function test_is_trusted_host($host, $trusted_hosts, $expected)
+    public function test_is_trusted_host($host, array $trusted_hosts, $expected)
     {
         $this->assertSame(
             $expected, URL::is_trusted_host($host, $trusted_hosts)
@@ -569,11 +569,12 @@ class Kohana_URLTest extends Unittest_TestCase
      * Tests if invalid host throws "Invalid host" exception
      *
      * @test
-     * @expectedException Kohana_Exception
-     * @expectedExceptionMessage Invalid host <invalid>
      */
     public function test_if_invalid_host_throws_exception()
     {
+        $this->expectException(Kohana_Exception::class);
+        $this->expectExceptionMessage('Invalid host <invalid>');
+
         // set the global HTTP_HOST to <invalid>
         $_SERVER['HTTP_HOST'] = '<invalid>';
         // trigger exception
@@ -584,11 +585,12 @@ class Kohana_URLTest extends Unittest_TestCase
      * Tests if untrusted host throws "Untrusted host" exception
      *
      * @test
-     * @expectedException Kohana_Exception
-     * @expectedExceptionMessage Untrusted host untrusted.com
      */
     public function test_if_untrusted_host_throws_exception()
     {
+        $this->expectException(Kohana_Exception::class);
+        $this->expectExceptionMessage('Untrusted host untrusted.com');
+
         // set the global HTTP_HOST to a valid but untrusted host
         $_SERVER['HTTP_HOST'] = 'untrusted.com';
         // trigger exception

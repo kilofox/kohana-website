@@ -231,8 +231,9 @@ class Kohana_ValidationTest extends Unittest_TestCase
                         // Tests the Class::method syntax for callbacks
                         ['Valid::exact_length', [':value', 3]],
                         // Tests the lambda function syntax for callbacks
-                        // Commented out for PHP 5.2 support
-                        // [function($value){return true;}, [':value']],
+                        [function ($value) {
+                            return $value === 'bar';
+                        }, [':value']],
                         // Tests using a function as a rule
                         ['is_string', [':value']]
                     ],
@@ -283,11 +284,11 @@ class Kohana_ValidationTest extends Unittest_TestCase
      * @param array $array The array of data
      * @param array $rules The array of rules
      * @param array $labels The array of labels
-     * @param boolean $expected Is it valid?
-     * @param boolean $expected_errors Array of expected errors
+     * @param bool $expected Is it valid?
+     * @param array $expected_errors Array of expected errors
      * @throws ReflectionException
      */
-    public function test_check($array, $rules, $labels, $expected, $expected_errors)
+    public function test_check(array $array, array $rules, array $labels, $expected, array $expected_errors)
     {
         $validation = new Validation($array);
 
@@ -306,8 +307,8 @@ class Kohana_ValidationTest extends Unittest_TestCase
         $this->assertSame($expected_errors, $errors);
 
         $validation = new validation($array);
-        foreach ($rules as $field => $rules) {
-            $validation->rules($field, $rules);
+        foreach ($rules as $field => $fieldRules) {
+            $validation->rules($field, $fieldRules);
         }
         $validation->labels($labels);
 
@@ -386,7 +387,7 @@ class Kohana_ValidationTest extends Unittest_TestCase
      * @param array $expected Array of expected errors
      * @throws ReflectionException
      */
-    public function test_errors($array, $rules, $expected)
+    public function test_errors(array $array, array $rules, array $expected)
     {
         $validation = Validation::factory($array);
 
@@ -432,7 +433,7 @@ class Kohana_ValidationTest extends Unittest_TestCase
      * @param array $untranslated_expected The array of expected errors when not translated
      * @throws ReflectionException
      */
-    public function test_translated_errors($data, $rules, $translated_expected, $untranslated_expected)
+    public function test_translated_errors(array $data, array $rules, array $translated_expected, array $untranslated_expected)
     {
         $validation = Validation::factory($data);
 

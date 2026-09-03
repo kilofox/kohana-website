@@ -22,12 +22,12 @@
 class Kohana_I18n
 {
     /**
-     * @var  string   target language: en-us, es-es, zh-cn, etc
+     * @var  string   target language: en-us, es-es, zh-cn, etc.
      */
     public static $lang = 'en-us';
 
     /**
-     * @var  string  source language: en-us, es-es, zh-cn, etc
+     * @var  string  source language: en-us, es-es, zh-cn, etc.
      */
     public static $source = 'en-us';
 
@@ -45,7 +45,7 @@ class Kohana_I18n
      *     // Change the current language to Spanish
      *     I18n::lang('es-es');
      *
-     * @param   string  $lang   new language setting
+     * @param string|null $lang New language setting
      * @return  string
      * @since   3.0.2
      */
@@ -65,8 +65,8 @@ class Kohana_I18n
      *
      *     $hello = I18n::get('Hello friends, my name is :name');
      *
-     * @param   string  $string text to translate
-     * @param   string  $lang   target language
+     * @param string $string Text to translate
+     * @param string|null $lang Target language
      * @return  string
      */
     public static function get($string, $lang = null)
@@ -89,7 +89,7 @@ class Kohana_I18n
      *     // Get all defined Spanish messages
      *     $messages = I18n::load('es-es');
      *
-     * @param   string  $lang   language to load
+     * @param string $lang Language to load
      * @return  array
      */
     public static function load($lang)
@@ -101,7 +101,7 @@ class Kohana_I18n
         // New translation table
         $table = [];
 
-        // Split the language: language, region, locale, etc
+        // Split the language: language, region, locale, etc.
         $parts = explode('-', $lang);
 
         do {
@@ -112,7 +112,7 @@ class Kohana_I18n
                 $t = [];
                 foreach ($files as $file) {
                     // Merge the language strings into the sub table
-                    $t = array_merge($t, Kohana::load($file));
+                    $t = array_merge($t, (array) Kohana::load($file));
                 }
 
                 // Append the sub table, preventing less specific language
@@ -139,11 +139,11 @@ if (!function_exists('__')) {
      *
      * [!!] The target language is defined by [I18n::$lang].
      *
-     * @uses    I18n::get
-     * @param   string  $string text to translate
-     * @param   array   $values values to replace in the translated text
-     * @param   string  $lang   source language
+     * @param string $string text to translate
+     * @param array|null $values values to replace in the translated text
+     * @param string $lang source language
      * @return  string
+     * @uses    I18n::get
      */
     function __($string, array $values = null, $lang = 'en-us')
     {
