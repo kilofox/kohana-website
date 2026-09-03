@@ -150,15 +150,4 @@ class Kostache extends Kohana_Kostache
     {
         return Kohana::VERSION;
     }
-
-    /**
-     * Returns current kohana codename
-     *
-     * @return  string
-     */
-    public function kohana_codename()
-    {
-        return Kohana::CODENAME;
-    }
-
 }
